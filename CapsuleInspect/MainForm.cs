@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
+using CapsuleInspect.Setting;
 
 namespace CapsuleInspect
 {
@@ -87,10 +88,16 @@ namespace CapsuleInspect
                 }
             }
         }
-
+        private void SetupMenuItem_Click(object sender, EventArgs e)
+        {
+            SetupForm setupForm = new SetupForm();
+            setupForm.ShowDialog();
+        }
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             Global.Inst.Dispose();
         }
+
+       
     }
 }

@@ -77,13 +77,13 @@ namespace CapsuleInspect.Setting
         private static SettingXml CreateDefaultInstance()
         {
             SettingXml setting = new SettingXml();
-            setting.ModelDir = @"d:\model";
+            setting.ModelDir = @"C:\model";
             return setting;
         }
 
         public SettingXml() { }
 
-        public string MachineName { get; set; } = "Jidam";
+        public string MachineName { get; set; } = "DASOM";
 
         public string ModelDir { get; set; } = "";
         public string ImageDir { get; set; } = "";

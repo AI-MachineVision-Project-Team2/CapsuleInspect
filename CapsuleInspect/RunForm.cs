@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CapsuleInspect.Core;
+using CapsuleInspect.Grab;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -8,11 +10,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
-using CapsuleInspect.Core;
 namespace CapsuleInspect
 {
+
     public partial class RunForm : DockContent
     {
+        
         public RunForm()
         {
             InitializeComponent();
@@ -20,12 +23,33 @@ namespace CapsuleInspect
 
         private void btnGrab_Click(object sender, EventArgs e)
         {
-            Global.Inst.InspStage.Grab(0);
+            var stage = Global.Inst.InspStage;
+            //SLogger.Write($"[RunForm] 촬상 클릭됨. CameraType: {stage.GetCurrentCameraType()}");
+
+            if (stage.GetCurrentCameraType() == CameraType.None)
+            {
+                MessageBox.Show("현재 선택된 카메라가 없습니다.");
+                return;
+            }
+            stage.Grab(0);
         }
 
         private void btnLive_Click(object sender, EventArgs e)
         {
-
+            var stage = Global.Inst.InspStage;
+            Global.Inst.InspStage.ToggleLiveMode();
+            if (Global.Inst.InspStage.LiveMode)
+            {
+                //SLogger.Write($"[RunForm] 동영상 모드 클릭됨. CameraType:{stage.GetCurrentCameraType()}");
+                // Global.Inst.InspStage.SetWorkingState(WorkingState.LIVE);
+                //Global.Inst.InspStage.CheckImageBuffer();
+                Global.Inst.InspStage.Grab(0); // 최초 시작
+            }
+            else
+            {
+                //SLogger.Write($"[RunForm] 동영상 모드 중지됨. CameraType:{stage.GetCurrentCameraType()}");
+                //Global.Inst.InspStage.SetWorkingState(WorkingState.NONE);
+            }
         }
 
         private void btnInsp_Click(object sender, EventArgs e)

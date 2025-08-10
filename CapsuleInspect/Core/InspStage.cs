@@ -1,14 +1,15 @@
-﻿using CapsuleInspect.Inspect;
+﻿using CapsuleInspect.Algorithm;
+using CapsuleInspect.Grab;
+using CapsuleInspect.Inspect;
+using CapsuleInspect.Setting;
+using OpenCvSharp;
+using OpenCvSharp.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CapsuleInspect.Grab;
-using CapsuleInspect.Algorithm;
-using OpenCvSharp;
-using OpenCvSharp.Extensions;
 namespace CapsuleInspect.Core
 {
 
@@ -53,6 +54,43 @@ namespace CapsuleInspect.Core
         {
             get => _previewImage;
         }
+        public bool LiveMode { get; private set; } = false;
+        public void ToggleLiveMode()
+        {
+            LiveMode = !LiveMode;
+        }
+        public CameraType GetCurrentCameraType()
+        {
+            return _camType;
+        }
+        public void SetCameraType(CameraType camType)
+        {
+            if (_camType == camType)
+                return;
+
+            _camType = camType;
+
+            _grabManager?.Dispose();
+            _grabManager = null;
+
+            switch (_camType)
+            {
+                case CameraType.WebCam:
+                    _grabManager = new WebCam();
+                    break;
+                case CameraType.HikRobotCam:
+                    _grabManager = new HikRobotCam();
+                    break;
+                case CameraType.None:
+                    return;
+            }
+
+            if (_grabManager.InitGrab())
+            {
+                _grabManager.TransferCompleted += _multiGrab_TransferCompleted;
+                InitModelGrab(MAX_GRAB_BUF);
+            }
+        }
 
         public bool Initialize()
         {
@@ -61,6 +99,8 @@ namespace CapsuleInspect.Core
             _blobAlgorithm = new BlobAlgorithm();
             _previewImage = new PreviewImage();
 
+            //환경설정에서 설정값 가져오기
+            LoadSetting();
             switch (_camType)
             {
                 //타입에 따른 카메라 인스턴스 생성
@@ -85,6 +125,12 @@ namespace CapsuleInspect.Core
             }
 
             return true;
+        }
+
+        private void LoadSetting()
+        {
+            //카메라 설정 타입 얻기
+            _camType = SettingXml.Inst.CamType;
         }
 
         public void InitModelGrab(int bufferCount)
@@ -192,7 +238,7 @@ namespace CapsuleInspect.Core
         }
 
         //영상 취득 완료 이벤트 발생시 후처리
-        private void _multiGrab_TransferCompleted(object sender, object e)
+        private async void _multiGrab_TransferCompleted(object sender, object e)
         {
             int bufferIndex = (int)e;
             Console.WriteLine($"_multiGrab_TransferCompleted {bufferIndex}");
@@ -205,6 +251,12 @@ namespace CapsuleInspect.Core
             {
                 Bitmap bitmap = ImageSpace.GetBitmap(0);
                 _previewImage.SetImage(BitmapConverter.ToMat(bitmap));
+            }
+            if (LiveMode)
+            {
+                //SLogger.Write("Grab");
+                await Task.Delay(100); // 너무 빠른 촬영 방지
+                _grabManager.Grab(bufferIndex, true); // 반복 촬영
             }
         }
 

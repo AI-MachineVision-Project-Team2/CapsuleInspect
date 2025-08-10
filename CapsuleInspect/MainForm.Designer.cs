@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.mainMenu = new System.Windows.Forms.MenuStrip();
-            this.txtFilePath = new System.Windows.Forms.TextBox();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.imageOpenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imageSaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -39,9 +38,10 @@
             this.modelSaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.modelSaveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.setupToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.SetupMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.inspectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cycleModeMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.txtFilePath = new System.Windows.Forms.TextBox();
             this.mainMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -55,17 +55,10 @@
             this.inspectToolStripMenuItem});
             this.mainMenu.Location = new System.Drawing.Point(0, 0);
             this.mainMenu.Name = "mainMenu";
-            this.mainMenu.Size = new System.Drawing.Size(800, 26);
+            this.mainMenu.Padding = new System.Windows.Forms.Padding(9, 4, 0, 4);
+            this.mainMenu.Size = new System.Drawing.Size(1257, 30);
             this.mainMenu.TabIndex = 2;
             this.mainMenu.Text = "menuStrip1";
-            // 
-            // txtFilePath
-            // 
-            this.txtFilePath.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtFilePath.Location = new System.Drawing.Point(186, 2);
-            this.txtFilePath.Name = "txtFilePath";
-            this.txtFilePath.Size = new System.Drawing.Size(610, 22);
-            this.txtFilePath.TabIndex = 3;
             // 
             // toolStripMenuItem1
             // 
@@ -126,16 +119,17 @@
             // setupToolStripMenuItem
             // 
             this.setupToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.setupToolStripMenuItem1});
+            this.SetupMenuItem});
             this.setupToolStripMenuItem.Name = "setupToolStripMenuItem";
             this.setupToolStripMenuItem.Size = new System.Drawing.Size(61, 22);
             this.setupToolStripMenuItem.Text = "Setup";
             // 
-            // setupToolStripMenuItem1
+            // SetupMenuItem
             // 
-            this.setupToolStripMenuItem1.Name = "setupToolStripMenuItem1";
-            this.setupToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
-            this.setupToolStripMenuItem1.Text = "Setup";
+            this.SetupMenuItem.Name = "SetupMenuItem";
+            this.SetupMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.SetupMenuItem.Text = "Setup";
+            this.SetupMenuItem.Click += new System.EventHandler(this.SetupMenuItem_Click);
             // 
             // inspectToolStripMenuItem
             // 
@@ -149,16 +143,26 @@
             // 
             this.cycleModeMenuItem.CheckOnClick = true;
             this.cycleModeMenuItem.Name = "cycleModeMenuItem";
-            this.cycleModeMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.cycleModeMenuItem.Size = new System.Drawing.Size(159, 22);
             this.cycleModeMenuItem.Text = "Cycle Mode";
+            // 
+            // txtFilePath
+            // 
+            this.txtFilePath.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtFilePath.Location = new System.Drawing.Point(292, 4);
+            this.txtFilePath.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.txtFilePath.Name = "txtFilePath";
+            this.txtFilePath.Size = new System.Drawing.Size(956, 22);
+            this.txtFilePath.TabIndex = 3;
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1257, 788);
             this.Controls.Add(this.txtFilePath);
             this.Controls.Add(this.mainMenu);
+            this.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.Name = "MainForm";
             this.Text = "MainForm";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
@@ -181,7 +185,7 @@
         private System.Windows.Forms.ToolStripMenuItem modelSaveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem modelSaveAsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem setupToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem setupToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem SetupMenuItem;
         private System.Windows.Forms.ToolStripMenuItem inspectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cycleModeMenuItem;
         private System.Windows.Forms.TextBox txtFilePath;
