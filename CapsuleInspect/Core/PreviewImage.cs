@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CapsuleInspect.Teach;
 
 namespace CapsuleInspect.Core
 {
@@ -14,12 +15,19 @@ namespace CapsuleInspect.Core
     {
         private Mat _orinalImage = null;
         private Mat _previewImage = null;
+        // 프리뷰를 위한 InspWindow 변수
+        private InspWindow _inspWindow = null;
         private bool _usePreview = true;
 
         public void SetImage(Mat image)
         {
             _orinalImage = image;
             _previewImage = new Mat();
+        }
+        // 프리뷰를 위한 InspWindow 설정
+        public void SetInspWindow(InspWindow inspwindow)
+        {
+            _inspWindow = inspwindow;
         }
 
         //ShowBinaryMode에 따라 이진화 프리뷰 진행
@@ -44,6 +52,11 @@ namespace CapsuleInspect.Core
             }
 
             Rect windowArea = new Rect(0, 0, _orinalImage.Width, _orinalImage.Height);
+            // InspWindow가 있다면 프리뷰 설정 영역을 ROI로 변경
+            if (_inspWindow != null)
+            {
+                windowArea = _inspWindow.WindowArea;
+            }
 
             Mat orgRoi = _orinalImage[windowArea];
 

@@ -17,6 +17,49 @@ namespace CapsuleInspect.Algorithm
         {
             InspectType = InspectType.InspFilter;
         }
+        // InspWindow 복사를 위한 FilterAlgorithm 복사 함수
+        public override InspAlgorithm Clone()
+        {
+            var cloneAlgo = new FilterAlgorithm();
+
+            // 공통 필드 복사
+            this.CopyBaseTo(cloneAlgo);
+
+            cloneAlgo.CopyFrom(this);
+
+            return cloneAlgo;
+        }
+
+        public override bool CopyFrom(InspAlgorithm sourceAlgo)
+        {
+            FilterAlgorithm filterAlgo = (FilterAlgorithm)sourceAlgo;
+
+            this.Filter = filterAlgo.Filter;
+
+            // Options는 dynamic이므로, null 체크 후 깊은 복사 시도
+            if (filterAlgo.Options != null)
+            {
+                // Options의 실제 타입에 따라 적절히 복사
+                // 예: FlipMode, Resize 옵션 등은 단순 값이므로 새 객체로 복사
+                this.Options = new
+                {
+                    FlipMode = filterAlgo.Options?.FlipMode,
+                    Direction = filterAlgo.Options?.Direction,
+                    Fx = filterAlgo.Options?.Fx,
+                    Fy = filterAlgo.Options?.Fy,
+                    Min = filterAlgo.Options?.Min,
+                    Max = filterAlgo.Options?.Max,
+                    MorphType = filterAlgo.Options?.MorphType,
+                    Angle = filterAlgo.Options?.Angle
+                };
+            }
+            else
+            {
+                this.Options = null;
+            }
+
+            return true;
+        }
 
         public static Mat Apply(Mat src, FilterType filter, dynamic options = null)
         {

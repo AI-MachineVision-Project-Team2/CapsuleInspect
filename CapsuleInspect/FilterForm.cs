@@ -77,6 +77,8 @@ namespace CapsuleInspect
 
             switch (filterType)
             {
+                case FilterType.None:
+                    return null; // None은 탭 생성 skip
                 case FilterType.Flip:
                     curProp = new FlipProp(); // 클래스명 오타 수정 주의!
                     break;
@@ -102,7 +104,7 @@ namespace CapsuleInspect
                     break;
 
                 default:
-                    MessageBox.Show("유효하지 않은 옵션입니다.");
+                    MessageBox.Show("유효하지 않은 옵션입니다."); // 주석 처리하여 조용히 실패
                     return null;
             }
 

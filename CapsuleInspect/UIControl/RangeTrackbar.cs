@@ -83,6 +83,7 @@ namespace CapsuleInspect.UIControl
         {
             _valueLeft = left;
             _valueRight = right;
+            Invalidate();
         }
 
         #region Painting

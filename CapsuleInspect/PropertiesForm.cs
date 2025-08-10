@@ -1,6 +1,7 @@
 ﻿using CapsuleInspect.Property;
 using CapsuleInspect.Core;
 using CapsuleInspect.Algorithm;
+using CapsuleInspect.Teach;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,13 +15,7 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace CapsuleInspect
 {
-    public enum PropertyType
-    {
-        Binary,
-        Filter,
-        AIModule
-    }
-
+   
     public partial class PropertiesForm : DockContent
     {
         // 속성탭을 관리하기 위한 딕셔너리
@@ -29,14 +24,10 @@ namespace CapsuleInspect
         {
             InitializeComponent();
             // 속성 탭을 초기화
-            LoadOptionControl(PropertyType.Binary);
-            LoadOptionControl(PropertyType.Filter);
-            LoadOptionControl(PropertyType.AIModule);
-            tabPropControl.SelectedIndex = 0; // 첫 번째 탭 선택
         }
-        private void LoadOptionControl(PropertyType propType)
+        private void LoadOptionControl(InspectType inspType)
         {
-            string tabName = propType.ToString();
+            string tabName = inspType.ToString();
 
             // 이미 있는 TabPage인지 확인
             foreach (TabPage tabPage in tabPropControl.TabPages)
@@ -53,7 +44,7 @@ namespace CapsuleInspect
             }
 
             // 새로운 UserControl 생성
-            UserControl _inspProp = CreateUserControl(propType);
+            UserControl _inspProp = CreateUserControl(inspType);
             if (_inspProp == null)
                 return;
 
@@ -69,39 +60,53 @@ namespace CapsuleInspect
 
             _allTabs[tabName] = newTab;
         }
-
+      
         // 속성 탭을 생성하는 메서드
-        private UserControl CreateUserControl(PropertyType propType)
+        private UserControl CreateUserControl(InspectType inspPropType)
         {
             UserControl curProp = null;
-            switch (propType)
+            switch (inspPropType)
             {
-                case PropertyType.Binary:
+                case InspectType.InspBinary:
                     BinaryProp blobProp = new BinaryProp();
                     //이진화 속성 변경시 발생하는 이벤트 추가
                     blobProp.RangeChanged += RangeSlider_RangeChanged;
-                    blobProp.PropertyChanged += PropertyChanged;
-
+                   
                     curProp = blobProp;
                     break;
-                case PropertyType.Filter:
+                case InspectType.InspFilter:
                     ImageFilterProp filterProp = new ImageFilterProp();
                     curProp = filterProp;
                     break;
-                case PropertyType.AIModule:
+                case InspectType.InspAIModule:
                     AIModuleProp aiModuleProp = new AIModuleProp();
                     curProp = aiModuleProp;
                     break;
-                default:
-                    MessageBox.Show("유효하지 않은 옵션입니다.");
-                    return null;
+                //default:
+                //    MessageBox.Show("유효하지 않은 옵션입니다.");
+                //    return null;
             }
             return curProp;
         }
 
-        public void UpdateProperty(BlobAlgorithm blobAlgorithm)
+        // InspWindow에서 사용하는 알고리즘을 모두 탭에 추가
+        public void ShowProperty(InspWindow window)
         {
-            if (blobAlgorithm is null)
+            foreach (InspAlgorithm algo in window.AlgorithmList)
+            {
+                Console.WriteLine(algo.InspectType);
+                LoadOptionControl(algo.InspectType);
+            }
+        }
+
+        public void ResetProperty()
+        {
+            tabPropControl.TabPages.Clear();
+        }
+
+        public void UpdateProperty(InspWindow window)
+        {
+            if (window is null)
                 return;
 
             foreach (TabPage tabPage in tabPropControl.TabPages)
@@ -112,7 +117,11 @@ namespace CapsuleInspect
 
                     if (uc is BinaryProp binaryProp)
                     {
-                        binaryProp.SetAlgorithm(blobAlgorithm);
+                        BlobAlgorithm blobAlgo = (BlobAlgorithm)window.FindInspAlgorithm(InspectType.InspBinary);
+                        if (blobAlgo is null)
+                            continue;
+
+                        binaryProp.SetAlgorithm(blobAlgo);
                     }
                 }
             }

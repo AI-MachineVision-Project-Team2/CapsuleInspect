@@ -63,7 +63,8 @@ namespace CapsuleInspect.Property
                 case 8: _selectedFilter = FilterType.Rotation; break;
                 default: _selectedFilter = FilterType.None; break;
             }
-            if (_selectedFilter == FilterType.Grayscale || _selectedFilter == FilterType.HSVscale)
+            // None, Grayscale, HSVscale은 FilterForm 탭 호출 skip
+            if (_selectedFilter == FilterType.None || _selectedFilter == FilterType.Grayscale || _selectedFilter == FilterType.HSVscale)
                 return;
 
             var filterForm = MainForm.SharedFilterForm;

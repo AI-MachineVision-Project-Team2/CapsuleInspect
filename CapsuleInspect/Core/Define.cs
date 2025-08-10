@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace CapsuleInspect.Core
 {
+    // InspWindow 정의
+    public enum InspWindowType
+    {
+        None = 0,
+        Base,
+        Body,
+        Sub
+    }
     public enum DecisionType
     {
         None = 0,
