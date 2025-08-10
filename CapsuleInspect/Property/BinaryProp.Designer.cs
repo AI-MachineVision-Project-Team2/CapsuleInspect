@@ -35,10 +35,11 @@
             this.grpBinary = new System.Windows.Forms.GroupBox();
             this.cbHighlight = new System.Windows.Forms.ComboBox();
             this.lbHighlight = new System.Windows.Forms.Label();
-            this.binRangeTrackbar = new CapsuleInspect.UIControl.RangeTrackbar();
             this.cbBinMethod = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.dataGridViewFilter = new System.Windows.Forms.DataGridView();
+            this.binRangeTrackbar = new CapsuleInspect.UIControl.RangeTrackbar();
+            this.chkRotatedRect = new System.Windows.Forms.CheckBox();
             this.grpBinary.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewFilter)).BeginInit();
             this.SuspendLayout();
@@ -92,16 +93,6 @@
             this.lbHighlight.TabIndex = 7;
             this.lbHighlight.Text = "하이라이트";
             // 
-            // binRangeTrackbar
-            // 
-            this.binRangeTrackbar.Location = new System.Drawing.Point(13, 35);
-            this.binRangeTrackbar.Margin = new System.Windows.Forms.Padding(5);
-            this.binRangeTrackbar.Name = "binRangeTrackbar";
-            this.binRangeTrackbar.Size = new System.Drawing.Size(371, 93);
-            this.binRangeTrackbar.TabIndex = 8;
-            this.binRangeTrackbar.ValueLeft = 80;
-            this.binRangeTrackbar.ValueRight = 200;
-            // 
             // cbBinMethod
             // 
             this.cbBinMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -135,10 +126,35 @@
             this.dataGridViewFilter.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewFilter_CellValueChanged);
             this.dataGridViewFilter.CurrentCellDirtyStateChanged += new System.EventHandler(this.dataGridViewFilter_CurrentCellDirtyStateChanged);
             // 
+            // binRangeTrackbar
+            // 
+            this.binRangeTrackbar.Location = new System.Drawing.Point(13, 35);
+            this.binRangeTrackbar.Margin = new System.Windows.Forms.Padding(5);
+            this.binRangeTrackbar.Name = "binRangeTrackbar";
+            this.binRangeTrackbar.Size = new System.Drawing.Size(371, 93);
+            this.binRangeTrackbar.TabIndex = 8;
+            this.binRangeTrackbar.ValueLeft = 80;
+            this.binRangeTrackbar.ValueRight = 200;
+            // 
+            // chkRotatedRect
+            // 
+            this.chkRotatedRect.AutoSize = true;
+            this.chkRotatedRect.Checked = true;
+            this.chkRotatedRect.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkRotatedRect.Location = new System.Drawing.Point(14, 495);
+            this.chkRotatedRect.Margin = new System.Windows.Forms.Padding(5);
+            this.chkRotatedRect.Name = "chkRotatedRect";
+            this.chkRotatedRect.Size = new System.Drawing.Size(134, 25);
+            this.chkRotatedRect.TabIndex = 17;
+            this.chkRotatedRect.Text = "회전사각형";
+            this.chkRotatedRect.UseVisualStyleBackColor = true;
+            this.chkRotatedRect.CheckedChanged += new System.EventHandler(this.chkRotatedRect_CheckedChanged);
+            // 
             // BinaryProp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkRotatedRect);
             this.Controls.Add(this.cbBinMethod);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.dataGridViewFilter);
@@ -146,7 +162,7 @@
             this.Controls.Add(this.grpBinary);
             this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "BinaryProp";
-            this.Size = new System.Drawing.Size(405, 499);
+            this.Size = new System.Drawing.Size(405, 535);
             this.grpBinary.ResumeLayout(false);
             this.grpBinary.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewFilter)).EndInit();
@@ -165,5 +181,6 @@
         private System.Windows.Forms.ComboBox cbBinMethod;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.DataGridView dataGridViewFilter;
+        private System.Windows.Forms.CheckBox chkRotatedRect;
     }
 }

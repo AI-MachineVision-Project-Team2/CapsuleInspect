@@ -22,5 +22,15 @@ namespace CapsuleInspect
         {
             Global.Inst.InspStage.Grab(0);
         }
+
+        private void btnLive_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnInsp_Click(object sender, EventArgs e)
+        {
+            Global.Inst.InspStage.TryInspection();
+        }
     }
 }

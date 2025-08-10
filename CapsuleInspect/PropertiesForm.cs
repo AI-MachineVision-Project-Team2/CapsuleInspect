@@ -29,9 +29,10 @@ namespace CapsuleInspect
         {
             InitializeComponent();
             // 속성 탭을 초기화
-            LoadOptionControl(PropertyType.Filter);
             LoadOptionControl(PropertyType.Binary);
+            LoadOptionControl(PropertyType.Filter);
             LoadOptionControl(PropertyType.AIModule);
+            tabPropControl.SelectedIndex = 0; // 첫 번째 탭 선택
         }
         private void LoadOptionControl(PropertyType propType)
         {

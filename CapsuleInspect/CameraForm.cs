@@ -49,6 +49,22 @@ namespace CapsuleInspect
             _isFirstApply = true;
 
             imageViewer.LoadBitmap((Bitmap)bitmap);
+            _imgHistory.Push(mat.Clone());
+        }
+        public void LoadGrabbedImage(Bitmap bitmap)
+        {
+            if (bitmap == null)
+                return;
+
+            var mat = BitmapConverter.ToMat(bitmap);
+
+            _originalImage = mat.Clone();
+            _imgHistory.Clear();
+            _redoImg.Clear();
+            _isFirstApply = true;
+
+            imageViewer.LoadBitmap(bitmap);
+            _imgHistory.Push(mat.Clone());
         }
 
         private void CameraForm_Resize(object sender, EventArgs e)
@@ -73,33 +89,49 @@ namespace CapsuleInspect
             }
 
             var filterAlgo = new FilterAlgorithm();
-            filterAlgo.SetSourceImage(_useAccumulativeFilter
-                ? BitmapConverter.ToMat(GetCurrentBitmap())
-                : _originalImage.Clone());
+            Mat src;
+            if (filterType == FilterType.Pyramid || filterType == FilterType.Flip)
+            {
+                src = BitmapConverter.ToMat(GetCurrentBitmap());
+            }
+            else
+            {
+                src = _useAccumulativeFilter
+                    ? BitmapConverter.ToMat(GetCurrentBitmap())
+                    : _originalImage.Clone();
+            }
+            // 필터 적용 전 소스 이미지를 history에 저장
+            _imgHistory.Push(src.Clone());
+            _redoImg.Clear();
+
+            filterAlgo.SetSourceImage(src);
             filterAlgo.Filter = filterType;
             filterAlgo.Options = options;
 
             if (filterAlgo.DoInspect())
             {
+                bool autoFit = !(filterType == FilterType.Resize || filterType == FilterType.Pyramid);
                 // DoInspect 결과로 업데이트된 _srcImage를 표시
-                imageViewer.LoadBitmap(filterAlgo.ResultImage.ToBitmap());
+                imageViewer.LoadBitmap(filterAlgo.ResultImage.ToBitmap(), autoFit);
                 _imgHistory.Push(filterAlgo.ResultImage.Clone());
                 _redoImg.Clear();
             }
             else
             {
                 MessageBox.Show("필터 적용에 실패했습니다.");
+                _imgHistory.Pop(); // 실패 시 소스 이미지 제거
             }
         }
-       
+
         public void Undo()
         {
-            if (_imgHistory.Count > 0)
+            if (_imgHistory.Count > 1)
             {
                 var current = BitmapConverter.ToMat(GetCurrentBitmap());
                 _redoImg.Push(current.Clone());
 
-                var prev = _imgHistory.Pop();
+                _imgHistory.Pop(); // 현재 이미지 제거
+                var prev = _imgHistory.Peek(); // 이전 이미지 가져오기
                 imageViewer.LoadBitmap(prev.ToBitmap());
             }
             else
@@ -152,7 +184,7 @@ namespace CapsuleInspect
 
             imageViewer.LoadBitmap(previewResult.ToBitmap());
         }
-    
+
         public void UpdateDisplay(Bitmap bitmap = null)
         {
             if (bitmap == null)
@@ -183,6 +215,18 @@ namespace CapsuleInspect
         public void UpdateImageViewer()
         {
             imageViewer.Invalidate();
+        }
+
+        //imageViewer에 검사 결과 정보를 연결해주기 위한 함수
+        public void ResetDisplay()
+        {
+            imageViewer.ResetEntity();
+        }
+
+        //검사 결과를 그래픽으로 출력하기 위한 정보를 받는 함수
+        public void AddRect(List<DrawInspectInfo> rectInfos)
+        {
+            imageViewer.AddRect(rectInfos);
         }
     }
 }

@@ -58,7 +58,7 @@ namespace CapsuleInspect
             var runWindow = new RunForm();
             runWindow.Show(cameraWindow.Pane, DockAlignment.Bottom, 0.2);
             SharedFilterForm = new FilterForm();
-            SharedFilterForm.Show(propWindow.Pane, DockAlignment.Bottom, 0.6);
+            SharedFilterForm.Show(propWindow.Pane, DockAlignment.Bottom, 0.4);
         }
         //쉽게 도킹패널에 접근하기 위한 정적 함수
         //제네릭 함수 사용를 이용해 입력된 타입의 폼 객체 얻기
@@ -83,6 +83,7 @@ namespace CapsuleInspect
                 {
                     string filePath = openFileDialog.FileName;
                     cameraForm.LoadImage(filePath);
+                    txtFilePath.Text = filePath;
                 }
             }
         }
