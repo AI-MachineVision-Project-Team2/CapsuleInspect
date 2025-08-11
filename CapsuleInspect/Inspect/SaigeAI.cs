@@ -1,4 +1,7 @@
-﻿using SaigeVision.Net.V2;
+﻿using CapsuleInspect.Core;
+using OpenCvSharp;
+using OpenCvSharp.Extensions;
+using SaigeVision.Net.V2;
 using SaigeVision.Net.V2.Detection;
 using SaigeVision.Net.V2.IAD;
 using SaigeVision.Net.V2.Segmentation;
@@ -84,14 +87,16 @@ namespace CapsuleInspect.Inspect
         }
         public bool Inspect(Bitmap bmpImage)
         {
-            if (bmpImage is null)
+            // 필터링된 이미지를 우선적으로 사용
+            Mat inputImage = Global.Inst.InspStage.GetFilteredImage() ?? BitmapConverter.ToMat(bmpImage);
+            if (inputImage is null)
             {
                 MessageBox.Show("이미지가 없습니다. 유효한 이미지를 입력해주세요.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
-            _inspImage = bmpImage;
-            SrImage srImage = new SrImage(bmpImage);
+            _inspImage = inputImage.ToBitmap();
+            SrImage srImage = new SrImage(_inspImage);
             Stopwatch sw = Stopwatch.StartNew();
 
 

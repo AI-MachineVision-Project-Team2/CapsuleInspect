@@ -1,18 +1,19 @@
-﻿using OpenCvSharp;
+﻿using CapsuleInspect.Core;
+using CapsuleInspect.Property;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CapsuleInspect.Property;
 namespace CapsuleInspect.Algorithm
 {
     public class FilterAlgorithm : InspAlgorithm
     {
         public FilterType Filter { get; set; } = FilterType.None;
         public dynamic Options { get; set; } = null;
-
+        public new Mat ResultImage { get; private set; } // new 키워드 추가
         public FilterAlgorithm()
         {
             InspectType = InspectType.InspFilter;
@@ -59,6 +60,10 @@ namespace CapsuleInspect.Algorithm
             }
 
             return true;
+        }
+        public new void SetSourceImage(Mat srcImage)
+        {
+            _srcImage = srcImage?.Clone();
         }
 
         public static Mat Apply(Mat src, FilterType filter, dynamic options = null)
@@ -162,14 +167,17 @@ namespace CapsuleInspect.Algorithm
 
             if (_srcImage == null)
             {
+                ResultString.Add("Error: Source image is null");
                 return false;
             }
 
             // Apply를 호출하여 필터 적용 (프로퍼티로 저장된 Filter와 Options 사용)
             Mat filteredImage = Apply(_srcImage, Filter, Options);
-
+            // 필터링 결과를 InspStage에 저장
+            Global.Inst.InspStage.SetFilteredImage(filteredImage);
             // 필터 적용 결과를 _srcImage에 업데이트 (후속 검사나 표시를 위해)
             // 필요 시 이 부분을 조정 (예: 별도 결과 저장)
+            ResultImage = filteredImage.Clone();
             _srcImage = filteredImage.Clone();
 
             // 검사 완료 표시 (BlobAlgorithm과 유사)
@@ -186,6 +194,8 @@ namespace CapsuleInspect.Algorithm
         public override void ResetResult()
         {
             base.ResetResult();
+            ResultImage?.Dispose();
+            ResultImage = null;
         }
     }
 }

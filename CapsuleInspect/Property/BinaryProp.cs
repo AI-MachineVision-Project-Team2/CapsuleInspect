@@ -230,6 +230,8 @@ namespace CapsuleInspect.Property
         //이진화 옵션을 선택할때마다, 이진화 이미지가 갱신되도록 하는 함수
         private void UpdateBinary()
         {
+            if (_blobAlgo is null)
+                return;
             GetProperty();
 
             int leftValue = LeftValue;

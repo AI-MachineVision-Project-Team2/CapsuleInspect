@@ -86,9 +86,17 @@ namespace CapsuleInspect
             _redoImg.Clear();
             _isFirstApply = true;
 
+            // 필터링된 이미지 초기화
+            Global.Inst.InspStage.SetFilteredImage(null);
+
             imageViewer.LoadBitmap((Bitmap)bitmap);
             _imgHistory.Push(mat.Clone());
         }
+        public Mat GetDisplayImage()
+        {
+            return Global.Inst.InspStage.ImageSpace.GetMat();
+        }
+
         public void LoadGrabbedImage(Bitmap bitmap)
         {
             if (bitmap == null)
@@ -100,6 +108,9 @@ namespace CapsuleInspect
             _imgHistory.Clear();
             _redoImg.Clear();
             _isFirstApply = true;
+
+            // 필터링된 이미지 초기화
+            Global.Inst.InspStage.SetFilteredImage(null);
 
             imageViewer.LoadBitmap(bitmap);
             _imgHistory.Push(mat.Clone());
@@ -153,6 +164,9 @@ namespace CapsuleInspect
                 imageViewer.LoadBitmap(filterAlgo.ResultImage.ToBitmap(), autoFit);
                 _imgHistory.Push(filterAlgo.ResultImage.Clone());
                 _redoImg.Clear();
+                // 필터링된 이미지를 InspStage에 저장
+                Global.Inst.InspStage.SetFilteredImage(filterAlgo.ResultImage);
+                Global.Inst.InspStage.UpdateDisplay(filterAlgo.ResultImage.ToBitmap());
             }
             else
             {
@@ -171,6 +185,8 @@ namespace CapsuleInspect
                 _imgHistory.Pop(); // 현재 이미지 제거
                 var prev = _imgHistory.Peek(); // 이전 이미지 가져오기
                 imageViewer.LoadBitmap(prev.ToBitmap());
+                // 필터링된 이미지 업데이트
+                Global.Inst.InspStage.SetFilteredImage(prev);
             }
             else
             {
@@ -187,6 +203,8 @@ namespace CapsuleInspect
 
                 var redo = _redoImg.Pop();
                 imageViewer.LoadBitmap(redo.ToBitmap());
+                // 필터링된 이미지 업데이트
+                Global.Inst.InspStage.SetFilteredImage(redo);
             }
             else
             {
@@ -203,6 +221,8 @@ namespace CapsuleInspect
                 _isFirstApply = true;
                 _imgHistory.Clear();
                 _redoImg.Clear();
+                // 필터링된 이미지 초기화
+                Global.Inst.InspStage.SetFilteredImage(null);
             }
             else
             {
@@ -241,17 +261,9 @@ namespace CapsuleInspect
             Global.Inst.InspStage.PreView.SetImage(curImage);
         }
 
-        public Bitmap GetDisplayImage()
-        {
-            Bitmap curImage = null;
-
-            if (imageViewer != null)
-                curImage = imageViewer.GetCurBitmap();
-
-            return curImage;
-        }
         public void UpdateImageViewer()
         {
+            imageViewer.UpdateInspParam();
             imageViewer.Invalidate();
         }
         //모델 정보를 이용해, ROI 갱신

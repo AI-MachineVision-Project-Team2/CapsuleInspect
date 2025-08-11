@@ -77,20 +77,26 @@ namespace CapsuleInspect
                     BinaryProp blobProp = new BinaryProp();
                     //이진화 속성 변경시 발생하는 이벤트 추가
                     blobProp.RangeChanged += RangeSlider_RangeChanged;
-                   
                     curProp = blobProp;
                     break;
                 case InspectType.InspFilter:
                     ImageFilterProp filterProp = new ImageFilterProp();
+                    filterProp.FilterApplied += FilterApplied; // 적용 버튼 이벤트 핸들러 추가
                     curProp = filterProp;
                     break;
                 case InspectType.InspAIModule:
                     AIModuleProp aiModuleProp = new AIModuleProp();
                     curProp = aiModuleProp;
                     break;
-                //default:
-                //    MessageBox.Show("유효하지 않은 옵션입니다.");
-                //    return null;
+                //패턴매칭 속성창 추가
+                case InspectType.InspMatch:
+                    MatchInspProp matchProp = new MatchInspProp();
+                    matchProp.PropertyChanged += PropertyChanged;
+                    curProp = matchProp;
+                    break;
+                default:
+                    MessageBox.Show("유효하지 않은 옵션입니다.");
+                    return null;
             }
             return curProp;
         }
@@ -133,6 +139,24 @@ namespace CapsuleInspect
 
                         binaryProp.SetAlgorithm(blobAlgo);
                     }
+                    else if (uc is ImageFilterProp filterProp)
+                    {
+                        FilterAlgorithm filterAlgo = (FilterAlgorithm)window.FindInspAlgorithm(InspectType.InspFilter);
+                        if (filterAlgo is null)
+                            continue;
+
+                        filterProp.SetAlgorithm(filterAlgo);
+                    }
+                    else if (uc is MatchInspProp matchProp)
+                    {
+                        MatchAlgorithm matchAlgo = (MatchAlgorithm)window.FindInspAlgorithm(InspectType.InspMatch);
+                        if (matchAlgo is null)
+                            continue;
+
+                        window.PatternLearn();
+
+                        matchProp.SetAlgorithm(matchAlgo);
+                    }
                 }
             }
         }
@@ -147,7 +171,10 @@ namespace CapsuleInspect
             ShowBinaryMode showBinMode = e.ShowBinMode;
             Global.Inst.InspStage.PreView?.SetBinary(lowerValue, upperValue, invert, showBinMode);
         }
-
+        private void FilterApplied(object sender, EventArgs e)
+        {
+            Global.Inst.InspStage.RedrawMainView();
+        }
         private void PropertyChanged(object sender, EventArgs e)
         {
             Global.Inst.InspStage.RedrawMainView();

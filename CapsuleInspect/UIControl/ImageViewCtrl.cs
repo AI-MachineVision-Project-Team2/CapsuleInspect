@@ -108,7 +108,10 @@ namespace CapsuleInspect.UIControl
 
             MouseWheel += new MouseEventHandler(ImageViewCCtrl_MouseWheel);
         }
-
+        public Bitmap GetCurBitmap()
+        {
+            return _bitmapImage;
+        }
         //캔버스 초기화 및 설정
         private void InitializeCanvas()
         {
@@ -148,10 +151,6 @@ namespace CapsuleInspect.UIControl
             Cursor = Cursors.Cross;
         }
 
-        public Bitmap GetCurBitmap()
-        {
-            return _bitmapImage;
-        }
 
         //줌에 따른 좌표 계산 기능 수정 
         private void ResizeCanvas()
@@ -352,6 +351,11 @@ namespace CapsuleInspect.UIControl
                 }
             }
 
+            if (_multiSelectedEntities.Count <= 1 && _selEntity != null)
+            {
+                //#11_MATCHING#8 패턴매칭할 영역 표시
+                DrawInspParam(g, _selEntity.LinkedWindow);
+            }
             //선택 영역 박스 그리기
             if (_isBoxSelecting && !_selectionBox.IsEmpty)
             {
@@ -447,6 +451,46 @@ namespace CapsuleInspect.UIControl
 
                 // 본문 텍스트
                 g.DrawString(text, font, textBrush, position);
+            }
+        }
+
+        // 패턴매칭할 영역 크기 얻는 함수,
+        //이 함수를 사용하는 코드도 참조 확인하여 추가할것
+        public void UpdateInspParam()
+        {
+            _extSize.Width = _extSize.Height = 0;
+
+            if (_selEntity is null)
+                return;
+
+            InspWindow window = _selEntity.LinkedWindow;
+            if (window is null)
+                return;
+
+            MatchAlgorithm matchAlgo = (MatchAlgorithm)window.FindInspAlgorithm(InspectType.InspMatch);
+            if (matchAlgo != null)
+            {
+                _extSize.Width = matchAlgo.ExtSize.Width;
+                _extSize.Height = matchAlgo.ExtSize.Height;
+            }
+        }
+
+        private void DrawInspParam(Graphics g, InspWindow window)
+        {
+            if (_extSize.Width > 0 || _extSize.Height > 0)
+            {
+                Rectangle extArea = new Rectangle(_roiRect.Left - _extSize.Width,
+                    _roiRect.Top - _extSize.Height,
+                    _roiRect.Width + _extSize.Width * 2,
+                    _roiRect.Height + _extSize.Height * 2);
+                Rectangle screenRect = VirtualToScreen(extArea);
+
+                using (Pen pen = new Pen(Color.White, 2))
+                {
+                    pen.DashStyle = DashStyle.Dot;
+                    pen.Width = 2;
+                    g.DrawRectangle(pen, screenRect);
+                }
             }
         }
         //마우스휠을 이용한 확대/축소
@@ -618,6 +662,8 @@ namespace CapsuleInspect.UIControl
                         _roiRect = entity.EntityROI;
                         _isMovingRoi = true;
                         _moveStart = e.Location;
+
+                        UpdateInspParam();
                         break;
                     }
 

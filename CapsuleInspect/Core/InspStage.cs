@@ -18,8 +18,7 @@ namespace CapsuleInspect.Core
     public class InspStage : IDisposable
     {
         public static readonly int MAX_GRAB_BUF = 5;
-        // 필터링된 이미지를 저장하는 필드 추가
-        private Mat _filteredImage = null;
+        
         private ImageSpace _imageSpace = null;
         //Dispose도 GrabModel에서 상속받아 사용
         private GrabModel _grabManager = null;
@@ -34,7 +33,8 @@ namespace CapsuleInspect.Core
         private Model _model = null;
 
         private InspWindow _selectedInspWindow = null;
-
+        // 필터링된 이미지를 저장하는 필드 추가
+        private Mat _filteredImage = null;
         public InspStage() { }
         public ImageSpace ImageSpace
         {
@@ -62,6 +62,11 @@ namespace CapsuleInspect.Core
             get => _model;
         }
         public bool LiveMode { get; private set; } = false;
+        public int SelBufferIndex { get; set; } = 0;
+        public eImageChannel SelImageChannel { get; set; } = eImageChannel.Gray;
+
+
+
         public void ToggleLiveMode()
         {
             LiveMode = !LiveMode;
@@ -72,6 +77,11 @@ namespace CapsuleInspect.Core
         {
             _filteredImage?.Dispose();
             _filteredImage = filteredImage?.Clone();
+            // UI 업데이트
+            if (_filteredImage != null)
+            {
+                UpdateDisplay(_filteredImage.ToBitmap());
+            }
         }
         public CameraType GetCurrentCameraType()
         {
@@ -185,6 +195,66 @@ namespace CapsuleInspect.Core
 
             propertiesForm.UpdateProperty(inspWindow);
         }
+        //#11_MATCHING#6 패턴매칭 속성창과 연동된 패턴 이미지 관리 함수
+        public void UpdateTeachingImage(int index)
+        {
+            if (_selectedInspWindow is null)
+                return;
+
+            SetTeachingImage(_selectedInspWindow, index);
+        }
+
+        public void DelTeachingImage(int index)
+        {
+            if (_selectedInspWindow is null)
+                return;
+
+            InspWindow inspWindow = _selectedInspWindow;
+
+            inspWindow.DelWindowImage(index);
+
+            MatchAlgorithm matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
+            if (matchAlgo != null)
+            {
+                UpdateProperty(inspWindow);
+            }
+        }
+
+        public void SetTeachingImage(InspWindow inspWindow, int index = -1)
+        {
+            if (inspWindow is null)
+                return;
+
+            CameraForm cameraForm = MainForm.GetDockForm<CameraForm>();
+            if (cameraForm is null)
+                return;
+
+            Mat curImage = cameraForm.GetDisplayImage();
+            if (curImage is null)
+                return;
+
+            if (inspWindow.WindowArea.Right >= curImage.Width ||
+                inspWindow.WindowArea.Bottom >= curImage.Height)
+            {
+                Console.Write("ROI 영역이 잘못되었습니다!");
+                return;
+            }
+
+            Mat windowImage = curImage[inspWindow.WindowArea];
+
+            if (index < 0)
+                inspWindow.AddWindowImage(windowImage);
+            else
+                inspWindow.SetWindowImage(windowImage, index);
+
+            inspWindow.IsPatternLearn = false;
+
+            MatchAlgorithm matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
+            if (matchAlgo != null)
+            {
+                UpdateProperty(inspWindow);
+            }
+        }
 
         public void SetBuffer(int bufferCount)
         {
@@ -225,6 +295,9 @@ namespace CapsuleInspect.Core
 
             foreach (var inspAlgo in inspWindow.AlgorithmList)
             {
+                if (!inspAlgo.IsUse)
+                    continue;
+
                 //검사 영역 초기화
                 inspAlgo.TeachRect = windowArea;
                 inspAlgo.InspRect = windowArea;
@@ -308,6 +381,9 @@ namespace CapsuleInspect.Core
 
             inspWindow.WindowArea = rect;
             inspWindow.IsTeach = false;
+            // 새로운 ROI가 추가되면, 티칭 이미지 추가
+            SetTeachingImage(inspWindow);
+
             UpdateProperty(inspWindow);
             UpdateDiagramEntity();
 
@@ -384,6 +460,8 @@ namespace CapsuleInspect.Core
                 return;
 
             _grabManager.Grab(bufferIndex, true);
+            // Grab 후 필터링된 이미지 초기화 (필요 시)
+            SetFilteredImage(null);
         }
 
         //영상 취득 완료 이벤트 발생시 후처리
@@ -426,19 +504,6 @@ namespace CapsuleInspect.Core
                 cameraForm.UpdateDisplay(bitmap);
             }
         }
-
-        public Bitmap GetCurrentImage()
-        {
-            Bitmap bitmap = null;
-            var cameraForm = MainForm.GetDockForm<CameraForm>();
-            if (cameraForm != null)
-            {
-                bitmap = cameraForm.GetDisplayImage();
-            }
-
-            return bitmap;
-        }
-
         public Bitmap GetBitmap(int bufferIndex = -1)
         {
             if (Global.Inst.InspStage.ImageSpace is null)
@@ -447,11 +512,32 @@ namespace CapsuleInspect.Core
             return Global.Inst.InspStage.ImageSpace.GetBitmap();
         }
         //이진화 프리뷰를 위해, ImageSpace에서 이미지 가져오기
-        public Mat GetMat()
+        public Mat GetMat(int bufferIndex = -1, eImageChannel imageChannel = eImageChannel.None)
         {
-            return Global.Inst.InspStage.ImageSpace.GetMat();
+            if (bufferIndex >= 0)
+                SelBufferIndex = bufferIndex;
+
+            // 채널 정보가 유지되도록, eImageChannel.None 타입을 추가
+            if (imageChannel != eImageChannel.None)
+                SelImageChannel = imageChannel;
+
+            return Global.Inst.InspStage.ImageSpace.GetMat(SelBufferIndex, SelImageChannel);
         }
 
+        /*
+        // 필터 결과 우선 반환 (검사용 Mat)
+        public Mat GetMat(int bufferIndex = 0)
+        {
+            if (_filteredImage != null)
+                return _filteredImage.Clone();
+
+            var cam = MainForm.GetDockForm<CameraForm>();
+            var disp = cam?.GetDisplayImage();
+            if (disp != null)
+                return BitmapConverter.ToMat(disp);
+
+            return _imageSpace?.GetMat(bufferIndex);
+        }*/
 
         //변경된 모델 정보 갱신하여, ImageViewer와 모델트리에 반영
         public void UpdateDiagramEntity()

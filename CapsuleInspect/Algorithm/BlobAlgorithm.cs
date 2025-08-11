@@ -138,7 +138,7 @@ namespace CapsuleInspect.Algorithm
             ResetResult();
             OutBlobCount = 0;
 
-            if (_srcImage == null)
+            if (_srcImage == null || _srcImage.Empty())
                 return false;
 
             //검사 영역이 검사 대상 이미지를 벗어나지 않는지 확인

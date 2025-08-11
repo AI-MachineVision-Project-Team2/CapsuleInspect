@@ -1,4 +1,7 @@
-﻿using CapsuleInspect.Inspect;
+﻿using CapsuleInspect.Algorithm;
+using CapsuleInspect.Inspect;
+using CapsuleInspect.Property2;
+using OpenCvSharp;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +12,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CapsuleInspect.Property2;
 namespace CapsuleInspect.Property
 {
     public enum FilterType
@@ -28,13 +30,26 @@ namespace CapsuleInspect.Property
     {
         private FilterType _selectedFilter;
         public FilterType SelectedFilter => _selectedFilter;
-
+        private FilterAlgorithm _filterAlgo;
+        // 필터 적용 시 발생하는 이벤트 (예: PropertiesForm이나 CameraForm에서 구독 가능)
+        public event EventHandler FilterApplied;
         public ImageFilterProp()
         {
             InitializeComponent();
             cbFilterType.DataSource = Enum.GetValues(typeof(FilterType)).Cast<FilterType>().ToList();
             cbFilterType.SelectedIndex = 0;
         }
+
+        public void SetAlgorithm(FilterAlgorithm algo)
+        {
+            _filterAlgo = algo;
+
+            // 알고리즘에 저장된 필터 타입을 콤보에 반영
+            var filter = _filterAlgo?.Filter ?? FilterType.None;
+            // 콤보박스가 이미 Enum 리스트로 바인딩되어 있으니 그대로 선택만 반영
+            cbFilterType.SelectedItem = filter;
+        }
+
 
         private void OnRotationPreview(object sender, EventArgs e)
         {
@@ -230,6 +245,7 @@ namespace CapsuleInspect.Property
 
             cameraForm.RunFilterAlgorithm(_selectedFilter, options);
             //cameraForm.ApplyFilter(_selectedFilter, options);
+            FilterApplied?.Invoke(this, EventArgs.Empty);
         }
 
         private void btnUndo_Click(object sender, EventArgs e)
