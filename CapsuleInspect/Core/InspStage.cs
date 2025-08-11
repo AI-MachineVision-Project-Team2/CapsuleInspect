@@ -18,7 +18,8 @@ namespace CapsuleInspect.Core
     public class InspStage : IDisposable
     {
         public static readonly int MAX_GRAB_BUF = 5;
-
+        // 필터링된 이미지를 저장하는 필드 추가
+        private Mat _filteredImage = null;
         private ImageSpace _imageSpace = null;
         //Dispose도 GrabModel에서 상속받아 사용
         private GrabModel _grabManager = null;
@@ -64,6 +65,13 @@ namespace CapsuleInspect.Core
         public void ToggleLiveMode()
         {
             LiveMode = !LiveMode;
+        }
+        // 필터링된 이미지를 가져오거나 설정하는 메서드
+        public Mat GetFilteredImage() => _filteredImage?.Clone();
+        public void SetFilteredImage(Mat filteredImage)
+        {
+            _filteredImage?.Dispose();
+            _filteredImage = filteredImage?.Clone();
         }
         public CameraType GetCurrentCameraType()
         {

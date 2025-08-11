@@ -57,9 +57,9 @@ namespace CapsuleInspect.Teach
                     inspAlgo = new BlobAlgorithm();
                     break;
 
-                case InspectType.InspFilter:
-                    inspAlgo = new FilterAlgorithm();
-                    break;
+                //case InspectType.InspFilter:
+                //    inspAlgo = new FilterAlgorithm();
+                //    break;
                 //case InspectType.InspAIModule:
                 //    inspAlgo = new AIModuleAlgorithm();  // 임시명
                 //    break;

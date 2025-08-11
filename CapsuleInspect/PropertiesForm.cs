@@ -23,7 +23,13 @@ namespace CapsuleInspect
         public PropertiesForm()
         {
             InitializeComponent();
-            // 속성 탭을 초기화
+
+            LoadDefaultTabs();
+        }
+        private void LoadDefaultTabs()
+        {
+            LoadOptionControl(InspectType.InspFilter);
+            LoadOptionControl(InspectType.InspAIModule);
         }
         private void LoadOptionControl(InspectType inspType)
         {
@@ -94,7 +100,6 @@ namespace CapsuleInspect
         {
             foreach (InspAlgorithm algo in window.AlgorithmList)
             {
-                Console.WriteLine(algo.InspectType);
                 LoadOptionControl(algo.InspectType);
             }
         }
@@ -102,13 +107,18 @@ namespace CapsuleInspect
         public void ResetProperty()
         {
             tabPropControl.TabPages.Clear();
+            LoadDefaultTabs();
         }
 
         public void UpdateProperty(InspWindow window)
         {
             if (window is null)
+            {
+                // window가 null이면 기본 탭만 유지하고 Binary 탭 로드하지 않음
+                ResetProperty(); // 클리어 후 기본 탭 로드
                 return;
-
+            }
+            LoadOptionControl(InspectType.InspBinary);
             foreach (TabPage tabPage in tabPropControl.TabPages)
             {
                 if (tabPage.Controls.Count > 0)
