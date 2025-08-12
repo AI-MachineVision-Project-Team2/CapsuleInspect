@@ -1,9 +1,13 @@
-﻿using System;
+﻿using CapsuleInspect.Core;
+using Common.Util.Helpers;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CapsuleInspect.Core;
+using System.Xml.Serialization;
+
 namespace CapsuleInspect.Teach
 {
     public class Model
@@ -15,6 +19,7 @@ namespace CapsuleInspect.Teach
 
         public string InspectImagePath { get; set; } = "";
 
+        [XmlElement("InspWindow")]
         public List<InspWindow> InspWindowList { get; set; }
 
         public Model()
@@ -63,6 +68,49 @@ namespace CapsuleInspect.Teach
             ModelPath = path;
             ModelName = modelName;
             ModelInfo = modelInfo;
+        }
+
+
+        //모델 파일 Load,Save,SaveAs
+        //모델 로딩함수
+        public Model Load(string path)
+        {
+            Model model = XmlHelper.LoadXml<Model>(path);
+            if (model == null)
+                return null;
+
+            foreach (var window in model.InspWindowList)
+            {
+                window.LoadInspWindow(model);
+            }
+
+            return model;
+        }
+
+        //모델 저장함수
+        public void Save()
+        {
+            if (ModelPath == "")
+                return;
+
+            XmlHelper.SaveXml(ModelPath, this);
+
+            foreach (var window in InspWindowList)
+            {
+                window.SaveInspWindow(this);
+            }
+        }
+
+        //모델 다른 이름으로 저장함수
+        public void SaveAs(string filePath)
+        {
+            string fileName = Path.GetFileName(filePath);
+            if (Directory.Exists(filePath) == false)
+            {
+                ModelPath = Path.Combine(filePath, fileName + ".xml");
+                ModelName = fileName;
+                Save();
+            }
         }
     }
 }

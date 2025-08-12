@@ -195,6 +195,8 @@ namespace CapsuleInspect.Core
                 return;
 
             Dispose();
+            _imageByChannel.Clear();
+            _imageInfo.Clear();
 
             Func<int, ImageInfo> newImageInfo = (x) =>
             {

@@ -1,11 +1,12 @@
-﻿using OpenCvSharp;
+﻿using CapsuleInspect.Core;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CapsuleInspect.Core;
+using System.Windows.Forms;
 namespace CapsuleInspect.Algorithm
 {
     //이진화 임계값 설정을 구조체로 만들기
@@ -139,7 +140,11 @@ namespace CapsuleInspect.Algorithm
             OutBlobCount = 0;
 
             if (_srcImage == null || _srcImage.Empty())
+            {
+                MessageBox.Show("소스 이미지를 가져올 수 없습니다!");
                 return false;
+            }
+                
 
             //검사 영역이 검사 대상 이미지를 벗어나지 않는지 확인
             if (InspRect.Right > _srcImage.Width ||

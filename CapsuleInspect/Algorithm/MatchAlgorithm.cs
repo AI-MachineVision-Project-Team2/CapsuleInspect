@@ -226,15 +226,17 @@ namespace CapsuleInspect.Algorithm
 
             return matchedPositions.Count;
         }
-
+        public override void ResetResult()
+        {
+            base.ResetResult(); // IsInspected, IsDefect, ResultString 초기화
+            OutPoint = new Point(0, 0);
+            OutPoints.Clear();
+            OutScore = 0;
+        }
         //매칭 알고리즘 검사 구현
         public override bool DoInspect()
         {
             ResetResult();
-
-            OutPoint = new Point(0, 0);
-            OutPoints.Clear();
-            OutScore = 0;
 
             if (_templateImages.Count <= 0)
             {

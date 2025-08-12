@@ -23,6 +23,9 @@ namespace CapsuleInspect
 
         private void btnGrab_Click(object sender, EventArgs e)
         {
+            // 그랩시 이미지 버퍼를 먼저 설정하도록 변경
+           
+
             var stage = Global.Inst.InspStage;
             //SLogger.Write($"[RunForm] 촬상 클릭됨. CameraType: {stage.GetCurrentCameraType()}");
 
@@ -31,6 +34,7 @@ namespace CapsuleInspect
                 MessageBox.Show("현재 선택된 카메라가 없습니다.");
                 return;
             }
+            stage.CheckImageBuffer();
             stage.Grab(0);
         }
 
@@ -42,7 +46,7 @@ namespace CapsuleInspect
             {
                 //SLogger.Write($"[RunForm] 동영상 모드 클릭됨. CameraType:{stage.GetCurrentCameraType()}");
                 // Global.Inst.InspStage.SetWorkingState(WorkingState.LIVE);
-                //Global.Inst.InspStage.CheckImageBuffer();
+                Global.Inst.InspStage.CheckImageBuffer();
                 Global.Inst.InspStage.Grab(0); // 최초 시작
             }
             else
