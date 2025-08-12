@@ -125,6 +125,7 @@ namespace CapsuleInspect
                 return;
             }
             LoadOptionControl(InspectType.InspBinary);
+            LoadOptionControl(InspectType.InspMatch);
             foreach (TabPage tabPage in tabPropControl.TabPages)
             {
                 if (tabPage.Controls.Count > 0)

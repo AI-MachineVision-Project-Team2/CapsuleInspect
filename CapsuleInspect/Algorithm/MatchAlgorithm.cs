@@ -350,6 +350,19 @@ namespace CapsuleInspect.Algorithm
 
             return resultArea.Count;
         }
+        public void SetTemplateImage(Mat template, int index)
+        {
+            if (index < 0 || index >= _templateImages.Count) return;
+            _templateImages[index]?.Dispose();
+            _templateImages[index] = template.Clone();
+        }
+
+        public void DelTemplateImage(int index)
+        {
+            if (index < 0 || index >= _templateImages.Count) return;
+            _templateImages[index]?.Dispose();
+            _templateImages.RemoveAt(index);
+        }
     }
 }
 

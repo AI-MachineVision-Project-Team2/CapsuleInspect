@@ -160,18 +160,31 @@ namespace CapsuleInspect.Teach
         {
             // 필터링된 이미지를 가져옴
             Mat inputImage = Global.Inst.InspStage.GetFilteredImage() ?? Global.Inst.InspStage.GetMat();
+            // 1. 먼저 InspFilter 실행하여 _filteredImage 설정
+            var filterAlgo = AlgorithmList.Find(algo => algo.InspectType == InspectType.InspFilter);
+            if (filterAlgo != null && filterAlgo.IsUse && (inspType == InspectType.InspNone || inspType == InspectType.InspFilter))
+            {
+                filterAlgo.SetInspData(inputImage);
+                if (filterAlgo.DoInspect())
+                {
+                    // 필터링된 이미지 갱신
+                    inputImage = Global.Inst.InspStage.GetFilteredImage()?.Clone() ?? inputImage;
+                }
+            }
+
+            // 2. 나머지 알고리즘(InspMatch, InspBinary) 실행
             foreach (var inspAlgo in AlgorithmList)
             {
-               
-                if (inspAlgo.InspectType == inspType || inspType == InspectType.InspNone)
+                if (inspAlgo == filterAlgo) continue; // 필터는 이미 실행됨
+                if (inspAlgo.IsUse && (inspType == InspectType.InspNone || inspAlgo.InspectType == inspType))
                 {
                     inspAlgo.SetInspData(inputImage);
                     inspAlgo.DoInspect();
                 }
-                    
             }
-            // InspAIModule은 AlgorithmList에 없으므로, 별도 처리
-            if (inspType == InspectType.InspAIModule || inspType == InspectType.InspNone)
+
+            // 3. InspAIModule 별도 처리
+            if (inspType == InspectType.InspNone || inspType == InspectType.InspAIModule)
             {
                 Bitmap inputBitmap = inputImage.ToBitmap();
                 Global.Inst.InspStage.AIModule.Inspect(inputBitmap);

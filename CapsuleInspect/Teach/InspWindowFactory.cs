@@ -59,22 +59,22 @@ namespace CapsuleInspect.Teach
             switch (inspWindow.InspWindowType)
             {
                 case InspWindowType.Base:
-                    inspWindow.AddInspAlgorithm(InspectType.InspMatch);
-                    inspWindow.AddInspAlgorithm(InspectType.InspBinary);
                     inspWindow.AddInspAlgorithm(InspectType.InspFilter);
-                    //inspWindow.AddInspAlgorithm(InspectType.InspAIModule);
+                    inspWindow.AddInspAlgorithm(InspectType.InspAIModule);
+                    inspWindow.AddInspAlgorithm(InspectType.InspBinary);
+                    inspWindow.AddInspAlgorithm(InspectType.InspMatch);
                     break;
                 case InspWindowType.Body:
-                    inspWindow.AddInspAlgorithm(InspectType.InspMatch);
-                    inspWindow.AddInspAlgorithm(InspectType.InspBinary);
                     inspWindow.AddInspAlgorithm(InspectType.InspFilter);
-                    //inspWindow.AddInspAlgorithm(InspectType.InspAIModule);
+                    inspWindow.AddInspAlgorithm(InspectType.InspAIModule);
+                    inspWindow.AddInspAlgorithm(InspectType.InspBinary);
+                    inspWindow.AddInspAlgorithm(InspectType.InspMatch);
                     break;
                 case InspWindowType.Sub:
-                    inspWindow.AddInspAlgorithm(InspectType.InspMatch);
-                    inspWindow.AddInspAlgorithm(InspectType.InspBinary);
                     inspWindow.AddInspAlgorithm(InspectType.InspFilter);
-                    //inspWindow.AddInspAlgorithm(InspectType.InspAIModule);
+                    inspWindow.AddInspAlgorithm(InspectType.InspAIModule);
+                    inspWindow.AddInspAlgorithm(InspectType.InspBinary);
+                    inspWindow.AddInspAlgorithm(InspectType.InspMatch);
                     break;
             }
 

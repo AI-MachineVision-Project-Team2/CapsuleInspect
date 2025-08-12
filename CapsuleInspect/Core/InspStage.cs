@@ -73,10 +73,11 @@ namespace CapsuleInspect.Core
         }
         // 필터링된 이미지를 가져오거나 설정하는 메서드
         public Mat GetFilteredImage() => _filteredImage?.Clone();
-        public void SetFilteredImage(Mat filteredImage)
+        public void SetFilteredImage(Mat filtered)
         {
             _filteredImage?.Dispose();
-            _filteredImage = filteredImage?.Clone();
+            _filteredImage = filtered?.Clone();
+            
             // UI 업데이트
             if (_filteredImage != null)
             {
@@ -195,7 +196,8 @@ namespace CapsuleInspect.Core
 
             propertiesForm.UpdateProperty(inspWindow);
         }
-        //#11_MATCHING#6 패턴매칭 속성창과 연동된 패턴 이미지 관리 함수
+
+        //패턴매칭 속성창과 연동된 패턴 이미지 관리 함수
         public void UpdateTeachingImage(int index)
         {
             if (_selectedInspWindow is null)
@@ -206,17 +208,19 @@ namespace CapsuleInspect.Core
 
         public void DelTeachingImage(int index)
         {
-            if (_selectedInspWindow is null)
-                return;
+            if (_selectedInspWindow == null) return;
 
-            InspWindow inspWindow = _selectedInspWindow;
+            var matchAlgo = (MatchAlgorithm)_selectedInspWindow.FindInspAlgorithm(InspectType.InspMatch);
+            if (matchAlgo == null) return;
 
-            inspWindow.DelWindowImage(index);
+            matchAlgo.DelTemplateImage(index); // MatchAlgorithm 템플릿 삭제
+            _selectedInspWindow.DelWindowImage(index); // InspWindow 동기화
 
-            MatchAlgorithm matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
-            if (matchAlgo != null)
+            // UI 갱신
+            var propForm = MainForm.GetDockForm<PropertiesForm>();
+            if (propForm != null)
             {
-                UpdateProperty(inspWindow);
+                propForm.ShowProperty(_selectedInspWindow);
             }
         }
 
@@ -225,13 +229,9 @@ namespace CapsuleInspect.Core
             if (inspWindow is null)
                 return;
 
-            CameraForm cameraForm = MainForm.GetDockForm<CameraForm>();
-            if (cameraForm is null)
-                return;
-
-            Mat curImage = cameraForm.GetDisplayImage();
-            if (curImage is null)
-                return;
+            // 필터링된 이미지 우선, 없으면 원본
+            Mat curImage = GetFilteredImage() ?? GetMat();
+            if (curImage == null) return;
 
             if (inspWindow.WindowArea.Right >= curImage.Width ||
                 inspWindow.WindowArea.Bottom >= curImage.Height)
@@ -240,19 +240,30 @@ namespace CapsuleInspect.Core
                 return;
             }
 
-            Mat windowImage = curImage[inspWindow.WindowArea];
-
-            if (index < 0)
-                inspWindow.AddWindowImage(windowImage);
-            else
-                inspWindow.SetWindowImage(windowImage, index);
+            Mat windowImage = curImage[inspWindow.WindowArea].Clone();
+            // MatchAlgorithm에 템플릿 설정
+            var matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
+            if (matchAlgo != null)
+            {
+                if (index < 0)
+                {
+                    matchAlgo.AddTemplateImage(windowImage);
+                    inspWindow.AddWindowImage(windowImage); // 동기화 유지
+                }
+                else
+                {
+                    matchAlgo.SetTemplateImage(windowImage, index); // Set 메서드 필요
+                    inspWindow.SetWindowImage(windowImage, index); // 동기화 유지
+                }
+            }
 
             inspWindow.IsPatternLearn = false;
 
-            MatchAlgorithm matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
-            if (matchAlgo != null)
+            // UI 갱신
+            var propForm = MainForm.GetDockForm<PropertiesForm>();
+            if (propForm != null)
             {
-                UpdateProperty(inspWindow);
+                propForm.ShowProperty(inspWindow); // 탭 갱신
             }
         }
 
@@ -512,32 +523,19 @@ namespace CapsuleInspect.Core
             return Global.Inst.InspStage.ImageSpace.GetBitmap();
         }
         //이진화 프리뷰를 위해, ImageSpace에서 이미지 가져오기
-        public Mat GetMat(int bufferIndex = -1, eImageChannel imageChannel = eImageChannel.None)
-        {
-            if (bufferIndex >= 0)
-                SelBufferIndex = bufferIndex;
 
-            // 채널 정보가 유지되도록, eImageChannel.None 타입을 추가
-            if (imageChannel != eImageChannel.None)
-                SelImageChannel = imageChannel;
-
-            return Global.Inst.InspStage.ImageSpace.GetMat(SelBufferIndex, SelImageChannel);
-        }
-
-        /*
-        // 필터 결과 우선 반환 (검사용 Mat)
-        public Mat GetMat(int bufferIndex = 0)
+           public Mat GetMat(int bufferIndex = 0, eImageChannel imageChannel = eImageChannel.None)
         {
             if (_filteredImage != null)
                 return _filteredImage.Clone();
 
-            var cam = MainForm.GetDockForm<CameraForm>();
-            var disp = cam?.GetDisplayImage();
-            if (disp != null)
-                return BitmapConverter.ToMat(disp);
+            if (imageChannel != eImageChannel.None)
+                SelImageChannel = imageChannel;
+            int index = bufferIndex >= 0 ? bufferIndex : SelBufferIndex;
+            return ImageSpace.GetMat(index, SelImageChannel);
+        }
 
-            return _imageSpace?.GetMat(bufferIndex);
-        }*/
+
 
         //변경된 모델 정보 갱신하여, ImageViewer와 모델트리에 반영
         public void UpdateDiagramEntity()
