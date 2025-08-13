@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.InteropServices;
 using CapsuleInspect.Util;
+using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace CapsuleInspect.Core
 {
@@ -37,8 +39,23 @@ namespace CapsuleInspect.Core
         private Model _model = null;
 
         private InspWindow _selectedInspWindow = null;
-        // 필터링된 이미지를 저장하는 필드 추가
-        private Mat _filteredImage = null;
+        //#15_INSP_WORKER#5 InspWorker 클래스 선언
+        private InspWorker _inspWorker = null;
+        private ImageLoader _imageLoader = null;
+
+        //#16_LAST_MODELOPEN#1 가장 최근 모델 파일 경로와 저장할 REGISTRY 키 변수 선언
+
+        // 레지스트리 키 생성 또는 열기
+        RegistryKey _regKey = null;
+
+        //가장 최근 모델 파일 경로를 저장하는 변수
+        private bool _lastestModelOpen = false;
+
+        public bool UseCamera { get; set; } = false;
+
+        private string _lotNumber;
+        private string _serialID;
+        private Mat _filteredImage;
         public InspStage() { }
         public ImageSpace ImageSpace
         {
@@ -59,6 +76,11 @@ namespace CapsuleInspect.Core
         public PreviewImage PreView
         {
             get => _previewImage;
+        }
+        //#15_INSP_WORKER#6 InspWorker 프로퍼티
+        public InspWorker InspWorker
+        {
+            get => _inspWorker;
         }
         //현재 모델 프로퍼티 생성
         public Model CurModel
@@ -128,6 +150,13 @@ namespace CapsuleInspect.Core
             //이진화 알고리즘과 프리뷰 변수 인스턴스 생성
 
             _previewImage = new PreviewImage();
+            //#15_INSP_WORKER#7 InspWorker 인스턴스 생성
+            _inspWorker = new InspWorker();
+            _imageLoader = new ImageLoader();
+
+            //#16_LAST_MODELOPEN#2 REGISTRY 키 생성
+            _regKey = Registry.CurrentUser.CreateSubKey("Software\\MoldVisionJ");
+
 
             // 모델 인스턴스 생성
             _model = new Model();
@@ -155,6 +184,11 @@ namespace CapsuleInspect.Core
                 _grabManager.TransferCompleted += _multiGrab_TransferCompleted;
 
                 InitModelGrab(MAX_GRAB_BUF);
+            }
+            //#16_LAST_MODELOPEN#5 마지막 모델 열기 여부 확인
+            if (!LastestModelOpen())
+            {
+                MessageBox.Show("모델 열기 실패!");
             }
 
             return true;
@@ -212,10 +246,12 @@ namespace CapsuleInspect.Core
 
             if (_imageSpace != null)
             {
-                _imageSpace.SetImageInfo(pixelBpp, imageWidth, imageHeight, imageStride);
+                if (_imageSpace.ImageSize.Width != imageWidth || _imageSpace.ImageSize.Height != imageHeight)
+                {
+                    _imageSpace.SetImageInfo(pixelBpp, imageWidth, imageHeight, imageStride);
+                    SetBuffer(_imageSpace.BufferCount);
+                }
             }
-
-            SetBuffer(1);
 
             int bufferIndex = 0;
 
@@ -356,6 +392,7 @@ namespace CapsuleInspect.Core
                         i);
                 }
             }
+
             SLogger.Write("버퍼 초기화 성공!");
         }
 
@@ -363,94 +400,10 @@ namespace CapsuleInspect.Core
 
         //inspWindow에 대한 검사구현
         //검사 결과를 출력하기 위해, 코드 수정
-        public void TryInspection(InspWindow inspWindow = null)
+        public void TryInspection(InspWindow inspWindow)
         {
-            if (inspWindow is null)
-            {
-                if (_selectedInspWindow is null)
-                    return;
-
-                inspWindow = _selectedInspWindow;
-            }
-
             UpdateDiagramEntity();
-
-            inspWindow.ResetInspResult();
-
-            List<DrawInspectInfo> totalArea = new List<DrawInspectInfo>();
-
-            Rect windowArea = inspWindow.WindowArea;
-
-            foreach (var inspAlgo in inspWindow.AlgorithmList)
-            {
-                if (!inspAlgo.IsUse)
-                    continue;
-
-                //검사 영역 초기화
-                inspAlgo.TeachRect = windowArea;
-                inspAlgo.InspRect = windowArea;
-
-                Mat srcImage = Global.Inst.InspStage.GetMat();
-                inspAlgo.SetInspData(srcImage);
-
-                if (!inspAlgo.DoInspect())
-                    continue;
-
-                List<DrawInspectInfo> resultArea = new List<DrawInspectInfo>();
-                int resultCnt = inspAlgo.GetResultRect(out resultArea);
-                if (resultCnt > 0)
-                {
-                    totalArea.AddRange(resultArea);
-                }
-
-                InspectType inspType = inspAlgo.InspectType;
-
-                string resultInfo = string.Join("\r\n", inspAlgo.ResultString);
-
-                InspResult inspResult = new InspResult
-                {
-                    ObjectID = inspWindow.UID,
-                    InspType = inspAlgo.InspectType,
-                    IsDefect = inspAlgo.IsDefect,
-                    ResultInfos = resultInfo
-                };
-
-                switch (inspType)
-                {
-                    case InspectType.InspMatch:
-                        {
-                            MatchAlgorithm matchAlgo = inspAlgo as MatchAlgorithm;
-                            inspResult.ResultValue = $"{matchAlgo.OutScore}";
-                            break;
-                        }
-                    case InspectType.InspBinary:
-                        {
-                            BlobAlgorithm blobAlgo = (BlobAlgorithm)inspAlgo;
-                            int min = blobAlgo.BlobFilters[blobAlgo.FILTER_COUNT].min;
-                            int max = blobAlgo.BlobFilters[blobAlgo.FILTER_COUNT].max;
-                            inspResult.ResultValue = $"{blobAlgo.OutBlobCount}/{min}~{max}";
-                            break;
-                        }
-                }
-
-                inspWindow.AddInspResult(inspResult);
-            }
-
-            if (totalArea.Count > 0)
-            {
-                //찾은 위치를 이미지상에서 표시
-                var cameraForm = MainForm.GetDockForm<CameraForm>();
-                if (cameraForm != null)
-                {
-                    cameraForm.AddRect(totalArea);
-                }
-            }
-
-            ResultForm resultForm = MainForm.GetDockForm<ResultForm>();
-            if (resultForm != null)
-            {
-                resultForm.AddWindowResult(inspWindow);
-            }
+            InspWorker.TryInspect(inspWindow, InspectType.InspNone);
         }
 
 
@@ -559,14 +512,15 @@ namespace CapsuleInspect.Core
             UpdateDiagramEntity();
         }
 
-        public void Grab(int bufferIndex)
+        public bool Grab(int bufferIndex)
         {
             if (_grabManager == null)
-                return;
+                return false;
 
-            _grabManager.Grab(bufferIndex, true);
-            // Grab 후 필터링된 이미지 초기화 (필요 시)
-            SetFilteredImage(null);
+            if (!_grabManager.Grab(bufferIndex, true))
+                return false;
+
+            return true;
         }
 
         //영상 취득 완료 이벤트 발생시 후처리
@@ -657,7 +611,14 @@ namespace CapsuleInspect.Core
                 cameraForm.UpdateImageViewer();
             }
         }
-
+        public void ResetDisplay()
+        {
+            CameraForm cameraForm = MainForm.GetDockForm<CameraForm>();
+            if (cameraForm != null)
+            {
+                cameraForm.ResetDisplay();
+            }
+        }
         //#12_MODEL SAVE#4 Mainform에서 호출되는 모델 열기와 저장 함수        
         public bool LoadModel(string filePath)
         {
@@ -678,6 +639,8 @@ namespace CapsuleInspect.Core
             }
 
             UpdateDiagramEntity();
+            //마지막 저장 모델 경로를 레지스트리에 저장
+            _regKey.SetValue("LastestModelPath", filePath);
 
             return true;
         }
@@ -692,6 +655,145 @@ namespace CapsuleInspect.Core
             else
                 Global.Inst.InspStage.CurModel.SaveAs(filePath);
         }
+
+        private bool LastestModelOpen()
+        {
+            if (_lastestModelOpen)
+                return true;
+
+            _lastestModelOpen = true;
+
+            string lastestModel = (string)_regKey.GetValue("LastestModelPath");
+            if (File.Exists(lastestModel) == false)
+                return true;
+
+            DialogResult result = MessageBox.Show($"최근 모델을 로딩할까요?\r\n{lastestModel}", "Question", MessageBoxButtons.YesNo);
+            if (result == DialogResult.No)
+                return true;
+
+            return LoadModel(lastestModel);
+        }
+
+        // 자동 연속 검사 함수
+        public void CycleInspect(bool isCycle)
+        {
+            if (InspWorker.IsRunning)
+                return;
+
+            if (!UseCamera)
+            {
+                string inspImagePath = CurModel.InspectImagePath;
+                if (inspImagePath == "")
+                    return;
+
+                string inspImageDir = Path.GetDirectoryName(inspImagePath);
+                if (!Directory.Exists(inspImageDir))
+                    return;
+
+                if (!_imageLoader.IsLoadedImages())
+                    _imageLoader.LoadImages(inspImageDir);
+            }
+
+            if (isCycle)
+                _inspWorker.StartCycleInspectImage();
+            else
+                OneCycle();
+        }
+
+        public bool OneCycle()
+        {
+            if (UseCamera)
+            {
+                if (!Grab(0))
+                    return false;
+            }
+            else
+            {
+                if (!VirtualGrab())
+                    return false;
+            }
+
+            ResetDisplay();
+
+            bool isDefect;
+            if (!_inspWorker.RunInspect(out isDefect))
+                return false;
+
+            return true;
+        }
+
+        public void StopCycle()
+        {
+            if (_inspWorker != null)
+                _inspWorker.Stop();
+
+            SetWorkingState(WorkingState.NONE);
+        }
+
+        public bool VirtualGrab()
+        {
+            if (_imageLoader is null)
+                return false;
+
+            string imagePath = _imageLoader.GetNextImagePath();
+            if (imagePath == "")
+                return false;
+
+            Global.Inst.InspStage.SetImageBuffer(imagePath);
+
+            _imageSpace.Split(0);
+
+            DisplayGrabImage(0);
+
+            return true;
+        }
+
+        //검사를 위한 준비 작업
+        public bool InspectReady(string lotNumber, string serialID)
+        {
+            _lotNumber = lotNumber;
+            _serialID = serialID;
+
+            LiveMode = false;
+            UseCamera = SettingXml.Inst.CamType != CameraType.None ? true : false;
+
+            Global.Inst.InspStage.CheckImageBuffer();
+
+            ResetDisplay();
+
+            return true;
+        }
+
+        public bool StartAutoRun()
+        {
+            SLogger.Write("Action : StartAutoRun");
+
+            string modelPath = CurModel.ModelPath;
+            if (modelPath == "")
+            {
+                SLogger.Write("열려진 모델이 없습니다!", SLogger.LogType.Error);
+                MessageBox.Show("열려진 모델이 없습니다!");
+                return false;
+            }
+
+            LiveMode = false;
+            UseCamera = SettingXml.Inst.CamType != CameraType.None ? true : false;
+
+            SetWorkingState(WorkingState.INSPECT);
+
+            return true;
+        }
+
+        //#17_WORKING_STATE#2 작업 상태 설정
+        public void SetWorkingState(WorkingState workingState)
+        {
+            var cameraForm = MainForm.GetDockForm<CameraForm>();
+            if (cameraForm != null)
+            {
+                cameraForm.SetWorkingState(workingState);
+            }
+        }
+
         #region Disposable
 
         private bool disposed = false; // to detect redundant calls
@@ -713,6 +815,7 @@ namespace CapsuleInspect.Core
                         _grabManager.Dispose();
                         _grabManager = null;
                     }
+                    _regKey.Close();
                 }
 
                 // Dispose unmanaged managed resources.

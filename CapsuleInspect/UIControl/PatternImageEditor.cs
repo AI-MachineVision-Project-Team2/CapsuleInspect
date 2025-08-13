@@ -24,11 +24,11 @@ namespace CapsuleInspect.UIControl
         private readonly ImageList _imageListThumb;      // holds the generated thumbnails
 
         // ––– placeholders for your business objects –––
-        private object _inspWindow;
+        //private object _inspWindow;
         private object _isImg;
         private int _curAlgoIndex = -1;
         private string _editBmpPath = string.Empty;
-        private int _editIndex = -1;
+        //private int _editIndex = -1;
 
         #region Events
         public event EventHandler<PatternImageEventArgs> ButtonChanged;
@@ -56,8 +56,8 @@ namespace CapsuleInspect.UIControl
             _imageListThumb.Images.Clear();
             listThumbnail.Items.Clear();
             _isImg = null;
-            _editIndex = -1;
-            _inspWindow = null;
+            //_editIndex = -1;
+            //_inspWindow = null;
             _curAlgoIndex = -1;
         }
 

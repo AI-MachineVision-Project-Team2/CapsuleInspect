@@ -47,6 +47,7 @@
             this.btnStop.Size = new System.Drawing.Size(82, 82);
             this.btnStop.TabIndex = 8;
             this.btnStop.UseVisualStyleBackColor = true;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
             // runImageList
             // 

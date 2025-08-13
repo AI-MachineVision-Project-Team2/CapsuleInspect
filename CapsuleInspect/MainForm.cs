@@ -46,6 +46,7 @@ namespace CapsuleInspect
             LoadDockingWindows();
             // Global 인스턴스 초기화
             Global.Inst.Initialize();
+            LoadSetting();
         }
         //도킹 윈도우를 로드하는 메서드
         private void LoadDockingWindows()
@@ -75,6 +76,11 @@ namespace CapsuleInspect
             modelTreeWindow.Show(runWindow.Pane, DockAlignment.Bottom, 0.6);
             
         }
+        private void LoadSetting()
+        {
+            cycleModeMenuItem.Checked = SettingXml.Inst.CycleMode;
+        }
+
         //쉽게 도킹패널에 접근하기 위한 정적 함수
         //제네릭 함수 사용를 이용해 입력된 타입의 폼 객체 얻기
         public static T GetDockForm<T>() where T : DockContent
@@ -183,7 +189,13 @@ namespace CapsuleInspect
                 }
             }
         }
+        //Cycle 모드 설정
+        private void cycleModeMenuItem_Click(object sender, EventArgs e)
+        {
+            // 현재 체크 상태 확인
+            bool isChecked = cycleModeMenuItem.Checked;
+            SettingXml.Inst.CycleMode = isChecked;
+        }
 
-       
     }
 }

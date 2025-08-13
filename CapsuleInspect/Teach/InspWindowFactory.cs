@@ -76,6 +76,9 @@ namespace CapsuleInspect.Teach
                     inspWindow.AddInspAlgorithm(InspectType.InspBinary);
                     inspWindow.AddInspAlgorithm(InspectType.InspMatch);
                     break;
+                case InspWindowType.ID:
+                    inspWindow.AddInspAlgorithm(InspectType.InspMatch);
+                    break;
             }
 
             return true;
@@ -99,6 +102,10 @@ namespace CapsuleInspect.Teach
                 case InspWindowType.Sub:
                     name = "Sub";
                     prefix = "SUB";
+                    break;
+                case InspWindowType.ID:
+                    name = "ID";
+                    prefix = "ID";
                     break;
                 default:
                     return false;

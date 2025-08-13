@@ -316,5 +316,33 @@ namespace CapsuleInspect
         {
             imageViewer.NewRoi(inspWindowType);
         }
+        // 검사 양불판정 갯수 설정 함수
+        public void SetInspResultCount(int totalArea, int okCnt, int ngCnt)
+        {
+            imageViewer.SetInspResultCount(new InspectResultCount(totalArea, okCnt, ngCnt));
+        }
+
+        // 작업 상태 화면 표시 설정
+        public void SetWorkingState(WorkingState workingState)
+        {
+            string state = "";
+            switch (workingState)
+            {
+                case WorkingState.INSPECT:
+                    state = "INSPECT";
+                    break;
+
+                case WorkingState.LIVE:
+                    state = "LIVE";
+                    break;
+
+                case WorkingState.ALARM:
+                    state = "ALARM";
+                    break;
+            }
+
+            imageViewer.WorkingState = state;
+            imageViewer.Invalidate();
+        }
     }
 }
