@@ -35,17 +35,20 @@
             // 
             this.tabPropControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabPropControl.Location = new System.Drawing.Point(0, 0);
+            this.tabPropControl.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPropControl.Name = "tabPropControl";
             this.tabPropControl.SelectedIndex = 0;
-            this.tabPropControl.Size = new System.Drawing.Size(800, 450);
+            this.tabPropControl.Size = new System.Drawing.Size(1143, 675);
             this.tabPropControl.TabIndex = 1;
             // 
             // PropertiesForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.BackColor = System.Drawing.Color.White;
+            this.ClientSize = new System.Drawing.Size(1143, 675);
             this.Controls.Add(this.tabPropControl);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "PropertiesForm";
             this.Text = "PropertiesForm";
             this.ResumeLayout(false);

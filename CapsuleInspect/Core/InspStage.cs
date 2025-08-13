@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.InteropServices;
+using CapsuleInspect.Util;
 
 namespace CapsuleInspect.Core
 {
@@ -122,6 +123,7 @@ namespace CapsuleInspect.Core
 
         public bool Initialize()
         {
+            SLogger.Write("InspStage 초기화!");
             _imageSpace = new ImageSpace();
             //이진화 알고리즘과 프리뷰 변수 인스턴스 생성
 
@@ -187,7 +189,7 @@ namespace CapsuleInspect.Core
         }
         public void SetImageBuffer(string filePath)
         {
-            Console.Write($"Load Image : {filePath}");
+            SLogger.Write($"Load Image : {filePath}");
 
             Mat matImage = Cv2.ImRead(filePath);
 
@@ -306,7 +308,7 @@ namespace CapsuleInspect.Core
             if (inspWindow.WindowArea.Right >= curImage.Width ||
                 inspWindow.WindowArea.Bottom >= curImage.Height)
             {
-                Console.Write("ROI 영역이 잘못되었습니다!");
+                SLogger.Write("ROI 영역이 잘못되었습니다!");
                 return;
             }
 
@@ -354,6 +356,7 @@ namespace CapsuleInspect.Core
                         i);
                 }
             }
+            SLogger.Write("버퍼 초기화 성공!");
         }
 
 
@@ -570,7 +573,8 @@ namespace CapsuleInspect.Core
         private async void _multiGrab_TransferCompleted(object sender, object e)
         {
             int bufferIndex = (int)e;
-            Console.WriteLine($"_multiGrab_TransferCompleted {bufferIndex}");
+            SLogger.Write($"TransferCompleted {bufferIndex}");
+
 
             _imageSpace.Split(bufferIndex);
 
@@ -583,7 +587,7 @@ namespace CapsuleInspect.Core
             }
             if (LiveMode)
             {
-                //SLogger.Write("Grab");
+                SLogger.Write("Grab");
                 await Task.Delay(100); // 너무 빠른 촬영 방지
                 _grabManager.Grab(bufferIndex, true); // 반복 촬영
             }
@@ -657,13 +661,13 @@ namespace CapsuleInspect.Core
         //#12_MODEL SAVE#4 Mainform에서 호출되는 모델 열기와 저장 함수        
         public bool LoadModel(string filePath)
         {
-            Console.Write($"모델 로딩:{filePath}");
+            SLogger.Write($"모델 로딩:{filePath}");
 
             _model = _model.Load(filePath);
 
             if (_model is null)
             {
-                Console.Write($"모델 로딩 실패:{filePath}");
+                SLogger.Write($"모델 로딩 실패:{filePath}");
                 return false;
             }
 
@@ -680,7 +684,7 @@ namespace CapsuleInspect.Core
 
         public void SaveModel(string filePath)
         {
-            Console.Write($"모델 저장:{filePath}");
+            SLogger.Write($"모델 저장:{filePath}");
 
             //입력 경로가 없으면 현재 모델 저장
             if (string.IsNullOrEmpty(filePath))

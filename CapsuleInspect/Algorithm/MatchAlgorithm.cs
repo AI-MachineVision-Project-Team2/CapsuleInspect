@@ -1,4 +1,5 @@
 ﻿using CapsuleInspect.Core;
+using CapsuleInspect.Util;
 using OpenCvSharp;
 using System;
 using System.Collections.Generic;
@@ -110,7 +111,7 @@ namespace CapsuleInspect.Algorithm
             OutScore = (int)(maxScore * 100);
             OutPoint = maxLoc + leftTopPos;
 
-            Console.Write($"최적 매칭 위치: {maxLoc}, 신뢰도: {maxScore:F2}");
+            SLogger.Write($"최적 매칭 위치: {maxLoc}, 신뢰도: {maxScore:F2}");
 
             return true;
         }

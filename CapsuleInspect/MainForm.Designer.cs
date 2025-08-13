@@ -47,7 +47,7 @@
             // 
             // mainMenu
             // 
-            this.mainMenu.BackColor = System.Drawing.Color.Khaki;
+            this.mainMenu.BackColor = System.Drawing.Color.LightPink;
             this.mainMenu.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.mainMenu.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.mainMenu.ImageScalingSize = new System.Drawing.Size(24, 24);
@@ -155,7 +155,7 @@
             // txtFilePath
             // 
             this.txtFilePath.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtFilePath.Location = new System.Drawing.Point(265, 3);
+            this.txtFilePath.Location = new System.Drawing.Point(266, 4);
             this.txtFilePath.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.txtFilePath.Name = "txtFilePath";
             this.txtFilePath.Size = new System.Drawing.Size(869, 30);

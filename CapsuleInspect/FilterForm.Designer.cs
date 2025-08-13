@@ -37,14 +37,15 @@
             this.tabPropControl2.Location = new System.Drawing.Point(0, 0);
             this.tabPropControl2.Name = "tabPropControl2";
             this.tabPropControl2.SelectedIndex = 0;
-            this.tabPropControl2.Size = new System.Drawing.Size(800, 450);
+            this.tabPropControl2.Size = new System.Drawing.Size(727, 386);
             this.tabPropControl2.TabIndex = 0;
             // 
             // FilterForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.BackColor = System.Drawing.Color.White;
+            this.ClientSize = new System.Drawing.Size(727, 386);
             this.Controls.Add(this.tabPropControl2);
             this.Name = "FilterForm";
             this.Text = "FilterForm";

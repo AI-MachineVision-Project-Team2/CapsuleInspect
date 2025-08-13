@@ -14,6 +14,7 @@ using CapsuleInspect.Teach;
 
 namespace CapsuleInspect
 {
+
     public partial class MainForm : Form
     {
         private static DockPanel _dockPanel;
@@ -26,9 +27,9 @@ namespace CapsuleInspect
             {
                 Height = 5,
                 Dock = DockStyle.Top,
-                BackColor = Color.FromArgb(41, 57, 85)
+                BackColor = Color.LightPink
             };
-
+           
             // DockPanel 생성 및 추가
             _dockPanel = new DockPanel
             {
@@ -36,10 +37,11 @@ namespace CapsuleInspect
             };
             Controls.Add(_dockPanel);
             Controls.Add(spacerPanel);
+            
+           
             Controls.SetChildIndex(spacerPanel, 0); // MenuStrip 아래
             Controls.SetChildIndex(_dockPanel, 1);  // spacer 아래
-
-            _dockPanel.Theme = new VS2015BlueTheme();
+            _dockPanel.Theme = new VS2015LightTheme();
             // 도킹 윈도우 로드 메서드 호출
             LoadDockingWindows();
             // Global 인스턴스 초기화
@@ -54,20 +56,24 @@ namespace CapsuleInspect
             //메인폼 설정
             var cameraWindow = new CameraForm();
             cameraWindow.Show(_dockPanel, DockState.Document);
-            var resultWindow = new ResultForm();
-            resultWindow.Show(cameraWindow.Pane, DockAlignment.Bottom, 0.3);
+
+
             var runWindow = new RunForm();
-            runWindow.Show(resultWindow.Pane, DockAlignment.Right, 0.4);
+            runWindow.Show(cameraWindow.Pane, DockAlignment.Bottom, 0.3);
+            var resultWindow = new ResultForm();
+            resultWindow.Show(_dockPanel, DockState.DockRight);
             var propWindow = new PropertiesForm();
-            propWindow.Show(_dockPanel, DockState.DockRight);
-            
+            propWindow.Show(_dockPanel, DockState.DockLeft);
+
+            var logWindow = new LogForm();
+            logWindow.Show(resultWindow.Pane, DockAlignment.Bottom, 0.3);
             SharedFilterForm = new FilterForm();
-            SharedFilterForm.Show(propWindow.Pane, DockAlignment.Bottom, 0.4);
+            SharedFilterForm.Show(propWindow.Pane, DockAlignment.Bottom, 0.3);
 
             //#11_MODEL_TREE#1 검사 결과창 우측에 40% 비율로 모델트리 추가
             var modelTreeWindow = new ModelTreeForm();
-            modelTreeWindow.Show(runWindow.Pane, DockAlignment.Bottom, 0.5);
-
+            modelTreeWindow.Show(runWindow.Pane, DockAlignment.Bottom, 0.6);
+            
         }
         //쉽게 도킹패널에 접근하기 위한 정적 함수
         //제네릭 함수 사용를 이용해 입력된 타입의 폼 객체 얻기
@@ -177,5 +183,7 @@ namespace CapsuleInspect
                 }
             }
         }
+
+       
     }
 }

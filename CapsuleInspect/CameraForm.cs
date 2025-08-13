@@ -1,8 +1,9 @@
-﻿using CapsuleInspect.Core;
+﻿using CapsuleInspect.Algorithm;
+using CapsuleInspect.Core;
 using CapsuleInspect.Property;
-using CapsuleInspect.Algorithm;
 using CapsuleInspect.Teach;
 using CapsuleInspect.UIControl;
+using CapsuleInspect.Util;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System;
@@ -37,6 +38,7 @@ namespace CapsuleInspect
         }
         private void ImageViewer_DiagramEntityEvent(object sender, DiagramEntityEventArgs e)
         {
+            SLogger.Write($"ImageViewer Action {e.ActionType.ToString()}");
             switch (e.ActionType)
             {
                 case EntityActionType.Select:
