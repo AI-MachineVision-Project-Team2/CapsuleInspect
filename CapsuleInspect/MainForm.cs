@@ -1,4 +1,7 @@
 ﻿using CapsuleInspect.Core;
+using CapsuleInspect.Setting;
+using CapsuleInspect.Teach;
+using CapsuleInspect.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,8 +12,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
-using CapsuleInspect.Setting;
-using CapsuleInspect.Teach;
 
 namespace CapsuleInspect
 {
@@ -111,6 +112,7 @@ namespace CapsuleInspect
         }
         private void SetupMenuItem_Click(object sender, EventArgs e)
         {
+            SLogger.Write($"환경설정창 열기");
             SetupForm setupForm = new SetupForm();
             setupForm.ShowDialog();
         }
@@ -192,6 +194,7 @@ namespace CapsuleInspect
         //Cycle 모드 설정
         private void cycleModeMenuItem_Click(object sender, EventArgs e)
         {
+            SLogger.Write($"Cycle Mode Click");
             // 현재 체크 상태 확인
             bool isChecked = cycleModeMenuItem.Checked;
             SettingXml.Inst.CycleMode = isChecked;

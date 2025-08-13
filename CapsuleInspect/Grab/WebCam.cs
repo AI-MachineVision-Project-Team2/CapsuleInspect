@@ -1,4 +1,5 @@
-﻿using OpenCvSharp;
+﻿using CapsuleInspect.Util;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,9 +23,11 @@ namespace CapsuleInspect.Grab
         internal override bool Create(string strIpAddr = null)
         {
             _capture = new VideoCapture(0); // 0번 카메라 (기본 웹캠)
-            if (_capture == null)
+            if (_capture == null || !_capture.IsOpened())
+            {
+                SLogger.Write("Error: WebCam 초기화 실패", SLogger.LogType.Error);
                 return false;
-
+            }
             return true;
         }
 
@@ -36,6 +39,7 @@ namespace CapsuleInspect.Grab
             _capture.Read(_frame);
             if (!_frame.Empty())
             {
+                Cv2.Flip(_frame, _frame, FlipMode.Y);
                 OnGrabCompleted(BufferIndex);
 
                 int bufSize = (int)(_frame.Total() * _frame.ElemSize());
@@ -46,10 +50,10 @@ namespace CapsuleInspect.Grab
                     {
                         Marshal.Copy(_frame.Data, _userImageBuffer[BufferIndex].ImageBuffer, 0, bufSize); // Mat의 데이터를 byte 배열로 복사
                     }
-                    //else
-                    //{
-                    //    SLogger.Write("Error: Buffer size is too small.", SLogger.LogType.Error);
-                    //}
+                    else
+                    {
+                        SLogger.Write("Error: Buffer size is too small.", SLogger.LogType.Error);
+                    }
                 }
 
                 OnTransferCompleted(BufferIndex);

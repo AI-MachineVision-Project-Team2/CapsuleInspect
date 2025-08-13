@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using CapsuleInspect.Util;
 namespace CapsuleInspect.Setting
 {
     public partial class PathSetting : UserControl
@@ -65,7 +65,7 @@ namespace CapsuleInspect.Setting
         private void btnApply_Click(object sender, EventArgs e)
         {
             SaveSetting();
-            //SLogger.Write($"경로 설정 적용");
+            SLogger.Write($"경로 설정 적용");
         }
     }
 }

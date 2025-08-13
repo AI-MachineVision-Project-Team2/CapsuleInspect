@@ -1,21 +1,23 @@
 ﻿using CapsuleInspect.Algorithm;
 using CapsuleInspect.Grab;
 using CapsuleInspect.Inspect;
+using CapsuleInspect.Sequence;
 using CapsuleInspect.Setting;
 using CapsuleInspect.Teach;
+using CapsuleInspect.Util;
+using Microsoft.Win32;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
-using System.Runtime.InteropServices;
-using CapsuleInspect.Util;
 using System.Windows.Forms;
-using Microsoft.Win32;
 
 namespace CapsuleInspect.Core
 {
@@ -114,6 +116,7 @@ namespace CapsuleInspect.Core
         {
             return _camType;
         }
+
         public void SetCameraType(CameraType camType)
         {
             if (_camType == camType)
@@ -141,7 +144,9 @@ namespace CapsuleInspect.Core
                 _grabManager.TransferCompleted += _multiGrab_TransferCompleted;
                 InitModelGrab(MAX_GRAB_BUF);
             }
+           
         }
+       
 
         public bool Initialize()
         {
@@ -184,7 +189,11 @@ namespace CapsuleInspect.Core
 
                 InitModelGrab(MAX_GRAB_BUF);
             }
-            //#16_LAST_MODELOPEN#5 마지막 모델 열기 여부 확인
+            // VisionSequence 초기화
+            VisionSequence.Inst.InitSequence();
+            VisionSequence.Inst.SeqCommand += SeqCommand;
+
+            // 마지막 모델 열기 여부 확인
             if (!LastestModelOpen())
             {
                 MessageBox.Show("모델 열기 실패!");
@@ -587,14 +596,14 @@ namespace CapsuleInspect.Core
         private async void _multiGrab_TransferCompleted(object sender, object e)
         {
             int bufferIndex = (int)e;
-            SLogger.Write($"TransferCompleted {bufferIndex}");
+            SLogger.Write($"_multiGrab_TransferCompleted {bufferIndex}");
 
 
             _imageSpace.Split(bufferIndex);
 
             DisplayGrabImage(bufferIndex);
 
-            
+
             if (LiveMode)
             {
                 SLogger.Write("Grab");
@@ -608,7 +617,7 @@ namespace CapsuleInspect.Core
             var cameraForm = MainForm.GetDockForm<CameraForm>();
             if (cameraForm != null)
             {
-                cameraForm.LoadGrabbedImage(ImageSpace.GetBitmap(bufferIndex));
+                cameraForm.UpdateDisplay();
             }
         }
 
@@ -656,7 +665,7 @@ namespace CapsuleInspect.Core
 
             return Global.Inst.InspStage.ImageSpace.GetBitmap(SelBufferIndex, SelImageChannel);
         }
-        
+
         //이진화 프리뷰를 위해, ImageSpace에서 이미지 가져오기
 
         public Mat GetMat(int bufferIndex = 0, eImageChannel imageChannel = eImageChannel.None)
@@ -664,7 +673,7 @@ namespace CapsuleInspect.Core
             if (_filteredImage != null)
                 return _filteredImage.Clone();
 
-            
+
             int index = bufferIndex >= 0 ? bufferIndex : SelBufferIndex;
             return Global.Inst.InspStage.ImageSpace.GetMat(SelBufferIndex, imageChannel);
         }
@@ -811,6 +820,7 @@ namespace CapsuleInspect.Core
         {
             if (_inspWorker != null)
                 _inspWorker.Stop();
+            VisionSequence.Inst.StopAutoRun();
 
             SetWorkingState(WorkingState.NONE);
         }
@@ -833,6 +843,62 @@ namespace CapsuleInspect.Core
             return true;
         }
 
+        //시퀀스 명령 처리
+        private void SeqCommand(object sender, SeqCmd seqCmd, object Param)
+        {
+            switch (seqCmd)
+            {
+                case SeqCmd.InspStart:
+                    {
+                        //카메라 촬상 후, 검사 진행
+                        SLogger.Write("MMI : InspStart", SLogger.LogType.Info);
+
+                        //검사 시작
+                        string errMsg;
+
+                        if (UseCamera)
+                        {
+                            if (!Grab(0))
+                            {
+                                errMsg = string.Format("Failed to grab");
+                                SLogger.Write(errMsg, SLogger.LogType.Error);
+                            }
+                        }
+                        else
+                        {
+                            if (!VirtualGrab())
+                            {
+                                errMsg = string.Format("Failed to virtual grab");
+                                SLogger.Write(errMsg, SLogger.LogType.Error);
+                            }
+                        }
+
+                        bool isDefect = false;
+                        if (!_inspWorker.RunInspect(out isDefect))
+                        {
+                            errMsg = string.Format("Failed to inspect");
+                            SLogger.Write(errMsg, SLogger.LogType.Error);
+                        }
+
+                        //#WCF_FSM#6 비젼 -> 제어에 검사 완료 및 결과 전송
+                        VisionSequence.Inst.VisionCommand(Vision2Mmi.InspDone, isDefect);
+                    }
+                    break;
+                case SeqCmd.InspEnd:
+                    {
+                        SLogger.Write("MMI : InspEnd", SLogger.LogType.Info);
+
+                        //모든 검사 종료
+                        string errMsg = "";
+
+                        //검사 완료에 대한 처리
+                        SLogger.Write("검사 종료");
+
+                        VisionSequence.Inst.VisionCommand(Vision2Mmi.InspEnd, errMsg);
+                    }
+                    break;
+            }
+        }
         //검사를 위한 준비 작업
         public bool InspectReady(string lotNumber, string serialID)
         {
@@ -863,9 +929,11 @@ namespace CapsuleInspect.Core
 
             LiveMode = false;
             UseCamera = SettingXml.Inst.CamType != CameraType.None ? true : false;
-
+            
             SetWorkingState(WorkingState.INSPECT);
-
+            // 자동검사 시작
+            string modelName = Path.GetFileNameWithoutExtension(modelPath);
+            VisionSequence.Inst.StartAutoRun(modelName);
             return true;
         }
 
@@ -890,6 +958,9 @@ namespace CapsuleInspect.Core
                 if (disposing)
                 {
                     // Dispose managed resources.
+                    //시퀀스 이벤트 해제
+                    VisionSequence.Inst.SeqCommand -= SeqCommand;
+
                     if (_saigeAI != null)
                     {
                         _saigeAI.Dispose();

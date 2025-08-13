@@ -1,5 +1,6 @@
 ﻿using CapsuleInspect.Core;
 using CapsuleInspect.Grab;
+using CapsuleInspect.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,6 +18,7 @@ namespace CapsuleInspect.Setting
         public CameraSetting()
         {
             InitializeComponent();
+            //최초 로딩시, 환경설정 정보 로딩
             LoadSetting();
         }
         private void LoadSetting()
@@ -40,7 +42,7 @@ namespace CapsuleInspect.Setting
         {
             SaveSetting();
             CameraType selectedType = (CameraType)cbCameraType.SelectedItem;
-            //SLogger.Write($"[CameraSetting] 적용된 카메라 타입: {selectedType}");
+            SLogger.Write($"[CameraSetting] 적용된 카메라 타입: {selectedType}");
         }
     }
 }

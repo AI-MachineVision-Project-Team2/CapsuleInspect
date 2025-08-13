@@ -237,8 +237,42 @@ namespace CapsuleInspect.UIControl
         }
         public void LoadBitmap(Bitmap bitmap)
         {
-            LoadBitmap(bitmap, true);  // 기본적으로 autoFit 적용
+            // 스레드에서 검사시, 멈추는 현상 방지
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new Action<Bitmap>(LoadBitmap), bitmap);
+                return;
+            }
+
+            // 기존에 로드된 이미지가 있다면 해제 후 초기화, 메모리누수 방지
+            if (_bitmapImage != null)
+            {
+                //이미지 크기가 같다면, 이미지 변경 후, 화면 갱신
+                if (_bitmapImage.Width == bitmap.Width && _bitmapImage.Height == bitmap.Height)
+                {
+                    _bitmapImage.Dispose();   // 기존 이미지 해제 후 교체
+                    _bitmapImage = bitmap;
+                    Invalidate();
+                    return;
+                }
+
+                _bitmapImage.Dispose(); // Bitmap 객체가 사용하던 메모리 리소스를 해제
+                _bitmapImage = null;  //객체를 해제하여 가비지 컬렉션(GC)이 수집할 수 있도록 설정
+            }
+
+            // 새로운 이미지 로드
+            _bitmapImage = bitmap;
+
+            ////bitmap==null 예외처리도 초기화되지않은 변수들 초기화
+            if (_isInitialized == false)
+            {
+                _isInitialized = true;
+                ResizeCanvas();
+            }
+
+            FitImageToScreen();
         }
+
         private void FitImageToScreen()
         {
             RecalcZoomRatio();
@@ -468,7 +502,7 @@ namespace CapsuleInspect.UIControl
 
                     if (rectInfo.decision == DecisionType.Info)
                     {
-                        baseFontSize = 3.0f;
+                        baseFontSize = 10.0f;
                         lineColor = Color.LightBlue;
                     }
 
