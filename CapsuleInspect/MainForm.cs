@@ -196,6 +196,6 @@ namespace CapsuleInspect
             bool isChecked = cycleModeMenuItem.Checked;
             SettingXml.Inst.CycleMode = isChecked;
         }
-
+        //1dsads
     }
 }
