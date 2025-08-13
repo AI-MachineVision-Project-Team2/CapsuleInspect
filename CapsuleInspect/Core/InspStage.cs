@@ -19,7 +19,7 @@ using Microsoft.Win32;
 
 namespace CapsuleInspect.Core
 {
-
+    //추가 
     //검사와 관련된 클래스를 관리하는 클래스
     public class InspStage : IDisposable
     {
