@@ -30,7 +30,9 @@ namespace CapsuleInspect.Algorithm
         public eImageChannel ImageChannel { get; set; } = eImageChannel.Gray;
 
         //검사할 원본 이미지
+        [XmlIgnore]
         protected Mat _srcImage = null;
+        [XmlIgnore]
         public Mat ResultImage => _srcImage?.Clone();
         //검사 결과 정보
         public List<string> ResultString { get; set; } = new List<string>();

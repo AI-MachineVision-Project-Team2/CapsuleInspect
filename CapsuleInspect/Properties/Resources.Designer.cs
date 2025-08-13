@@ -59,15 +59,5 @@ namespace CapsuleInspect.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
-        /// </summary>
-        internal static System.Drawing.Bitmap _114d7ae1260225d12228170ef4374aae {
-            get {
-                object obj = ResourceManager.GetObject("114d7ae1260225d12228170ef4374aae", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
     }
 }

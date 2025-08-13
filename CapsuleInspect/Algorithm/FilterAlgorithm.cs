@@ -7,12 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 namespace CapsuleInspect.Algorithm
 {
     public class FilterAlgorithm : InspAlgorithm
     {
         public FilterType Filter { get; set; } = FilterType.None;
+        [XmlIgnore]
         public dynamic Options { get; set; } = null;
+        [XmlIgnore]
         public new Mat ResultImage { get; private set; } // new 키워드 추가
         public FilterAlgorithm()
         {

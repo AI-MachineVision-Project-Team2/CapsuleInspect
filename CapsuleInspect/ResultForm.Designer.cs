@@ -35,7 +35,6 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.BackgroundImage = global::CapsuleInspect.Properties.Resources._114d7ae1260225d12228170ef4374aae;
             this.ClientSize = new System.Drawing.Size(640, 425);
             this.Cursor = System.Windows.Forms.Cursors.PanNW;
             this.Font = new System.Drawing.Font("한컴 말랑말랑 Bold", 9.749998F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));

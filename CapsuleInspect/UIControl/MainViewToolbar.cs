@@ -49,7 +49,8 @@ namespace CapsuleInspect.UIControl
                 AutoSize = false,
                 Width = 32,
                 Padding = new Padding(2),
-                ImageList = imageListToolbar   // 버튼용 ImageList 연결
+                ImageList = imageListToolbar,   // 버튼용 ImageList 연결
+                Cursor = Cursors.PanNW
             };
 
             // ───────────────── Helper ─────────────────
@@ -64,7 +65,8 @@ namespace CapsuleInspect.UIControl
                     Width = 32,
                     Height = 32,
                     CheckOnClick = toggle,
-                    ToolTipText = tip
+                    ToolTipText = tip,
+                   
                 };
                 if (onClick != null) b.Click += onClick;
                 return b;

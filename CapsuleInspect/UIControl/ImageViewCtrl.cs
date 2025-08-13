@@ -438,10 +438,10 @@ namespace CapsuleInspect.UIControl
                 DrawRectInfo(g);
             }
 
-            //#17_WORKING_STATE#4 작업 상태 화면에 표시
+            //작업 상태 화면에 표시
             if (WorkingState != "")
             {
-                float fontSize = 20.0f;
+                float fontSize = 15.0f;
                 Color stateColor = Color.FromArgb(255, 128, 0);
                 PointF textPos = new PointF(10, 10);
                 DrawText(g, WorkingState, textPos, fontSize, stateColor);
@@ -452,7 +452,7 @@ namespace CapsuleInspect.UIControl
             {
                 string resultText = $"Total: {_inspectResultCount.Total}\r\nOK: {_inspectResultCount.OK}\r\nNG: {_inspectResultCount.NG}";
 
-                float fontSize = 12.0f;
+                float fontSize = 5.0f;
                 Color resultColor = Color.FromArgb(255, 255, 255);
                 PointF textPos = new PointF(Width - 80, 10);
                 DrawText(g, resultText, textPos, fontSize, resultColor);
@@ -498,11 +498,11 @@ namespace CapsuleInspect.UIControl
 
                 if (rectInfo.info != "")
                 {
-                    float baseFontSize = 20.0f;
+                    float baseFontSize = 15.0f;
 
                     if (rectInfo.decision == DecisionType.Info)
                     {
-                        baseFontSize = 10.0f;
+                        baseFontSize = 7.0f;
                         lineColor = Color.LightBlue;
                     }
 

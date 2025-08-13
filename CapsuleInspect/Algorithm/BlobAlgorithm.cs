@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 namespace CapsuleInspect.Algorithm
 {
     //이진화 임계값 설정을 구조체로 만들기
@@ -56,6 +57,7 @@ namespace CapsuleInspect.Algorithm
         public readonly int FILTER_COUNT = 3;
 
         //이진화 필터로 찾은 영역
+        [XmlIgnore]
         private List<DrawInspectInfo> _findArea;
         public BinaryMethod BinMethod { get; set; } = BinaryMethod.Feature;
         //검사로 찾은 영역을 최외곽박스로 표시할 지 여부
@@ -320,9 +322,7 @@ namespace CapsuleInspect.Algorithm
                     showHeight = (int)(blobSize.Height + 0.5f);
                 }
 
-                // 필터링된 객체를 이미지에 그림
-                //Cv2.DrawContours(filteredImage, new Point[][] { contour }, -1, Scalar.White, -1);
-
+                
                 findBlobCount++;
                 Rect blobRect = boundingRect + InspRect.TopLeft;
 

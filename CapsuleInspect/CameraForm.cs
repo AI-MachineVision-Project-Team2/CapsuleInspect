@@ -31,7 +31,7 @@ namespace CapsuleInspect
 
         // 현재 선택된 이미지 채널을 저장하는 변수
 
-        eImageChannel _currentImageChannel = eImageChannel.Gray;
+        eImageChannel _currentImageChannel = eImageChannel.Color;
 
         public CameraForm()
         {
