@@ -638,7 +638,7 @@ namespace CapsuleInspect.Core
             var cameraForm = MainForm.GetDockForm<CameraForm>();
             if (cameraForm != null)
             {
-                //cameraForm.SetImageChannel(channel);
+                cameraForm.SetImageChannel(channel);
             }
         }
         //비트맵 이미지 요청시, 이미지 채널이 있다면 SelImageChangel에 설정

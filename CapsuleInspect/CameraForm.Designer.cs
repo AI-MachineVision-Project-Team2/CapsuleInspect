@@ -29,12 +29,13 @@
         private void InitializeComponent()
         {
             this.imageViewer = new CapsuleInspect.UIControl.ImageViewCtrl();
+            this.mainViewToolbar = new CapsuleInspect.UIControl.MainViewToolbar();
             this.SuspendLayout();
             // 
             // imageViewer
             // 
             this.imageViewer.BackColor = System.Drawing.Color.White;
-            this.imageViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.imageViewer.Dock = System.Windows.Forms.DockStyle.Left;
             this.imageViewer.Location = new System.Drawing.Point(0, 0);
             this.imageViewer.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.imageViewer.Name = "imageViewer";
@@ -42,12 +43,21 @@
             this.imageViewer.TabIndex = 0;
             this.imageViewer.WorkingState = "";
             // 
+            // mainViewToolbar
+            // 
+            this.mainViewToolbar.Dock = System.Windows.Forms.DockStyle.Right;
+            this.mainViewToolbar.Location = new System.Drawing.Point(691, 0);
+            this.mainViewToolbar.Name = "mainViewToolbar";
+            this.mainViewToolbar.Size = new System.Drawing.Size(109, 450);
+            this.mainViewToolbar.TabIndex = 1;
+            // 
             // CameraForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(211)))), ((int)(((byte)(211)))));
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.mainViewToolbar);
             this.Controls.Add(this.imageViewer);
             this.Name = "CameraForm";
             this.Text = "이미지창";
