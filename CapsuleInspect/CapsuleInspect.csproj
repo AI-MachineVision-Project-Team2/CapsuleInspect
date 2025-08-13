@@ -79,6 +79,9 @@
     <Reference Include="MvCameraControl.Net">
       <HintPath>..\ExternalLib\HikRobot\MvCameraControl.Net.dll</HintPath>
     </Reference>
+    <Reference Include="ObjectListView">
+      <HintPath>..\ExternalLib\ObjectListView\ObjectListView.dll</HintPath>
+    </Reference>
     <Reference Include="OpenCvSharp">
       <HintPath>..\ExternalLib\OpenCvSharp\OpenCvSharp.dll</HintPath>
     </Reference>
@@ -135,6 +138,7 @@
     <Compile Include="Grab\GrabModel.cs" />
     <Compile Include="Grab\HikRobotCam.cs" />
     <Compile Include="Grab\WebCam.cs" />
+    <Compile Include="Inspect\InspResult.cs" />
     <Compile Include="Inspect\SaigeAI.cs" />
     <Compile Include="LogForm.cs">
       <SubType>Form</SubType>
@@ -227,6 +231,12 @@
     </Compile>
     <Compile Include="Property\MatchInspProp.Designer.cs">
       <DependentUpon>MatchInspProp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ResultForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ResultForm.Designer.cs">
+      <DependentUpon>ResultForm.cs</DependentUpon>
     </Compile>
     <Compile Include="RunForm.cs">
       <SubType>Form</SubType>

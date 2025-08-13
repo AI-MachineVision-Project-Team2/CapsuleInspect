@@ -10,6 +10,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using CapsuleInspect.Inspect;
+
 namespace CapsuleInspect.Teach
 {
     public class InspWindow
@@ -26,6 +28,9 @@ namespace CapsuleInspect.Teach
         // Xml Serialize를 위해서, Element을 명확하게 알려줘야 함        
         [XmlElement("InspAlgorithm")]
         public List<InspAlgorithm> AlgorithmList { get; set; } = new List<InspAlgorithm>();
+        
+        // 검사 결과를 저장하기 위한 리스트
+        public List<InspResult> InspResultList { get; set; } = new List<InspResult>();
 
 
         // 패턴매칭에 필요한 티칭 이미지 관리 기능
@@ -84,6 +89,10 @@ namespace CapsuleInspect.Teach
             InspWindow cloneWindow = InspWindowFactory.Inst.Create(this.InspWindowType, false);
             cloneWindow.WindowArea = this.WindowArea + offset;
             cloneWindow.IsTeach = false;
+            cloneWindow.IsPatternLearn = false;
+
+            foreach (var img in _windowImages.ToList())
+                cloneWindow._windowImages.Add(img?.Clone());
 
             foreach (InspAlgorithm algo in AlgorithmList)
             {
@@ -290,6 +299,22 @@ namespace CapsuleInspect.Teach
             }
 
             return true;
+        }
+
+        // 검사 결과를 초기화 및 추가 함수
+        public void ResetInspResult()
+        {
+            foreach (var algorithm in AlgorithmList)
+            {
+                algorithm.ResetResult();
+            }
+
+            InspResultList.Clear();
+        }
+
+        public void AddInspResult(InspResult inspResult)
+        {
+            InspResultList.Add(inspResult);
         }
     }
 }

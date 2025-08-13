@@ -54,17 +54,19 @@ namespace CapsuleInspect
             //메인폼 설정
             var cameraWindow = new CameraForm();
             cameraWindow.Show(_dockPanel, DockState.Document);
-
+            var resultWindow = new ResultForm();
+            resultWindow.Show(cameraWindow.Pane, DockAlignment.Bottom, 0.3);
+            var runWindow = new RunForm();
+            runWindow.Show(resultWindow.Pane, DockAlignment.Right, 0.4);
             var propWindow = new PropertiesForm();
             propWindow.Show(_dockPanel, DockState.DockRight);
-            var runWindow = new RunForm();
-            runWindow.Show(cameraWindow.Pane, DockAlignment.Bottom, 0.2);
+            
             SharedFilterForm = new FilterForm();
             SharedFilterForm.Show(propWindow.Pane, DockAlignment.Bottom, 0.4);
 
             //#11_MODEL_TREE#1 검사 결과창 우측에 40% 비율로 모델트리 추가
             var modelTreeWindow = new ModelTreeForm();
-            modelTreeWindow.Show(runWindow.Pane, DockAlignment.Right, 0.3);
+            modelTreeWindow.Show(runWindow.Pane, DockAlignment.Bottom, 0.5);
 
         }
         //쉽게 도킹패널에 접근하기 위한 정적 함수

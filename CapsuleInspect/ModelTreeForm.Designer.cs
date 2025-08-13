@@ -35,20 +35,20 @@
             // 
             this.tvModelTree.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tvModelTree.Location = new System.Drawing.Point(0, 0);
-            this.tvModelTree.Margin = new System.Windows.Forms.Padding(5);
+            this.tvModelTree.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.tvModelTree.Name = "tvModelTree";
-            this.tvModelTree.Size = new System.Drawing.Size(800, 450);
+            this.tvModelTree.Size = new System.Drawing.Size(727, 386);
             this.tvModelTree.TabIndex = 2;
             this.tvModelTree.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tvModelTree_MouseDown);
             // 
             // ModelTreeForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(727, 386);
             this.Controls.Add(this.tvModelTree);
             this.Name = "ModelTreeForm";
-            this.Text = "ModelTreeForm";
+            this.Text = "ROIForm";
             this.ResumeLayout(false);
 
         }

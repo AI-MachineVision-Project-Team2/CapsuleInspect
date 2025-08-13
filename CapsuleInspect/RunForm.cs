@@ -41,18 +41,18 @@ namespace CapsuleInspect
         private void btnLive_Click(object sender, EventArgs e)
         {
             var stage = Global.Inst.InspStage;
-            Global.Inst.InspStage.ToggleLiveMode();
-            if (Global.Inst.InspStage.LiveMode)
+            stage.ToggleLiveMode();
+            if (stage.LiveMode)
             {
                 //SLogger.Write($"[RunForm] 동영상 모드 클릭됨. CameraType:{stage.GetCurrentCameraType()}");
-                // Global.Inst.InspStage.SetWorkingState(WorkingState.LIVE);
-                Global.Inst.InspStage.CheckImageBuffer();
-                Global.Inst.InspStage.Grab(0); // 최초 시작
+                // stage.SetWorkingState(WorkingState.LIVE);
+                stage.CheckImageBuffer();
+                stage.Grab(0); // 최초 시작
             }
             else
             {
                 //SLogger.Write($"[RunForm] 동영상 모드 중지됨. CameraType:{stage.GetCurrentCameraType()}");
-                //Global.Inst.InspStage.SetWorkingState(WorkingState.NONE);
+                //stage.SetWorkingState(WorkingState.NONE);
             }
         }
 
@@ -62,3 +62,4 @@ namespace CapsuleInspect
         }
     }
 }
+    

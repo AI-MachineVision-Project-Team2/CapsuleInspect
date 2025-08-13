@@ -30,7 +30,7 @@ namespace CapsuleInspect.Core
         SaigeAI _saigeAI; // SaigeAI 인스턴스
 
         //이진화 프리뷰에 필요한 변수 선언
-       
+
         private PreviewImage _previewImage = null;
         //모델과 선택된 ROI 윈도우 변수 선언
         private Model _model = null;
@@ -54,7 +54,7 @@ namespace CapsuleInspect.Core
             }
         }
 
-       
+
         public PreviewImage PreView
         {
             get => _previewImage;
@@ -80,7 +80,7 @@ namespace CapsuleInspect.Core
         {
             _filteredImage?.Dispose();
             _filteredImage = filtered?.Clone();
-            
+
             // UI 업데이트
             if (_filteredImage != null)
             {
@@ -124,7 +124,7 @@ namespace CapsuleInspect.Core
         {
             _imageSpace = new ImageSpace();
             //이진화 알고리즘과 프리뷰 변수 인스턴스 생성
-            
+
             _previewImage = new PreviewImage();
 
             // 모델 인스턴스 생성
@@ -336,7 +336,7 @@ namespace CapsuleInspect.Core
                 propForm.ShowProperty(inspWindow); // 탭 갱신
             }
         }
-        //#13_SET_IMAGE_BUFFER#1 InitImageSpace를 먼저 실행하도록 수정
+        //InitImageSpace를 먼저 실행하도록 수정
         public void SetBuffer(int bufferCount)
         {
             _imageSpace.InitImageSpace(bufferCount);
@@ -355,30 +355,11 @@ namespace CapsuleInspect.Core
                 }
             }
         }
-        /*
-        public void SetBuffer(int bufferCount)
-        {
-            if (_grabManager == null)
-                return;
 
-            if (_imageSpace.BufferCount == bufferCount)
-                return;
-
-            _imageSpace.InitImageSpace(bufferCount);
-            _grabManager.InitBuffer(bufferCount);
-
-            for (int i = 0; i < bufferCount; i++)
-            {
-                _grabManager.SetBuffer(
-                    _imageSpace.GetInspectionBuffer(i),
-                    _imageSpace.GetnspectionBufferPtr(i),
-                    _imageSpace.GetInspectionBufferHandle(i),
-                    i);
-            }
-        }*/
 
 
         //inspWindow에 대한 검사구현
+        //검사 결과를 출력하기 위해, 코드 수정
         public void TryInspection(InspWindow inspWindow = null)
         {
             if (inspWindow is null)
@@ -390,6 +371,8 @@ namespace CapsuleInspect.Core
             }
 
             UpdateDiagramEntity();
+
+            inspWindow.ResetInspResult();
 
             List<DrawInspectInfo> totalArea = new List<DrawInspectInfo>();
 
@@ -404,40 +387,50 @@ namespace CapsuleInspect.Core
                 inspAlgo.TeachRect = windowArea;
                 inspAlgo.InspRect = windowArea;
 
+                Mat srcImage = Global.Inst.InspStage.GetMat();
+                inspAlgo.SetInspData(srcImage);
+
+                if (!inspAlgo.DoInspect())
+                    continue;
+
+                List<DrawInspectInfo> resultArea = new List<DrawInspectInfo>();
+                int resultCnt = inspAlgo.GetResultRect(out resultArea);
+                if (resultCnt > 0)
+                {
+                    totalArea.AddRange(resultArea);
+                }
+
                 InspectType inspType = inspAlgo.InspectType;
+
+                string resultInfo = string.Join("\r\n", inspAlgo.ResultString);
+
+                InspResult inspResult = new InspResult
+                {
+                    ObjectID = inspWindow.UID,
+                    InspType = inspAlgo.InspectType,
+                    IsDefect = inspAlgo.IsDefect,
+                    ResultInfos = resultInfo
+                };
 
                 switch (inspType)
                 {
+                    case InspectType.InspMatch:
+                        {
+                            MatchAlgorithm matchAlgo = inspAlgo as MatchAlgorithm;
+                            inspResult.ResultValue = $"{matchAlgo.OutScore}";
+                            break;
+                        }
                     case InspectType.InspBinary:
                         {
                             BlobAlgorithm blobAlgo = (BlobAlgorithm)inspAlgo;
-
-                            Mat srcImage = Global.Inst.InspStage.GetMat();
-                            blobAlgo.SetInspData(srcImage);
-
-                            if (blobAlgo.DoInspect())
-                            {
-                                List<DrawInspectInfo> resultArea = new List<DrawInspectInfo>();
-                                int resultCnt = blobAlgo.GetResultRect(out resultArea);
-                                if (resultCnt > 0)
-                                {
-                                    totalArea.AddRange(resultArea);
-                                }
-                            }
-
+                            int min = blobAlgo.BlobFilters[blobAlgo.FILTER_COUNT].min;
+                            int max = blobAlgo.BlobFilters[blobAlgo.FILTER_COUNT].max;
+                            inspResult.ResultValue = $"{blobAlgo.OutBlobCount}/{min}~{max}";
                             break;
                         }
                 }
 
-                if (inspAlgo.DoInspect())
-                {
-                    List<DrawInspectInfo> resultArea = new List<DrawInspectInfo>();
-                    int resultCnt = inspAlgo.GetResultRect(out resultArea);
-                    if (resultCnt > 0)
-                    {
-                        totalArea.AddRange(resultArea);
-                    }
-                }
+                inspWindow.AddInspResult(inspResult);
             }
 
             if (totalArea.Count > 0)
@@ -449,7 +442,14 @@ namespace CapsuleInspect.Core
                     cameraForm.AddRect(totalArea);
                 }
             }
+
+            ResultForm resultForm = MainForm.GetDockForm<ResultForm>();
+            if (resultForm != null)
+            {
+                resultForm.AddWindowResult(inspWindow);
+            }
         }
+
 
         //#10_INSPWINDOW#13 ImageViewCtrl에서 ROI 생성,수정,이동,선택 등에 대한 함수
         public void SelectInspWindow(InspWindow inspWindow)
@@ -615,7 +615,7 @@ namespace CapsuleInspect.Core
         }
         //이진화 프리뷰를 위해, ImageSpace에서 이미지 가져오기
 
-           public Mat GetMat(int bufferIndex = 0, eImageChannel imageChannel = eImageChannel.None)
+        public Mat GetMat(int bufferIndex = 0, eImageChannel imageChannel = eImageChannel.None)
         {
             if (_filteredImage != null)
                 return _filteredImage.Clone();

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace CapsuleInspect.Algorithm
 {
@@ -18,6 +19,9 @@ namespace CapsuleInspect.Algorithm
         InspAIModule,
         InspCount
     }
+    [XmlInclude(typeof(MatchAlgorithm))]
+    [XmlInclude(typeof(BlobAlgorithm))]
+    [XmlInclude(typeof(FilterAlgorithm))]
     public abstract class InspAlgorithm
     {
         //알고리즘 타입 정의

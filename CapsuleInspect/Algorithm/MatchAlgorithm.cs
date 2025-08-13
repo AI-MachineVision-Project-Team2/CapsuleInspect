@@ -6,11 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace CapsuleInspect.Algorithm
 {
     public class MatchAlgorithm : InspAlgorithm
     {
+        [XmlIgnore]
         private List<Mat> _templateImages = new List<Mat>();
 
         //찾을 이미지의 매칭율

@@ -137,7 +137,13 @@ namespace CapsuleInspect.UIControl
             int nSelItem = GetSelectedIndex();
             if (nSelItem < 0)
                 return;
-
+            {
+                //1개 이하 일때 기본값 사용
+                if (listThumbnail.Items.Count == 1)
+                    nSelItem = 0;
+                else
+                    return;
+            }
             OnSelectChannel(PatternImageButton.UpdateImage, nSelItem);
         }
 
@@ -148,6 +154,9 @@ namespace CapsuleInspect.UIControl
 
         private void btnDel_Click(object sender, EventArgs e)
         {
+            //1개 이하 일때 리턴
+            if (listThumbnail.Items.Count <= 1)
+                return;
             int nSelItem = GetSelectedIndex();
             if (nSelItem < 0)
                 return;
