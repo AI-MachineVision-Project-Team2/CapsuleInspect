@@ -33,24 +33,27 @@
             // 
             // tabPropControl
             // 
+            this.tabPropControl.Cursor = System.Windows.Forms.Cursors.PanNW;
             this.tabPropControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabPropControl.Location = new System.Drawing.Point(0, 0);
-            this.tabPropControl.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPropControl.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tabPropControl.Name = "tabPropControl";
             this.tabPropControl.SelectedIndex = 0;
-            this.tabPropControl.Size = new System.Drawing.Size(1143, 675);
+            this.tabPropControl.Size = new System.Drawing.Size(914, 638);
             this.tabPropControl.TabIndex = 1;
             // 
             // PropertiesForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1143, 675);
+            this.ClientSize = new System.Drawing.Size(914, 638);
             this.Controls.Add(this.tabPropControl);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Cursor = System.Windows.Forms.Cursors.PanNW;
+            this.Font = new System.Drawing.Font("한컴 말랑말랑 Bold", 9.749998F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "PropertiesForm";
-            this.Text = "PropertiesForm";
+            this.Text = "속성창";
             this.ResumeLayout(false);
 
         }

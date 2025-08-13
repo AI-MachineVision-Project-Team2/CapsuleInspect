@@ -77,6 +77,9 @@ namespace CapsuleInspect
                     BinaryProp blobProp = new BinaryProp();
                     //이진화 속성 변경시 발생하는 이벤트 추가
                     blobProp.RangeChanged += RangeSlider_RangeChanged;
+                    // 이미지 채널 변경시 이벤트 추가
+                    blobProp.ImageChannelChanged += ImageChannelChanged;
+
                     curProp = blobProp;
                     break;
                 case InspectType.InspFilter:
@@ -91,7 +94,7 @@ namespace CapsuleInspect
                 //패턴매칭 속성창 추가
                 case InspectType.InspMatch:
                     MatchInspProp matchProp = new MatchInspProp();
-                    matchProp.PropertyChanged += PropertyChanged;
+                    
                     curProp = matchProp;
                     break;
                 default:
@@ -176,9 +179,10 @@ namespace CapsuleInspect
         {
             Global.Inst.InspStage.RedrawMainView();
         }
-        private void PropertyChanged(object sender, EventArgs e)
+        //이미지 채널 변경시 프리뷰에 이미지 채널 설정
+        private void ImageChannelChanged(object sender, ImageChannelEventArgs e)
         {
-            Global.Inst.InspStage.RedrawMainView();
+            Global.Inst.InspStage.SetPreviewImage(e.Channel);
         }
     }
 }

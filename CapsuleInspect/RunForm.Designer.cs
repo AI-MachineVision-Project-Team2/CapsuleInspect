@@ -39,12 +39,13 @@
             // 
             // btnStop
             // 
+            this.btnStop.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnStop.Cursor = System.Windows.Forms.Cursors.PanNW;
             this.btnStop.ImageIndex = 3;
             this.btnStop.ImageList = this.runImageList;
-            this.btnStop.Location = new System.Drawing.Point(282, 12);
-            this.btnStop.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnStop.Location = new System.Drawing.Point(197, 8);
             this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(82, 82);
+            this.btnStop.Size = new System.Drawing.Size(57, 55);
             this.btnStop.TabIndex = 8;
             this.btnStop.UseVisualStyleBackColor = true;
             this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
@@ -60,52 +61,56 @@
             // 
             // btnLive
             // 
+            this.btnLive.Cursor = System.Windows.Forms.Cursors.PanNW;
             this.btnLive.ImageIndex = 1;
             this.btnLive.ImageList = this.runImageList;
-            this.btnLive.Location = new System.Drawing.Point(101, 12);
-            this.btnLive.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnLive.Location = new System.Drawing.Point(71, 8);
             this.btnLive.Name = "btnLive";
-            this.btnLive.Size = new System.Drawing.Size(82, 82);
+            this.btnLive.Size = new System.Drawing.Size(57, 55);
             this.btnLive.TabIndex = 7;
             this.btnLive.UseVisualStyleBackColor = true;
             this.btnLive.Click += new System.EventHandler(this.btnLive_Click);
             // 
             // btnInsp
             // 
+            this.btnInsp.Cursor = System.Windows.Forms.Cursors.PanNW;
             this.btnInsp.ImageIndex = 2;
             this.btnInsp.ImageList = this.runImageList;
-            this.btnInsp.Location = new System.Drawing.Point(192, 12);
-            this.btnInsp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnInsp.Location = new System.Drawing.Point(134, 8);
             this.btnInsp.Name = "btnInsp";
-            this.btnInsp.Size = new System.Drawing.Size(82, 82);
+            this.btnInsp.Size = new System.Drawing.Size(57, 55);
             this.btnInsp.TabIndex = 6;
             this.btnInsp.UseVisualStyleBackColor = true;
             this.btnInsp.Click += new System.EventHandler(this.btnInsp_Click);
             // 
             // btnGrab
             // 
+            this.btnGrab.BackColor = System.Drawing.Color.White;
+            this.btnGrab.Cursor = System.Windows.Forms.Cursors.PanNW;
             this.btnGrab.ImageIndex = 0;
             this.btnGrab.ImageList = this.runImageList;
-            this.btnGrab.Location = new System.Drawing.Point(12, 12);
-            this.btnGrab.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnGrab.Location = new System.Drawing.Point(8, 8);
             this.btnGrab.Name = "btnGrab";
-            this.btnGrab.Size = new System.Drawing.Size(82, 82);
+            this.btnGrab.Size = new System.Drawing.Size(57, 55);
             this.btnGrab.TabIndex = 5;
-            this.btnGrab.UseVisualStyleBackColor = true;
+            this.btnGrab.UseVisualStyleBackColor = false;
             this.btnGrab.Click += new System.EventHandler(this.btnGrab_Click);
             // 
             // RunForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(382, 106);
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(211)))), ((int)(((byte)(211)))));
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.ClientSize = new System.Drawing.Size(267, 71);
             this.Controls.Add(this.btnStop);
             this.Controls.Add(this.btnLive);
             this.Controls.Add(this.btnInsp);
             this.Controls.Add(this.btnGrab);
+            this.Cursor = System.Windows.Forms.Cursors.PanNW;
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "RunForm";
-            this.Text = "RunForm";
+            this.Text = "실행창";
             this.ResumeLayout(false);
 
         }

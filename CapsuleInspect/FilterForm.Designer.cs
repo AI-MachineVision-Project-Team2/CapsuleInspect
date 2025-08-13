@@ -37,18 +37,19 @@
             this.tabPropControl2.Location = new System.Drawing.Point(0, 0);
             this.tabPropControl2.Name = "tabPropControl2";
             this.tabPropControl2.SelectedIndex = 0;
-            this.tabPropControl2.Size = new System.Drawing.Size(727, 386);
+            this.tabPropControl2.Size = new System.Drawing.Size(654, 428);
             this.tabPropControl2.TabIndex = 0;
             // 
             // FilterForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(727, 386);
+            this.ClientSize = new System.Drawing.Size(654, 428);
             this.Controls.Add(this.tabPropControl2);
+            this.Font = new System.Drawing.Font("한컴 말랑말랑 Bold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.Name = "FilterForm";
-            this.Text = "FilterForm";
+            this.Text = "이미지필터창";
             this.ResumeLayout(false);
 
         }

@@ -37,10 +37,10 @@
             // 
             // btnCreate
             // 
-            this.btnCreate.Location = new System.Drawing.Point(264, 222);
-            this.btnCreate.Margin = new System.Windows.Forms.Padding(4);
+            this.btnCreate.Location = new System.Drawing.Point(211, 210);
+            this.btnCreate.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnCreate.Name = "btnCreate";
-            this.btnCreate.Size = new System.Drawing.Size(113, 45);
+            this.btnCreate.Size = new System.Drawing.Size(90, 42);
             this.btnCreate.TabIndex = 14;
             this.btnCreate.Text = "만들기";
             this.btnCreate.UseVisualStyleBackColor = true;
@@ -48,52 +48,53 @@
             // 
             // txtModelInfo
             // 
-            this.txtModelInfo.Location = new System.Drawing.Point(107, 58);
-            this.txtModelInfo.Margin = new System.Windows.Forms.Padding(4);
+            this.txtModelInfo.Location = new System.Drawing.Point(86, 55);
+            this.txtModelInfo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtModelInfo.Name = "txtModelInfo";
-            this.txtModelInfo.Size = new System.Drawing.Size(270, 154);
+            this.txtModelInfo.Size = new System.Drawing.Size(217, 146);
             this.txtModelInfo.TabIndex = 13;
             this.txtModelInfo.Text = "";
             // 
             // txtModelName
             // 
-            this.txtModelName.Location = new System.Drawing.Point(107, 17);
-            this.txtModelName.Margin = new System.Windows.Forms.Padding(4);
+            this.txtModelName.Location = new System.Drawing.Point(86, 16);
+            this.txtModelName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtModelName.Name = "txtModelName";
-            this.txtModelName.Size = new System.Drawing.Size(270, 28);
+            this.txtModelName.Size = new System.Drawing.Size(217, 24);
             this.txtModelName.TabIndex = 12;
             // 
             // lbModelInfo
             // 
             this.lbModelInfo.AutoSize = true;
-            this.lbModelInfo.Location = new System.Drawing.Point(14, 62);
-            this.lbModelInfo.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lbModelInfo.Location = new System.Drawing.Point(11, 58);
             this.lbModelInfo.Name = "lbModelInfo";
-            this.lbModelInfo.Size = new System.Drawing.Size(86, 18);
+            this.lbModelInfo.Size = new System.Drawing.Size(56, 17);
             this.lbModelInfo.TabIndex = 11;
             this.lbModelInfo.Text = "모델 정보";
             // 
             // lbModelName
             // 
             this.lbModelName.AutoSize = true;
-            this.lbModelName.Location = new System.Drawing.Point(14, 22);
-            this.lbModelName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lbModelName.Font = new System.Drawing.Font("한컴 말랑말랑 Bold", 9.749998F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.lbModelName.Location = new System.Drawing.Point(11, 19);
             this.lbModelName.Name = "lbModelName";
-            this.lbModelName.Size = new System.Drawing.Size(62, 18);
+            this.lbModelName.Size = new System.Drawing.Size(41, 17);
             this.lbModelName.TabIndex = 10;
             this.lbModelName.Text = "모델명";
             // 
             // NewModel
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(401, 280);
+            this.ClientSize = new System.Drawing.Size(321, 265);
             this.Controls.Add(this.btnCreate);
             this.Controls.Add(this.txtModelInfo);
             this.Controls.Add(this.txtModelName);
             this.Controls.Add(this.lbModelInfo);
             this.Controls.Add(this.lbModelName);
+            this.Font = new System.Drawing.Font("한컴 말랑말랑 Bold", 9.749998F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.Name = "NewModel";
             this.Text = "NewModel";
             this.ResumeLayout(false);

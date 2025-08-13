@@ -27,7 +27,7 @@ namespace CapsuleInspect
             {
                 Height = 5,
                 Dock = DockStyle.Top,
-                BackColor = Color.LightPink
+                BackColor = Color.FromArgb(255, 221, 221) // 상단 메뉴와 도킹 패널 사이의 간격을 위한 패널
             };
            
             // DockPanel 생성 및 추가
@@ -36,10 +36,10 @@ namespace CapsuleInspect
                 Dock = DockStyle.Fill
             };
             Controls.Add(_dockPanel);
-            Controls.Add(spacerPanel);
+            //Controls.Add(spacerPanel);
             
            
-            Controls.SetChildIndex(spacerPanel, 0); // MenuStrip 아래
+            //Controls.SetChildIndex(spacerPanel, 0); // MenuStrip 아래
             Controls.SetChildIndex(_dockPanel, 1);  // spacer 아래
             _dockPanel.Theme = new VS2015LightTheme();
             // 도킹 윈도우 로드 메서드 호출
@@ -196,6 +196,6 @@ namespace CapsuleInspect
             bool isChecked = cycleModeMenuItem.Checked;
             SettingXml.Inst.CycleMode = isChecked;
         }
-        //1dsads
+        
     }
 }

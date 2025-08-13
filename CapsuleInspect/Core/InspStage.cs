@@ -154,9 +154,8 @@ namespace CapsuleInspect.Core
             _inspWorker = new InspWorker();
             _imageLoader = new ImageLoader();
 
-            //#16_LAST_MODELOPEN#2 REGISTRY 키 생성
-            _regKey = Registry.CurrentUser.CreateSubKey("Software\\MoldVisionJ");
-
+            //#REGISTRY 키 생성
+            _regKey = Registry.CurrentUser.CreateSubKey("Software\\SomVision");
 
             // 모델 인스턴스 생성
             _model = new Model();
@@ -219,6 +218,9 @@ namespace CapsuleInspect.Core
             }
 
             SetBuffer(bufferCount);
+            //카메라 칼라 여부에 따라, 기본 채널 설정
+            eImageChannel imageChannel = (pixelBpp == 24) ? eImageChannel.Color : eImageChannel.Gray;
+            SetImageChannel(imageChannel);
 
         }
         public void SetImageBuffer(string filePath)
@@ -262,12 +264,6 @@ namespace CapsuleInspect.Core
             _imageSpace.Split(bufferIndex);
 
             DisplayGrabImage(bufferIndex);
-
-            if (_previewImage != null)
-            {
-                Bitmap bitmap = ImageSpace.GetBitmap(0);
-                _previewImage.SetImage(BitmapConverter.ToMat(bitmap));
-            }
         }
 
         public void CheckImageBuffer()
@@ -331,7 +327,71 @@ namespace CapsuleInspect.Core
                 propForm.ShowProperty(_selectedInspWindow);
             }
         }
+        public void SetTeachingImage(InspWindow inspWindow, int index = -1)
+        {
+            if (inspWindow is null)
+                return;
 
+            // 새로운 코드: CameraForm에서 이미지 가져오기
+            CameraForm cameraForm = MainForm.GetDockForm<CameraForm>();
+            if (cameraForm is null)
+                return;
+
+            // 새로운 코드: GetDisplayImage()로 이미지 가져오기
+            Mat curImage = cameraForm.GetDisplayImage() ?? GetFilteredImage() ?? GetMat();
+            if (curImage == null)
+                return;
+
+            // ROI 영역 유효성 검사
+            if (inspWindow.WindowArea.Right >= curImage.Width ||
+                inspWindow.WindowArea.Bottom >= curImage.Height)
+            {
+                SLogger.Write("ROI 영역이 잘못되었습니다!");
+                return;
+            }
+
+            // 기존 코드: Clone 사용, 새로운 코드에서는 Clone 제거
+            // 두 가지 옵션을 유지하기 위해 Clone 유지 (필요 시 주석 처리 가능)
+            Mat windowImage = curImage[inspWindow.WindowArea].Clone();
+
+            // MatchAlgorithm 처리
+            var matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
+            if (matchAlgo != null)
+            {
+                // 새로운 코드: ImageChannel 설정 및 컬러를 그레이로 변환
+                matchAlgo.ImageChannel = SelImageChannel;
+                if (matchAlgo.ImageChannel == eImageChannel.Color)
+                    matchAlgo.ImageChannel = eImageChannel.Gray;
+
+                // 기존 코드: 템플릿 이미지 설정
+                if (index < 0)
+                {
+                    matchAlgo.AddTemplateImage(windowImage);
+                    inspWindow.AddWindowImage(windowImage); // 동기화 유지
+                }
+                else
+                {
+                    matchAlgo.SetTemplateImage(windowImage, index); // Set 메서드 필요
+                    inspWindow.SetWindowImage(windowImage, index); // 동기화 유지
+                }
+            }
+
+            inspWindow.IsPatternLearn = false;
+
+            // 기존 및 새로운 코드: UI 갱신
+            var propForm = MainForm.GetDockForm<PropertiesForm>();
+            if (propForm != null)
+            {
+                propForm.ShowProperty(inspWindow); // 탭 갱신
+            }
+
+            // 새로운 코드: UpdateProperty 호출
+            if (matchAlgo != null)
+            {
+                UpdateProperty(inspWindow);
+            }
+        }
+        /*
         public void SetTeachingImage(InspWindow inspWindow, int index = -1)
         {
             if (inspWindow is null)
@@ -373,7 +433,7 @@ namespace CapsuleInspect.Core
             {
                 propForm.ShowProperty(inspWindow); // 탭 갱신
             }
-        }
+        }*/
         //InitImageSpace를 먼저 실행하도록 수정
         public void SetBuffer(int bufferCount)
         {
@@ -534,11 +594,7 @@ namespace CapsuleInspect.Core
 
             DisplayGrabImage(bufferIndex);
 
-            if (_previewImage != null)
-            {
-                Bitmap bitmap = ImageSpace.GetBitmap(0);
-                _previewImage.SetImage(BitmapConverter.ToMat(bitmap));
-            }
+            
             if (LiveMode)
             {
                 SLogger.Write("Grab");
@@ -564,13 +620,43 @@ namespace CapsuleInspect.Core
                 cameraForm.UpdateDisplay(bitmap);
             }
         }
-        public Bitmap GetBitmap(int bufferIndex = -1)
+        //프리뷰 이미지 채널을 설정하는 함수
+        public void SetPreviewImage(eImageChannel channel)
         {
+            if (_previewImage is null)
+                return;
+
+            Bitmap bitmap = ImageSpace.GetBitmap(0, channel);
+            _previewImage.SetImage(BitmapConverter.ToMat(bitmap));
+
+            SetImageChannel(channel);
+        }
+
+        // 이미지 채널을 설정하는 함수
+        public void SetImageChannel(eImageChannel channel)
+        {
+            var cameraForm = MainForm.GetDockForm<CameraForm>();
+            if (cameraForm != null)
+            {
+                //cameraForm.SetImageChannel(channel);
+            }
+        }
+        //비트맵 이미지 요청시, 이미지 채널이 있다면 SelImageChangel에 설정
+        public Bitmap GetBitmap(int bufferIndex = -1, eImageChannel imageChannel = eImageChannel.None)
+        {
+            if (bufferIndex >= 0)
+                SelBufferIndex = bufferIndex;
+
+            //#BINARY FILTER#13 채널 정보가 유지되도록, eImageChannel.None 타입을 추가
+            if (imageChannel != eImageChannel.None)
+                SelImageChannel = imageChannel;
+
             if (Global.Inst.InspStage.ImageSpace is null)
                 return null;
 
-            return Global.Inst.InspStage.ImageSpace.GetBitmap();
+            return Global.Inst.InspStage.ImageSpace.GetBitmap(SelBufferIndex, SelImageChannel);
         }
+        
         //이진화 프리뷰를 위해, ImageSpace에서 이미지 가져오기
 
         public Mat GetMat(int bufferIndex = 0, eImageChannel imageChannel = eImageChannel.None)
@@ -578,10 +664,9 @@ namespace CapsuleInspect.Core
             if (_filteredImage != null)
                 return _filteredImage.Clone();
 
-            if (imageChannel != eImageChannel.None)
-                SelImageChannel = imageChannel;
+            
             int index = bufferIndex >= 0 ? bufferIndex : SelBufferIndex;
-            return ImageSpace.GetMat(index, SelImageChannel);
+            return Global.Inst.InspStage.ImageSpace.GetMat(SelBufferIndex, imageChannel);
         }
 
 

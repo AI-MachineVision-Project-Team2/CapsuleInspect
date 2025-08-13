@@ -29,12 +29,17 @@ namespace CapsuleInspect
         private Mat _originalImage;
         private bool _isFirstApply = true;
 
+        // 현재 선택된 이미지 채널을 저장하는 변수
+
+        eImageChannel _currentImageChannel = eImageChannel.Gray;
+
         public CameraForm()
         {
             InitializeComponent();
+            this.FormClosed += CameraForm_FormClosed;
             // ImageViewCtrl에서 발생하는 이벤트 처리
             imageViewer.DiagramEntityEvent += ImageViewer_DiagramEntityEvent;
-
+            mainViewToolbar.ButtonChanged += Toolbar_ButtonChanged;
         }
         private void ImageViewer_DiagramEntityEvent(object sender, DiagramEntityEventArgs e)
         {
@@ -96,7 +101,7 @@ namespace CapsuleInspect
         }
         public Mat GetDisplayImage()
         {
-            return Global.Inst.InspStage.ImageSpace.GetMat();
+            return Global.Inst.InspStage.ImageSpace.GetMat(0, _currentImageChannel);
         }
 
         public void LoadGrabbedImage(Bitmap bitmap)
@@ -121,7 +126,7 @@ namespace CapsuleInspect
         private void CameraForm_Resize(object sender, EventArgs e)
         {
             int margin = 0;
-            imageViewer.Width = this.Width - margin * 2;
+            imageViewer.Width = this.Width - mainViewToolbar.Width - margin * 2;
             imageViewer.Height = this.Height - margin * 2;
 
             imageViewer.Location = new System.Drawing.Point(margin, margin);
@@ -250,17 +255,15 @@ namespace CapsuleInspect
             if (bitmap == null)
             {
                 //업데이트시 bitmap이 없다면 InspSpace에서 가져온다
-                bitmap = Global.Inst.InspStage.GetBitmap(0);
+                bitmap = Global.Inst.InspStage.GetBitmap(0, _currentImageChannel);
+
                 if (bitmap == null)
                     return;
             }
 
             if (imageViewer != null)
                 imageViewer.LoadBitmap(bitmap);
-            //현재 선택된 이미지로 Preview 이미지 갱신
-            //이진화 프리뷰에서 각 채널별로 설정이 적용되도록, 현재 이미지를 프리뷰 클래스 설정            
-            Mat curImage = Global.Inst.InspStage.GetMat();
-            Global.Inst.InspStage.PreView.SetImage(curImage);
+
         }
 
         public void UpdateImageViewer()
@@ -343,6 +346,55 @@ namespace CapsuleInspect
 
             imageViewer.WorkingState = state;
             imageViewer.Invalidate();
+        }
+
+        //#18_IMAGE_CHANNEL#2 메인툴바의 버튼 이벤트를 처리하는 함수
+        private void Toolbar_ButtonChanged(object sender, ToolbarEventArgs e)
+        {
+            switch (e.Button)
+            {
+                case ToolbarButton.ShowROI:
+                    if (e.IsChecked)
+                        UpdateDiagramEntity();
+                    else
+                        imageViewer.ResetEntity();
+                    break;
+                case ToolbarButton.ChannelColor:
+                    _currentImageChannel = eImageChannel.Color;
+                    UpdateDisplay();
+                    break;
+                case ToolbarButton.ChannelGray:
+                    _currentImageChannel = eImageChannel.Gray;
+                    UpdateDisplay();
+                    break;
+                case ToolbarButton.ChannelRed:
+                    _currentImageChannel = eImageChannel.Red;
+                    UpdateDisplay();
+                    break;
+                case ToolbarButton.ChannelGreen:
+                    _currentImageChannel = eImageChannel.Green;
+                    UpdateDisplay();
+                    break;
+                case ToolbarButton.ChannelBlue:
+                    _currentImageChannel = eImageChannel.Blue;
+                    UpdateDisplay();
+                    break;
+            }
+        }
+
+        public void SetImageChannel(eImageChannel channel)
+        {
+            mainViewToolbar.SetSelectButton(channel);
+            UpdateDisplay();
+        }
+
+        private void CameraForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            mainViewToolbar.ButtonChanged -= Toolbar_ButtonChanged;
+
+            imageViewer.DiagramEntityEvent -= ImageViewer_DiagramEntityEvent;
+
+            this.FormClosed -= CameraForm_FormClosed;
         }
     }
 }

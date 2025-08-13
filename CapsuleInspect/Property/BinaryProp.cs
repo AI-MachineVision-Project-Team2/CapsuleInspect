@@ -22,6 +22,10 @@ namespace CapsuleInspect.Property
     }
     public partial class BinaryProp : UserControl
     {
+        // 이미지 채널 변경시 발생하는 이벤트
+        public event EventHandler<ImageChannelEventArgs> ImageChannelChanged;
+
+
         //속성창의 값이 변경시 발생하는 이벤트
         public event EventHandler<EventArgs> PropertyChanged;
         //양방향 슬라이더 값 변경시 발생하는 이벤트
@@ -54,6 +58,13 @@ namespace CapsuleInspect.Property
 
             binRangeTrackbar.ValueLeft = 0;
             binRangeTrackbar.ValueRight = 128;
+
+            // 이미지 채널 설정 콤보박스
+            cbChannel.Items.Add("Gray");
+            cbChannel.Items.Add("Red");
+            cbChannel.Items.Add("Green");
+            cbChannel.Items.Add("Blue");
+            cbChannel.SelectedIndex = 0; // 기본값으로 "사용안함" 선택
 
             //이진화 프리뷰 콤보박스 초기화 설정
             cbHighlight.Items.Add("사용안함");
@@ -143,6 +154,7 @@ namespace CapsuleInspect.Property
             }
             // 이진화 검사 관련 속성값 적용
             cbBinMethod.SelectedIndex = (int)_blobAlgo.BinMethod;
+            cbChannel.SelectedIndex = (int)_blobAlgo.ImageChannel - 1;
 
             UpdateDataGridView(true);
             chkRotatedRect.Checked = _blobAlgo.UseRotatedRect;
@@ -277,6 +289,14 @@ namespace CapsuleInspect.Property
         }
         private void cbHighlight_SelectedIndexChanged(object sender, EventArgs e)
         {
+            // 하이라이트 선택시, 이미지 채널 정보를 전달하여,
+            //프리뷰에 나타나도록 이벤트 발생
+            if (_blobAlgo is null)
+                return;
+
+            _blobAlgo.ImageChannel = (eImageChannel)cbChannel.SelectedIndex + 1;
+            ImageChannelChanged?.Invoke(this, new ImageChannelEventArgs(_blobAlgo.ImageChannel));
+
             UpdateBinary();
         }
 
@@ -311,6 +331,27 @@ namespace CapsuleInspect.Property
                 return;
 
             _blobAlgo.UseRotatedRect = chkRotatedRect.Checked;
+        }
+
+        private void cbChannel_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (_blobAlgo is null)
+                return;
+
+            _blobAlgo.ImageChannel = (eImageChannel)cbChannel.SelectedIndex + 1;
+            ImageChannelChanged?.Invoke(this, new ImageChannelEventArgs(_blobAlgo.ImageChannel));
+        }
+    }
+    public class ImageChannelEventArgs : EventArgs
+    {
+        public eImageChannel Channel { get; }
+        public int UpperValue { get; }
+        public bool Invert { get; }
+        public ShowBinaryMode ShowBinMode { get; }
+
+        public ImageChannelEventArgs(eImageChannel channel)
+        {
+            Channel = channel;
         }
     }
     //이진화 관련 이벤트 발생시, 전달할 값 추가
