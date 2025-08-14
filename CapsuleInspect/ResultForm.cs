@@ -49,21 +49,9 @@ namespace CapsuleInspect
                 UseFiltering = true,
                 OwnerDraw = true,
                 MultiSelect = false,
-                GridLines = true,
-                Cursor = Cursors.PanNW, // 커서 변경
-                
+                GridLines = true,   
             };
             _treeListView.SelectionChanged += TreeListView_SelectionChanged;
-            _treeListView.MouseEnter += (s, e) =>
-            {
-                _treeListView.Cursor = Cursors.PanNW;
-            };
-
-            _treeListView.MouseMove += (s, e) =>
-            {
-                if (_treeListView.Cursor != Cursors.PanNW)
-                    _treeListView.Cursor = Cursors.PanNW;
-            };
             _treeListView.CanExpandGetter = x => true;
 
             _treeListView.ChildrenGetter = x =>
@@ -135,7 +123,6 @@ namespace CapsuleInspect
                 Multiline = true,
                 ScrollBars = ScrollBars.Vertical,
                 Font = new Font("Arial", 10),
-                Cursor = Cursors.PanNW,
                 ReadOnly = true
             };
 

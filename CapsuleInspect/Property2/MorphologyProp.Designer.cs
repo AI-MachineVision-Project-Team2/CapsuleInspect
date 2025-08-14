@@ -30,15 +30,16 @@
         {
             this.btnOpening = new System.Windows.Forms.RadioButton();
             this.btnClosing = new System.Windows.Forms.RadioButton();
+            this.label1 = new System.Windows.Forms.Label();
+            this.txtpixelsize = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // btnOpening
             // 
             this.btnOpening.AutoSize = true;
-            this.btnOpening.Location = new System.Drawing.Point(15, 21);
-            this.btnOpening.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnOpening.Location = new System.Drawing.Point(14, 18);
             this.btnOpening.Name = "btnOpening";
-            this.btnOpening.Size = new System.Drawing.Size(98, 25);
+            this.btnOpening.Size = new System.Drawing.Size(99, 22);
             this.btnOpening.TabIndex = 12;
             this.btnOpening.TabStop = true;
             this.btnOpening.Text = "Opening";
@@ -47,22 +48,41 @@
             // btnClosing
             // 
             this.btnClosing.AutoSize = true;
-            this.btnClosing.Location = new System.Drawing.Point(15, 61);
-            this.btnClosing.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnClosing.Location = new System.Drawing.Point(14, 52);
             this.btnClosing.Name = "btnClosing";
-            this.btnClosing.Size = new System.Drawing.Size(88, 25);
+            this.btnClosing.Size = new System.Drawing.Size(92, 22);
             this.btnClosing.TabIndex = 13;
             this.btnClosing.TabStop = true;
             this.btnClosing.Text = "Closing";
             this.btnClosing.UseVisualStyleBackColor = true;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(15, 99);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(98, 18);
+            this.label1.TabIndex = 14;
+            this.label1.Text = "픽셀 크기: ";
+            // 
+            // txtpixelsize
+            // 
+            this.txtpixelsize.Location = new System.Drawing.Point(110, 93);
+            this.txtpixelsize.Name = "txtpixelsize";
+            this.txtpixelsize.Size = new System.Drawing.Size(100, 28);
+            this.txtpixelsize.TabIndex = 15;
+            this.txtpixelsize.TextChanged += new System.EventHandler(this.Txtpixelsize_TextChanged);
+            // 
             // MorphologyProp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.txtpixelsize);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.btnOpening);
             this.Controls.Add(this.btnClosing);
             this.Name = "MorphologyProp";
+            this.Size = new System.Drawing.Size(290, 253);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -72,5 +92,7 @@
 
         private System.Windows.Forms.RadioButton btnOpening;
         private System.Windows.Forms.RadioButton btnClosing;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox txtpixelsize;
     }
 }
