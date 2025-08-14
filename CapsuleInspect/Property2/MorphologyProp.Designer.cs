@@ -30,7 +30,6 @@
         {
             this.btnOpening = new System.Windows.Forms.RadioButton();
             this.btnClosing = new System.Windows.Forms.RadioButton();
-
             this.lblpixel = new System.Windows.Forms.Label();
             this.txtpixelsize = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
@@ -39,9 +38,10 @@
             // 
             this.btnOpening.AutoSize = true;
             this.btnOpening.Font = new System.Drawing.Font("Noto Sans KR", 8.25F);
-            this.btnOpening.Location = new System.Drawing.Point(14, 18);
+            this.btnOpening.Location = new System.Drawing.Point(10, 12);
+            this.btnOpening.Margin = new System.Windows.Forms.Padding(2);
             this.btnOpening.Name = "btnOpening";
-            this.btnOpening.Size = new System.Drawing.Size(105, 29);
+            this.btnOpening.Size = new System.Drawing.Size(69, 20);
             this.btnOpening.TabIndex = 12;
             this.btnOpening.TabStop = true;
             this.btnOpening.Text = "Opening";
@@ -51,45 +51,47 @@
             // 
             this.btnClosing.AutoSize = true;
             this.btnClosing.Font = new System.Drawing.Font("Noto Sans KR", 8.25F);
-            this.btnClosing.Location = new System.Drawing.Point(14, 52);
+            this.btnClosing.Location = new System.Drawing.Point(10, 35);
+            this.btnClosing.Margin = new System.Windows.Forms.Padding(2);
             this.btnClosing.Name = "btnClosing";
-            this.btnClosing.Size = new System.Drawing.Size(96, 29);
+            this.btnClosing.Size = new System.Drawing.Size(63, 20);
             this.btnClosing.TabIndex = 13;
             this.btnClosing.TabStop = true;
             this.btnClosing.Text = "Closing";
             this.btnClosing.UseVisualStyleBackColor = true;
             // 
-
             // lblpixel
             // 
             this.lblpixel.AutoSize = true;
-            this.lblpixel.Location = new System.Drawing.Point(15, 91);
+            this.lblpixel.Font = new System.Drawing.Font("Noto Sans KR", 8.25F);
+            this.lblpixel.Location = new System.Drawing.Point(8, 67);
+            this.lblpixel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblpixel.Name = "lblpixel";
-            this.lblpixel.Size = new System.Drawing.Size(98, 18);
+            this.lblpixel.Size = new System.Drawing.Size(55, 16);
             this.lblpixel.TabIndex = 14;
             this.lblpixel.Text = "픽셀 크기: ";
             // 
             // txtpixelsize
             // 
-
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-
-            this.txtpixelsize.Location = new System.Drawing.Point(119, 88);
+            this.txtpixelsize.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.txtpixelsize.Font = new System.Drawing.Font("Noto Sans KR", 8.25F);
+            this.txtpixelsize.Location = new System.Drawing.Point(72, 65);
             this.txtpixelsize.Name = "txtpixelsize";
-            this.txtpixelsize.Size = new System.Drawing.Size(100, 28);
+            this.txtpixelsize.Size = new System.Drawing.Size(100, 23);
             this.txtpixelsize.TabIndex = 15;
-            this.txtpixelsize.TextChanged += new System.EventHandler(this.txtpixelsize_TextChanged);
-
+            // 
+            // MorphologyProp
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.txtpixelsize);
             this.Controls.Add(this.lblpixel);
-
             this.Controls.Add(this.btnOpening);
             this.Controls.Add(this.btnClosing);
             this.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "MorphologyProp";
-
-            this.Size = new System.Drawing.Size(136, 129);
-
+            this.Size = new System.Drawing.Size(201, 103);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -102,6 +104,7 @@
 
         private System.Windows.Forms.Label lblpixel;
 
+       
         private System.Windows.Forms.TextBox txtpixelsize;
     }
 }

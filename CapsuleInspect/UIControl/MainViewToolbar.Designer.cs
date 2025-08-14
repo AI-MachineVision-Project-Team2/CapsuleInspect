@@ -50,13 +50,13 @@
             // 
             // MainViewToolbar
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 26F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Font = new System.Drawing.Font("Noto Sans KR", 9F);
             this.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.Name = "MainViewToolbar";
-            this.Size = new System.Drawing.Size(156, 906);
+            this.Size = new System.Drawing.Size(92, 906);
             this.ResumeLayout(false);
 
         }

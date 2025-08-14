@@ -25,6 +25,9 @@ namespace CapsuleInspect
         public MainForm()
         {
             InitializeComponent();
+            if (DesignModeDetector.IsDesignMode)
+                return; // 디자이너에서는 여기서 중단
+
             mainMenu.Dock = DockStyle.Top;
             var spacerPanel = new Panel
             {
@@ -66,16 +69,14 @@ namespace CapsuleInspect
             //메인폼 설정
             var cameraWindow = new CameraForm();
             cameraWindow.Show(_dockPanel, DockState.Document);
-
-
             var runWindow = new RunForm();
             runWindow.Show(cameraWindow.Pane, DockAlignment.Bottom, 0.3);
             var resultWindow = new ResultForm();
             resultWindow.Show(_dockPanel, DockState.DockRight);
-            var helpWindow = new HelpForm();
-            helpWindow.Show(_dockPanel, DockState.DockRight);
             var statisicsWindow = new StatisticsForm();
             statisicsWindow.Show(_dockPanel, DockState.DockRight);
+            var helpWindow = new HelpForm();
+            helpWindow.Show(_dockPanel, DockState.DockRight);
             var propWindow = new PropertiesForm();
             propWindow.Show(_dockPanel, DockState.DockLeft);
 

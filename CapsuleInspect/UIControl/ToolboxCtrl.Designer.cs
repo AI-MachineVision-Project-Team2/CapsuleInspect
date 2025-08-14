@@ -47,51 +47,50 @@
             // btnLive
             // 
             this.btnLive.BackColor = System.Drawing.Color.Transparent;
-            this.btnLive.Cursor = System.Windows.Forms.Cursors.PanNW;
+            this.btnLive.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnLive.ImageIndex = 1;
             this.btnLive.ImageList = this.toolboxImgList;
-            this.btnLive.Location = new System.Drawing.Point(52, 4);
-            this.btnLive.Margin = new System.Windows.Forms.Padding(4);
+            this.btnLive.Location = new System.Drawing.Point(36, 3);
             this.btnLive.Name = "btnLive";
-            this.btnLive.Size = new System.Drawing.Size(25, 25);
+            this.btnLive.Size = new System.Drawing.Size(18, 17);
             this.btnLive.TabIndex = 11;
             this.btnLive.UseVisualStyleBackColor = false;
             // 
             // btnInsp
             // 
             this.btnInsp.BackColor = System.Drawing.Color.Transparent;
-            this.btnInsp.Cursor = System.Windows.Forms.Cursors.PanNW;
+            this.btnInsp.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnInsp.ImageIndex = 2;
             this.btnInsp.ImageList = this.toolboxImgList;
-            this.btnInsp.Location = new System.Drawing.Point(88, 4);
-            this.btnInsp.Margin = new System.Windows.Forms.Padding(4);
+            this.btnInsp.Location = new System.Drawing.Point(62, 3);
             this.btnInsp.Name = "btnInsp";
-            this.btnInsp.Size = new System.Drawing.Size(25, 25);
+            this.btnInsp.Size = new System.Drawing.Size(18, 17);
             this.btnInsp.TabIndex = 10;
             this.btnInsp.UseVisualStyleBackColor = false;
             // 
             // btnGrab
             // 
             this.btnGrab.BackColor = System.Drawing.Color.Transparent;
-            this.btnGrab.Cursor = System.Windows.Forms.Cursors.PanNW;
+            this.btnGrab.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnGrab.ImageIndex = 0;
             this.btnGrab.ImageList = this.toolboxImgList;
-            this.btnGrab.Location = new System.Drawing.Point(14, 4);
-            this.btnGrab.Margin = new System.Windows.Forms.Padding(4);
+            this.btnGrab.Location = new System.Drawing.Point(10, 3);
             this.btnGrab.Name = "btnGrab";
-            this.btnGrab.Size = new System.Drawing.Size(25, 25);
+            this.btnGrab.Size = new System.Drawing.Size(18, 17);
             this.btnGrab.TabIndex = 9;
             this.btnGrab.UseVisualStyleBackColor = false;
             // 
             // ToolboxCtrl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.btnLive);
             this.Controls.Add(this.btnInsp);
             this.Controls.Add(this.btnGrab);
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "ToolboxCtrl";
-            this.Size = new System.Drawing.Size(828, 32);
+            this.Size = new System.Drawing.Size(580, 21);
             this.ResumeLayout(false);
 
         }
