@@ -102,6 +102,14 @@ namespace CapsuleInspect.Inspect
                 {
                     cameraForm.SetInspResultCount(totalCnt, okCnt, ngCnt);
                 }
+                var resultForm = MainForm.GetDockForm<ResultForm>();
+                if (resultForm != null)
+                {
+                    if (resultForm.InvokeRequired)
+                        resultForm.BeginInvoke(new Action(() => resultForm.AddModelResult(curMode)));
+                    else
+                        resultForm.AddModelResult(curMode);
+                }
             }
 
             return true;

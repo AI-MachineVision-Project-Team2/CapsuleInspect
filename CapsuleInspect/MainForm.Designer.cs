@@ -61,6 +61,7 @@
             this.mainMenu.Name = "mainMenu";
             this.mainMenu.Padding = new System.Windows.Forms.Padding(8, 3, 0, 3);
             this.mainMenu.Size = new System.Drawing.Size(1534, 39);
+
             this.mainMenu.TabIndex = 2;
             this.mainMenu.Text = "menuStrip1";
             // 
@@ -84,6 +85,7 @@
             this.imageOpenToolStripMenuItem.Name = "imageOpenToolStripMenuItem";
             this.imageOpenToolStripMenuItem.Size = new System.Drawing.Size(314, 38);
             this.imageOpenToolStripMenuItem.Text = "이미지 열기";
+
             this.imageOpenToolStripMenuItem.Click += new System.EventHandler(this.imageOpenToolStripMenuItem_Click);
             // 
             // imageSaveToolStripMenuItem
@@ -91,17 +93,20 @@
             this.imageSaveToolStripMenuItem.Name = "imageSaveToolStripMenuItem";
             this.imageSaveToolStripMenuItem.Size = new System.Drawing.Size(314, 38);
             this.imageSaveToolStripMenuItem.Text = "이미지 저장";
+
             // 
             // toolStripSeparator
             // 
             this.toolStripSeparator.Name = "toolStripSeparator";
             this.toolStripSeparator.Size = new System.Drawing.Size(311, 6);
+
             // 
             // modelNewMenuItem
             // 
             this.modelNewMenuItem.Name = "modelNewMenuItem";
             this.modelNewMenuItem.Size = new System.Drawing.Size(314, 38);
             this.modelNewMenuItem.Text = "새 모델 만들기";
+
             this.modelNewMenuItem.Click += new System.EventHandler(this.modelNewMenuItem_Click);
             // 
             // modelOpenMenuItem
@@ -109,6 +114,7 @@
             this.modelOpenMenuItem.Name = "modelOpenMenuItem";
             this.modelOpenMenuItem.Size = new System.Drawing.Size(314, 38);
             this.modelOpenMenuItem.Text = "모델 열기";
+
             this.modelOpenMenuItem.Click += new System.EventHandler(this.modelOpenMenuItem_Click);
             // 
             // modelSaveMenuItem
@@ -133,6 +139,7 @@
             this.setupToolStripMenuItem.Name = "setupToolStripMenuItem";
             this.setupToolStripMenuItem.Size = new System.Drawing.Size(65, 33);
             this.setupToolStripMenuItem.Text = "설정";
+
             // 
             // SetupMenuItem
             // 
@@ -149,6 +156,7 @@
             this.inspectToolStripMenuItem.Name = "inspectToolStripMenuItem";
             this.inspectToolStripMenuItem.Size = new System.Drawing.Size(65, 33);
             this.inspectToolStripMenuItem.Text = "검사";
+
             // 
             // cycleModeMenuItem
             // 

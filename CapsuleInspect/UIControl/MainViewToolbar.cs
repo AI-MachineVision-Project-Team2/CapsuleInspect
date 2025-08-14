@@ -51,6 +51,7 @@ namespace CapsuleInspect.UIControl
                 Padding = new Padding(2),
                 ImageList = imageListToolbar,   // 버튼용 ImageList 연결
                 Cursor = Cursors.Hand
+
             };
 
             // ───────────────── Helper ─────────────────

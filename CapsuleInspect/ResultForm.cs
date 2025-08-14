@@ -64,6 +64,7 @@ namespace CapsuleInspect
                 if (_treeListView.Cursor != Cursors.Hand)
                     _treeListView.Cursor = Cursors.Hand;
             };
+
             _treeListView.CanExpandGetter = x => true;
 
             _treeListView.ChildrenGetter = x =>
@@ -136,6 +137,7 @@ namespace CapsuleInspect
                 ScrollBars = ScrollBars.Vertical,
                 Font = new Font("Arial", 10),
                 Cursor = Cursors.Hand,
+
                 ReadOnly = true
             };
 

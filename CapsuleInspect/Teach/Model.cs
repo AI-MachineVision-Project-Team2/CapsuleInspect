@@ -78,7 +78,7 @@ namespace CapsuleInspect.Teach
             Model model = XmlHelper.LoadXml<Model>(path);
             if (model == null)
                 return null;
-
+            ModelPath = path;
             foreach (var window in model.InspWindowList)
             {
                 window.LoadInspWindow(model);

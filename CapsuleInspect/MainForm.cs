@@ -1,6 +1,7 @@
 ﻿using CapsuleInspect.Core;
 using CapsuleInspect.Setting;
 using CapsuleInspect.Teach;
+using CapsuleInspect.UIControl;
 using CapsuleInspect.Util;
 using System;
 using System.Collections.Generic;
@@ -24,22 +25,29 @@ namespace CapsuleInspect
         public MainForm()
         {
             InitializeComponent();
+            mainMenu.Dock = DockStyle.Top;
             var spacerPanel = new Panel
             {
                 Height = 5,
                 Dock = DockStyle.Top,
                 BackColor = Color.FromArgb(243, 244, 246) // 상단 메뉴와 도킹 패널 사이의 간격을 위한 패널
             };
-           
+            var toolboxCtrl = new ToolboxCtrl
+            {
+                Dock = DockStyle.Top,
+                Height = 20 // 필요에 따라 높이 조정
+            };
             // DockPanel 생성 및 추가
             _dockPanel = new DockPanel
             {
                 Dock = DockStyle.Fill
             };
             Controls.Add(_dockPanel);
+            Controls.Add(toolboxCtrl);
+            Controls.Add(mainMenu);
             //Controls.Add(spacerPanel);
-            
-           
+
+
             //Controls.SetChildIndex(spacerPanel, 0); // MenuStrip 아래
             Controls.SetChildIndex(_dockPanel, 1);  // spacer 아래
             _dockPanel.Theme = new VS2015LightTheme();

@@ -75,17 +75,6 @@ namespace CapsuleInspect.Algorithm
 
             switch (filter)
             {
-                case FilterType.Grayscale:
-                    if (src.Channels() == 1)
-                    {
-                        dst = src.Clone(); // 이미 흑백이면 그대로 복사
-                    }
-                    else
-                    {
-                        Cv2.CvtColor(src, dst, ColorConversionCodes.BGR2GRAY);
-                    }
-                    break;
-
                 case FilterType.HSVscale:
                     if (src.Channels() == 1)
                     {
@@ -139,7 +128,9 @@ namespace CapsuleInspect.Algorithm
                         else
                             Cv2.CvtColor(src, binary, ColorConversionCodes.BGR2GRAY);
                         Cv2.Threshold(binary, binary, 0, 255, ThresholdTypes.Binary | ThresholdTypes.Otsu);
-                        Mat kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(5, 5));
+                        // MorphologyProp에서 가져온 커널 크기 사용
+                        int kernelSize = options?.MorphProp?.KernelSize ?? 3; // MorphProp이 null이면 기본값 3
+                        Mat kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(kernelSize, kernelSize));
 
                         MorphTypes morphType = options.MorphType;
                         Cv2.MorphologyEx(binary, dst, morphType, kernel);

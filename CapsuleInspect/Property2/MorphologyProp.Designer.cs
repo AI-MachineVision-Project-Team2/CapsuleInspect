@@ -30,6 +30,9 @@
         {
             this.btnOpening = new System.Windows.Forms.RadioButton();
             this.btnClosing = new System.Windows.Forms.RadioButton();
+
+            this.lblpixel = new System.Windows.Forms.Label();
+            this.txtpixelsize = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // btnOpening
@@ -56,15 +59,37 @@
             this.btnClosing.Text = "Closing";
             this.btnClosing.UseVisualStyleBackColor = true;
             // 
-            // MorphologyProp
+
+            // lblpixel
             // 
+            this.lblpixel.AutoSize = true;
+            this.lblpixel.Location = new System.Drawing.Point(15, 91);
+            this.lblpixel.Name = "lblpixel";
+            this.lblpixel.Size = new System.Drawing.Size(98, 18);
+            this.lblpixel.TabIndex = 14;
+            this.lblpixel.Text = "픽셀 크기: ";
+            // 
+            // txtpixelsize
+            // 
+
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+
+            this.txtpixelsize.Location = new System.Drawing.Point(119, 88);
+            this.txtpixelsize.Name = "txtpixelsize";
+            this.txtpixelsize.Size = new System.Drawing.Size(100, 28);
+            this.txtpixelsize.TabIndex = 15;
+            this.txtpixelsize.TextChanged += new System.EventHandler(this.txtpixelsize_TextChanged);
+
+            this.Controls.Add(this.lblpixel);
+
             this.Controls.Add(this.btnOpening);
             this.Controls.Add(this.btnClosing);
             this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Name = "MorphologyProp";
+
             this.Size = new System.Drawing.Size(136, 129);
+
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -74,5 +99,9 @@
 
         private System.Windows.Forms.RadioButton btnOpening;
         private System.Windows.Forms.RadioButton btnClosing;
+
+        private System.Windows.Forms.Label lblpixel;
+
+        private System.Windows.Forms.TextBox txtpixelsize;
     }
 }
