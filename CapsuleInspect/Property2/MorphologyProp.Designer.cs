@@ -30,7 +30,8 @@
         {
             this.btnOpening = new System.Windows.Forms.RadioButton();
             this.btnClosing = new System.Windows.Forms.RadioButton();
-            this.label1 = new System.Windows.Forms.Label();
+
+            this.lblpixel = new System.Windows.Forms.Label();
             this.txtpixelsize = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
@@ -56,33 +57,30 @@
             this.btnClosing.Text = "Closing";
             this.btnClosing.UseVisualStyleBackColor = true;
             // 
-            // label1
+
+            // lblpixel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(15, 99);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(98, 18);
-            this.label1.TabIndex = 14;
-            this.label1.Text = "픽셀 크기: ";
+            this.lblpixel.AutoSize = true;
+            this.lblpixel.Location = new System.Drawing.Point(15, 91);
+            this.lblpixel.Name = "lblpixel";
+            this.lblpixel.Size = new System.Drawing.Size(98, 18);
+            this.lblpixel.TabIndex = 14;
+            this.lblpixel.Text = "픽셀 크기: ";
             // 
             // txtpixelsize
             // 
-            this.txtpixelsize.Location = new System.Drawing.Point(110, 93);
+            this.txtpixelsize.Location = new System.Drawing.Point(119, 88);
             this.txtpixelsize.Name = "txtpixelsize";
             this.txtpixelsize.Size = new System.Drawing.Size(100, 28);
             this.txtpixelsize.TabIndex = 15;
-            this.txtpixelsize.TextChanged += new System.EventHandler(this.Txtpixelsize_TextChanged);
-            // 
-            // MorphologyProp
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.txtpixelsize);
-            this.Controls.Add(this.label1);
+            this.txtpixelsize.TextChanged += new System.EventHandler(this.txtpixelsize_TextChanged);
+
+            this.Controls.Add(this.lblpixel);
             this.Controls.Add(this.btnOpening);
             this.Controls.Add(this.btnClosing);
             this.Name = "MorphologyProp";
-            this.Size = new System.Drawing.Size(290, 253);
+            this.Size = new System.Drawing.Size(258, 143);
+
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -92,7 +90,9 @@
 
         private System.Windows.Forms.RadioButton btnOpening;
         private System.Windows.Forms.RadioButton btnClosing;
-        private System.Windows.Forms.Label label1;
+
+        private System.Windows.Forms.Label lblpixel;
+
         private System.Windows.Forms.TextBox txtpixelsize;
     }
 }
