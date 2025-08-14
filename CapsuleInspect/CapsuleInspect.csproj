@@ -329,6 +329,12 @@
     <Compile Include="UIControl\RangeTrackbar.Designer.cs">
       <DependentUpon>RangeTrackbar.cs</DependentUpon>
     </Compile>
+    <Compile Include="UIControl\ToolboxCtrl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UIControl\ToolboxCtrl.Designer.cs">
+      <DependentUpon>ToolboxCtrl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Util\BitmapExtension.cs" />
     <Compile Include="Util\ImageFileSorter.cs" />
     <Compile Include="Util\ImageLoader.cs" />
@@ -421,6 +427,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UIControl\PatternImageEditor.resx">
       <DependentUpon>PatternImageEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UIControl\ToolboxCtrl.resx">
+      <DependentUpon>ToolboxCtrl.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
