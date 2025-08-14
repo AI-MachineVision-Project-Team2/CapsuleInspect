@@ -33,8 +33,9 @@
             // 
             // tabPropControl
             // 
-            this.tabPropControl.Cursor = System.Windows.Forms.Cursors.PanNW;
+            this.tabPropControl.Cursor = System.Windows.Forms.Cursors.Hand;
             this.tabPropControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabPropControl.Font = new System.Drawing.Font("Noto Sans KR", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.tabPropControl.Location = new System.Drawing.Point(0, 0);
             this.tabPropControl.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tabPropControl.Name = "tabPropControl";
@@ -44,13 +45,13 @@
             // 
             // PropertiesForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(914, 638);
             this.Controls.Add(this.tabPropControl);
-            this.Cursor = System.Windows.Forms.Cursors.PanNW;
-            this.Font = new System.Drawing.Font("한컴 말랑말랑 Bold", 9.749998F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.Font = new System.Drawing.Font("Noto Sans KR", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "PropertiesForm";
             this.Text = "속성창";

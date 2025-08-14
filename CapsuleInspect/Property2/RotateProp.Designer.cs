@@ -36,53 +36,56 @@
             // 
             // txtRotate
             // 
-            this.txtRotate.Location = new System.Drawing.Point(19, 325);
-            this.txtRotate.Margin = new System.Windows.Forms.Padding(5);
+            this.txtRotate.Location = new System.Drawing.Point(17, 279);
+            this.txtRotate.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.txtRotate.Multiline = true;
             this.txtRotate.Name = "txtRotate";
             this.txtRotate.ReadOnly = true;
-            this.txtRotate.Size = new System.Drawing.Size(103, 34);
+            this.txtRotate.Size = new System.Drawing.Size(94, 30);
             this.txtRotate.TabIndex = 12;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(61, 297);
+            this.label5.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.label5.Location = new System.Drawing.Point(55, 255);
             this.label5.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(21, 21);
+            this.label5.Size = new System.Drawing.Size(22, 26);
             this.label5.TabIndex = 11;
             this.label5.Text = "0";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(52, 10);
+            this.label4.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.label4.Location = new System.Drawing.Point(47, 9);
             this.label4.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(43, 21);
+            this.label4.Size = new System.Drawing.Size(42, 26);
             this.label4.TabIndex = 10;
             this.label4.Text = "360";
             // 
             // vScrollBarRotate
             // 
-            this.vScrollBarRotate.Location = new System.Drawing.Point(19, 40);
+            this.vScrollBarRotate.Location = new System.Drawing.Point(17, 34);
             this.vScrollBarRotate.Maximum = 360;
             this.vScrollBarRotate.Name = "vScrollBarRotate";
-            this.vScrollBarRotate.Size = new System.Drawing.Size(103, 248);
+            this.vScrollBarRotate.Size = new System.Drawing.Size(103, 213);
             this.vScrollBarRotate.TabIndex = 9;
             this.vScrollBarRotate.Scroll += new System.Windows.Forms.ScrollEventHandler(this.vScrollBarRotate_Scroll);
             // 
             // RotateProp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.txtRotate);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.vScrollBarRotate);
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Name = "RotateProp";
-            this.Size = new System.Drawing.Size(150, 385);
+            this.Size = new System.Drawing.Size(136, 330);
             this.ResumeLayout(false);
             this.PerformLayout();
 

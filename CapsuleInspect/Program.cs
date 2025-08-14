@@ -17,7 +17,7 @@ namespace CapsuleInspect
         static void Main()
         {
             log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
-            SLogger.Write("Logger initialized!", SLogger.LogType.Info);
+            SLogger.Write("로그시스템이 초기화 됐습니다", SLogger.LogType.Info);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

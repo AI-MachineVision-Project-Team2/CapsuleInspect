@@ -28,7 +28,7 @@ namespace CapsuleInspect
             {
                 Height = 5,
                 Dock = DockStyle.Top,
-                BackColor = Color.FromArgb(255, 221, 221) // 상단 메뉴와 도킹 패널 사이의 간격을 위한 패널
+                BackColor = Color.FromArgb(243, 244, 246) // 상단 메뉴와 도킹 패널 사이의 간격을 위한 패널
             };
            
             // DockPanel 생성 및 추가
@@ -64,6 +64,10 @@ namespace CapsuleInspect
             runWindow.Show(cameraWindow.Pane, DockAlignment.Bottom, 0.3);
             var resultWindow = new ResultForm();
             resultWindow.Show(_dockPanel, DockState.DockRight);
+            var helpWindow = new HelpForm();
+            helpWindow.Show(_dockPanel, DockState.DockRight);
+            var statisicsWindow = new StatisticsForm();
+            statisicsWindow.Show(_dockPanel, DockState.DockRight);
             var propWindow = new PropertiesForm();
             propWindow.Show(_dockPanel, DockState.DockLeft);
 
@@ -194,7 +198,7 @@ namespace CapsuleInspect
         //Cycle 모드 설정
         private void cycleModeMenuItem_Click(object sender, EventArgs e)
         {
-            SLogger.Write($"Cycle Mode Click");
+            SLogger.Write($"자동 반복 검사 클릭됨");
             // 현재 체크 상태 확인
             bool isChecked = cycleModeMenuItem.Checked;
             SettingXml.Inst.CycleMode = isChecked;

@@ -141,7 +141,8 @@ namespace CapsuleInspect.Sequence
             MmiMessageInfo message, ClientInfo clinet)
         {
             _currentMessage = XmlHelper.XmlDeserialize<Message>(message.Message);
-            SLogger.Write($"--Receive Message--\nTime : {_currentMessage.Time}\nCommand : {_currentMessage.Command}", SLogger.LogType.Info);
+            SLogger.Write($"--메시지 수신--\n수신 시각 : {_currentMessage.Time}\n명령어 : {_currentMessage.Command}",
+                          SLogger.LogType.Info);
             switch (_currentMessage.Command)
             {
                 case Message.MessageCommand.Loaded:

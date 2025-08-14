@@ -234,7 +234,7 @@ namespace CapsuleInspect.Core
         }
         public void SetImageBuffer(string filePath)
         {
-            SLogger.Write($"Load Image : {filePath}");
+            SLogger.Write($"이미지 불러오기 : {filePath}");
 
             Mat matImage = Cv2.ImRead(filePath);
 
@@ -851,7 +851,7 @@ namespace CapsuleInspect.Core
                 case SeqCmd.InspStart:
                     {
                         //카메라 촬상 후, 검사 진행
-                        SLogger.Write("MMI : InspStart", SLogger.LogType.Info);
+                        SLogger.Write("MMI : 검사 진행", SLogger.LogType.Info);
 
                         //검사 시작
                         string errMsg;
@@ -860,7 +860,7 @@ namespace CapsuleInspect.Core
                         {
                             if (!Grab(0))
                             {
-                                errMsg = string.Format("Failed to grab");
+                                errMsg = string.Format("이미지 촬영 실패");
                                 SLogger.Write(errMsg, SLogger.LogType.Error);
                             }
                         }
@@ -868,7 +868,7 @@ namespace CapsuleInspect.Core
                         {
                             if (!VirtualGrab())
                             {
-                                errMsg = string.Format("Failed to virtual grab");
+                                errMsg = string.Format("가상 촬영 실패");
                                 SLogger.Write(errMsg, SLogger.LogType.Error);
                             }
                         }
@@ -876,7 +876,7 @@ namespace CapsuleInspect.Core
                         bool isDefect = false;
                         if (!_inspWorker.RunInspect(out isDefect))
                         {
-                            errMsg = string.Format("Failed to inspect");
+                            errMsg = string.Format("검사 실패");
                             SLogger.Write(errMsg, SLogger.LogType.Error);
                         }
 
@@ -886,7 +886,7 @@ namespace CapsuleInspect.Core
                     break;
                 case SeqCmd.InspEnd:
                     {
-                        SLogger.Write("MMI : InspEnd", SLogger.LogType.Info);
+                        SLogger.Write("MMI : 검사 종료", SLogger.LogType.Info);
 
                         //모든 검사 종료
                         string errMsg = "";
@@ -917,7 +917,7 @@ namespace CapsuleInspect.Core
 
         public bool StartAutoRun()
         {
-            SLogger.Write("Action : StartAutoRun");
+            SLogger.Write("동작 : 자동 검사 시작");
 
             string modelPath = CurModel.ModelPath;
             if (modelPath == "")

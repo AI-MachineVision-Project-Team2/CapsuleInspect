@@ -35,10 +35,10 @@
             // btnOpening
             // 
             this.btnOpening.AutoSize = true;
-            this.btnOpening.Location = new System.Drawing.Point(15, 21);
-            this.btnOpening.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnOpening.Font = new System.Drawing.Font("Noto Sans KR", 8.25F);
+            this.btnOpening.Location = new System.Drawing.Point(14, 18);
             this.btnOpening.Name = "btnOpening";
-            this.btnOpening.Size = new System.Drawing.Size(98, 25);
+            this.btnOpening.Size = new System.Drawing.Size(105, 29);
             this.btnOpening.TabIndex = 12;
             this.btnOpening.TabStop = true;
             this.btnOpening.Text = "Opening";
@@ -47,10 +47,10 @@
             // btnClosing
             // 
             this.btnClosing.AutoSize = true;
-            this.btnClosing.Location = new System.Drawing.Point(15, 61);
-            this.btnClosing.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnClosing.Font = new System.Drawing.Font("Noto Sans KR", 8.25F);
+            this.btnClosing.Location = new System.Drawing.Point(14, 52);
             this.btnClosing.Name = "btnClosing";
-            this.btnClosing.Size = new System.Drawing.Size(88, 25);
+            this.btnClosing.Size = new System.Drawing.Size(96, 29);
             this.btnClosing.TabIndex = 13;
             this.btnClosing.TabStop = true;
             this.btnClosing.Text = "Closing";
@@ -58,11 +58,13 @@
             // 
             // MorphologyProp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.btnOpening);
             this.Controls.Add(this.btnClosing);
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Name = "MorphologyProp";
+            this.Size = new System.Drawing.Size(136, 129);
             this.ResumeLayout(false);
             this.PerformLayout();
 

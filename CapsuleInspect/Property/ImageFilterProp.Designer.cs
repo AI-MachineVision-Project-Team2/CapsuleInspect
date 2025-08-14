@@ -38,10 +38,10 @@
             // 
             // btnRedo
             // 
-            this.btnRedo.Location = new System.Drawing.Point(188, 140);
-            this.btnRedo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnRedo.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.btnRedo.Location = new System.Drawing.Point(171, 120);
             this.btnRedo.Name = "btnRedo";
-            this.btnRedo.Size = new System.Drawing.Size(78, 44);
+            this.btnRedo.Size = new System.Drawing.Size(71, 38);
             this.btnRedo.TabIndex = 30;
             this.btnRedo.Text = "다음";
             this.btnRedo.UseVisualStyleBackColor = true;
@@ -50,10 +50,11 @@
             // checkFilter
             // 
             this.checkFilter.AutoSize = true;
-            this.checkFilter.Location = new System.Drawing.Point(16, 82);
-            this.checkFilter.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.checkFilter.Font = new System.Drawing.Font("Noto Sans KR", 10F);
+            this.checkFilter.Location = new System.Drawing.Point(15, 70);
+            this.checkFilter.Margin = new System.Windows.Forms.Padding(4);
             this.checkFilter.Name = "checkFilter";
-            this.checkFilter.Size = new System.Drawing.Size(169, 25);
+            this.checkFilter.Size = new System.Drawing.Size(159, 33);
             this.checkFilter.TabIndex = 29;
             this.checkFilter.Text = "누적 필터 적용";
             this.checkFilter.UseVisualStyleBackColor = true;
@@ -61,10 +62,10 @@
             // 
             // btnUndo
             // 
-            this.btnUndo.Location = new System.Drawing.Point(104, 140);
-            this.btnUndo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnUndo.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.btnUndo.Location = new System.Drawing.Point(95, 120);
             this.btnUndo.Name = "btnUndo";
-            this.btnUndo.Size = new System.Drawing.Size(78, 44);
+            this.btnUndo.Size = new System.Drawing.Size(71, 38);
             this.btnUndo.TabIndex = 28;
             this.btnUndo.Text = "이전";
             this.btnUndo.UseVisualStyleBackColor = true;
@@ -72,10 +73,10 @@
             // 
             // btnSrc
             // 
-            this.btnSrc.Location = new System.Drawing.Point(273, 140);
-            this.btnSrc.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnSrc.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.btnSrc.Location = new System.Drawing.Point(248, 120);
             this.btnSrc.Name = "btnSrc";
-            this.btnSrc.Size = new System.Drawing.Size(78, 44);
+            this.btnSrc.Size = new System.Drawing.Size(71, 38);
             this.btnSrc.TabIndex = 27;
             this.btnSrc.Text = "원본";
             this.btnSrc.UseVisualStyleBackColor = true;
@@ -83,10 +84,10 @@
             // 
             // btnApply
             // 
-            this.btnApply.Location = new System.Drawing.Point(16, 140);
-            this.btnApply.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnApply.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.btnApply.Location = new System.Drawing.Point(15, 120);
             this.btnApply.Name = "btnApply";
-            this.btnApply.Size = new System.Drawing.Size(78, 44);
+            this.btnApply.Size = new System.Drawing.Size(71, 38);
             this.btnApply.TabIndex = 26;
             this.btnApply.Text = "적용";
             this.btnApply.UseVisualStyleBackColor = true;
@@ -96,19 +97,18 @@
             // 
             this.cbFilterType.BackColor = System.Drawing.SystemColors.Info;
             this.cbFilterType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbFilterType.Font = new System.Drawing.Font("Arial", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbFilterType.Font = new System.Drawing.Font("Noto Sans KR", 9F);
             this.cbFilterType.ForeColor = System.Drawing.SystemColors.InfoText;
             this.cbFilterType.FormattingEnabled = true;
-            this.cbFilterType.Location = new System.Drawing.Point(17, 26);
-            this.cbFilterType.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.cbFilterType.Location = new System.Drawing.Point(15, 22);
             this.cbFilterType.Name = "cbFilterType";
-            this.cbFilterType.Size = new System.Drawing.Size(334, 24);
+            this.cbFilterType.Size = new System.Drawing.Size(304, 34);
             this.cbFilterType.TabIndex = 31;
             this.cbFilterType.SelectedIndexChanged += new System.EventHandler(this.cbFilterType_SelectedIndexChanged);
             // 
             // ImageFilterProp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.cbFilterType);
             this.Controls.Add(this.btnRedo);
@@ -116,8 +116,9 @@
             this.Controls.Add(this.btnUndo);
             this.Controls.Add(this.btnSrc);
             this.Controls.Add(this.btnApply);
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Name = "ImageFilterProp";
-            this.Size = new System.Drawing.Size(376, 299);
+            this.Size = new System.Drawing.Size(342, 256);
             this.ResumeLayout(false);
             this.PerformLayout();
 

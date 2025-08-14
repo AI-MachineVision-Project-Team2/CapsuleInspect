@@ -39,10 +39,11 @@
             // 
             // btnSelImageDir
             // 
-            this.btnSelImageDir.Location = new System.Drawing.Point(458, 62);
-            this.btnSelImageDir.Margin = new System.Windows.Forms.Padding(5);
+            this.btnSelImageDir.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.btnSelImageDir.Location = new System.Drawing.Point(416, 77);
+            this.btnSelImageDir.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             this.btnSelImageDir.Name = "btnSelImageDir";
-            this.btnSelImageDir.Size = new System.Drawing.Size(61, 37);
+            this.btnSelImageDir.Size = new System.Drawing.Size(55, 46);
             this.btnSelImageDir.TabIndex = 20;
             this.btnSelImageDir.Text = "...";
             this.btnSelImageDir.UseVisualStyleBackColor = true;
@@ -50,28 +51,31 @@
             // 
             // txtImageDir
             // 
-            this.txtImageDir.Location = new System.Drawing.Point(136, 64);
-            this.txtImageDir.Margin = new System.Windows.Forms.Padding(5);
+            this.txtImageDir.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.txtImageDir.Location = new System.Drawing.Point(124, 79);
+            this.txtImageDir.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             this.txtImageDir.Name = "txtImageDir";
-            this.txtImageDir.Size = new System.Drawing.Size(287, 32);
+            this.txtImageDir.Size = new System.Drawing.Size(261, 34);
             this.txtImageDir.TabIndex = 19;
             // 
             // lbImageDir
             // 
             this.lbImageDir.AutoSize = true;
-            this.lbImageDir.Location = new System.Drawing.Point(17, 69);
+            this.lbImageDir.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.lbImageDir.Location = new System.Drawing.Point(15, 85);
             this.lbImageDir.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.lbImageDir.Name = "lbImageDir";
-            this.lbImageDir.Size = new System.Drawing.Size(122, 21);
+            this.lbImageDir.Size = new System.Drawing.Size(102, 26);
             this.lbImageDir.TabIndex = 18;
             this.lbImageDir.Text = "이미지 경로";
             // 
             // btnApply
             // 
-            this.btnApply.Location = new System.Drawing.Point(427, 111);
-            this.btnApply.Margin = new System.Windows.Forms.Padding(5);
+            this.btnApply.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.btnApply.Location = new System.Drawing.Point(388, 137);
+            this.btnApply.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             this.btnApply.Name = "btnApply";
-            this.btnApply.Size = new System.Drawing.Size(93, 46);
+            this.btnApply.Size = new System.Drawing.Size(85, 56);
             this.btnApply.TabIndex = 17;
             this.btnApply.Text = "적용";
             this.btnApply.UseVisualStyleBackColor = true;
@@ -79,10 +83,11 @@
             // 
             // btnSelModelDir
             // 
-            this.btnSelModelDir.Location = new System.Drawing.Point(458, 15);
-            this.btnSelModelDir.Margin = new System.Windows.Forms.Padding(5);
+            this.btnSelModelDir.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.btnSelModelDir.Location = new System.Drawing.Point(416, 19);
+            this.btnSelModelDir.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             this.btnSelModelDir.Name = "btnSelModelDir";
-            this.btnSelModelDir.Size = new System.Drawing.Size(61, 37);
+            this.btnSelModelDir.Size = new System.Drawing.Size(55, 46);
             this.btnSelModelDir.TabIndex = 16;
             this.btnSelModelDir.Text = "...";
             this.btnSelModelDir.UseVisualStyleBackColor = true;
@@ -90,25 +95,27 @@
             // 
             // txtModelDir
             // 
-            this.txtModelDir.Location = new System.Drawing.Point(136, 15);
-            this.txtModelDir.Margin = new System.Windows.Forms.Padding(5);
+            this.txtModelDir.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.txtModelDir.Location = new System.Drawing.Point(124, 19);
+            this.txtModelDir.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             this.txtModelDir.Name = "txtModelDir";
-            this.txtModelDir.Size = new System.Drawing.Size(287, 32);
+            this.txtModelDir.Size = new System.Drawing.Size(261, 34);
             this.txtModelDir.TabIndex = 15;
             // 
             // lbModelDir
             // 
             this.lbModelDir.AutoSize = true;
-            this.lbModelDir.Location = new System.Drawing.Point(17, 22);
+            this.lbModelDir.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.lbModelDir.Location = new System.Drawing.Point(15, 27);
             this.lbModelDir.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.lbModelDir.Name = "lbModelDir";
-            this.lbModelDir.Size = new System.Drawing.Size(101, 21);
+            this.lbModelDir.Size = new System.Drawing.Size(85, 26);
             this.lbModelDir.TabIndex = 14;
             this.lbModelDir.Text = "모델 경로";
             // 
             // PathSetting
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 26F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.btnSelImageDir);
             this.Controls.Add(this.txtImageDir);
@@ -117,8 +124,11 @@
             this.Controls.Add(this.btnSelModelDir);
             this.Controls.Add(this.txtModelDir);
             this.Controls.Add(this.lbModelDir);
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "PathSetting";
-            this.Size = new System.Drawing.Size(537, 187);
+            this.Size = new System.Drawing.Size(488, 231);
             this.ResumeLayout(false);
             this.PerformLayout();
 

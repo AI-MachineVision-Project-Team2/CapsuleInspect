@@ -37,7 +37,7 @@ namespace CapsuleInspect
                 SplitterDistance = 120,
                 Panel1MinSize = 70,
                 Panel2MinSize = 70,
-                Cursor = Cursors.PanNW,
+                Cursor = Cursors.Hand,
             };
 
             //TreeListView 검사 결과 트리 생성
@@ -50,19 +50,19 @@ namespace CapsuleInspect
                 OwnerDraw = true,
                 MultiSelect = false,
                 GridLines = true,
-                Cursor = Cursors.PanNW, // 커서 변경
+                Cursor = Cursors.Hand, // 커서 변경
                 
             };
             _treeListView.SelectionChanged += TreeListView_SelectionChanged;
             _treeListView.MouseEnter += (s, e) =>
             {
-                _treeListView.Cursor = Cursors.PanNW;
+                _treeListView.Cursor = Cursors.Hand;
             };
 
             _treeListView.MouseMove += (s, e) =>
             {
-                if (_treeListView.Cursor != Cursors.PanNW)
-                    _treeListView.Cursor = Cursors.PanNW;
+                if (_treeListView.Cursor != Cursors.Hand)
+                    _treeListView.Cursor = Cursors.Hand;
             };
             _treeListView.CanExpandGetter = x => true;
 
@@ -135,7 +135,7 @@ namespace CapsuleInspect
                 Multiline = true,
                 ScrollBars = ScrollBars.Vertical,
                 Font = new Font("Arial", 10),
-                Cursor = Cursors.PanNW,
+                Cursor = Cursors.Hand,
                 ReadOnly = true
             };
 

@@ -25,7 +25,7 @@ namespace CapsuleInspect.Grab
             _capture = new VideoCapture(0); // 0번 카메라 (기본 웹캠)
             if (_capture == null || !_capture.IsOpened())
             {
-                SLogger.Write("Error: WebCam 초기화 실패", SLogger.LogType.Error);
+                SLogger.Write("!Error! WebCam 초기화 실패", SLogger.LogType.Error);
                 return false;
             }
             return true;
@@ -52,7 +52,7 @@ namespace CapsuleInspect.Grab
                     }
                     else
                     {
-                        SLogger.Write("Error: Buffer size is too small.", SLogger.LogType.Error);
+                        SLogger.Write("!에러! 버퍼 크기가 너무 작습니다.", SLogger.LogType.Error);
                     }
                 }
 

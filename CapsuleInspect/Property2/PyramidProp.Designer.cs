@@ -35,10 +35,11 @@
             // btnDown
             // 
             this.btnDown.AutoSize = true;
-            this.btnDown.Location = new System.Drawing.Point(19, 58);
-            this.btnDown.Margin = new System.Windows.Forms.Padding(5);
+            this.btnDown.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.btnDown.Location = new System.Drawing.Point(17, 50);
+            this.btnDown.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.btnDown.Name = "btnDown";
-            this.btnDown.Size = new System.Drawing.Size(76, 25);
+            this.btnDown.Size = new System.Drawing.Size(85, 30);
             this.btnDown.TabIndex = 3;
             this.btnDown.TabStop = true;
             this.btnDown.Text = "Down";
@@ -48,10 +49,11 @@
             // btnUP
             // 
             this.btnUP.AutoSize = true;
-            this.btnUP.Location = new System.Drawing.Point(19, 20);
-            this.btnUP.Margin = new System.Windows.Forms.Padding(5);
+            this.btnUP.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.btnUP.Location = new System.Drawing.Point(17, 17);
+            this.btnUP.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.btnUP.Name = "btnUP";
-            this.btnUP.Size = new System.Drawing.Size(52, 25);
+            this.btnUP.Size = new System.Drawing.Size(61, 30);
             this.btnUP.TabIndex = 2;
             this.btnUP.TabStop = true;
             this.btnUP.Text = "Up";
@@ -60,11 +62,13 @@
             // 
             // PyramidProp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.btnDown);
             this.Controls.Add(this.btnUP);
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Name = "PyramidProp";
+            this.Size = new System.Drawing.Size(136, 129);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -38,23 +38,25 @@
             // cbAIEngineType
             // 
             this.cbAIEngineType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbAIEngineType.Font = new System.Drawing.Font("Noto Sans KR", 9F);
             this.cbAIEngineType.FormattingEnabled = true;
             this.cbAIEngineType.Items.AddRange(new object[] {
             "IAD",
             "DET",
             "SEG"});
-            this.cbAIEngineType.Location = new System.Drawing.Point(8, 41);
-            this.cbAIEngineType.Margin = new System.Windows.Forms.Padding(2);
+            this.cbAIEngineType.Location = new System.Drawing.Point(11, 62);
             this.cbAIEngineType.Name = "cbAIEngineType";
-            this.cbAIEngineType.Size = new System.Drawing.Size(210, 20);
+            this.cbAIEngineType.Size = new System.Drawing.Size(298, 34);
             this.cbAIEngineType.TabIndex = 17;
             this.cbAIEngineType.SelectedIndexChanged += new System.EventHandler(this.cbAIEngineType_SelectedIndexChanged);
             // 
             // btnInspAI
             // 
-            this.btnInspAI.Location = new System.Drawing.Point(164, 69);
+            this.btnInspAI.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.btnInspAI.Location = new System.Drawing.Point(234, 104);
+            this.btnInspAI.Margin = new System.Windows.Forms.Padding(4);
             this.btnInspAI.Name = "btnInspAI";
-            this.btnInspAI.Size = new System.Drawing.Size(53, 28);
+            this.btnInspAI.Size = new System.Drawing.Size(76, 42);
             this.btnInspAI.TabIndex = 16;
             this.btnInspAI.Text = "AI 검사";
             this.btnInspAI.UseVisualStyleBackColor = true;
@@ -62,9 +64,11 @@
             // 
             // btnLoadModel
             // 
-            this.btnLoadModel.Location = new System.Drawing.Point(91, 69);
+            this.btnLoadModel.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.btnLoadModel.Location = new System.Drawing.Point(130, 104);
+            this.btnLoadModel.Margin = new System.Windows.Forms.Padding(4);
             this.btnLoadModel.Name = "btnLoadModel";
-            this.btnLoadModel.Size = new System.Drawing.Size(65, 29);
+            this.btnLoadModel.Size = new System.Drawing.Size(96, 44);
             this.btnLoadModel.TabIndex = 15;
             this.btnLoadModel.Text = "모델 로딩";
             this.btnLoadModel.UseVisualStyleBackColor = true;
@@ -72,9 +76,11 @@
             // 
             // btnSelAIModel
             // 
-            this.btnSelAIModel.Location = new System.Drawing.Point(8, 69);
+            this.btnSelAIModel.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.btnSelAIModel.Location = new System.Drawing.Point(11, 104);
+            this.btnSelAIModel.Margin = new System.Windows.Forms.Padding(4);
             this.btnSelAIModel.Name = "btnSelAIModel";
-            this.btnSelAIModel.Size = new System.Drawing.Size(76, 28);
+            this.btnSelAIModel.Size = new System.Drawing.Size(109, 42);
             this.btnSelAIModel.TabIndex = 14;
             this.btnSelAIModel.Text = "AI모델 선택";
             this.btnSelAIModel.UseVisualStyleBackColor = true;
@@ -82,23 +88,27 @@
             // 
             // txtAIModelPath
             // 
-            this.txtAIModelPath.Location = new System.Drawing.Point(8, 10);
+            this.txtAIModelPath.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.txtAIModelPath.Location = new System.Drawing.Point(11, 15);
+            this.txtAIModelPath.Margin = new System.Windows.Forms.Padding(4);
             this.txtAIModelPath.Name = "txtAIModelPath";
             this.txtAIModelPath.ReadOnly = true;
-            this.txtAIModelPath.Size = new System.Drawing.Size(210, 21);
+            this.txtAIModelPath.Size = new System.Drawing.Size(298, 34);
             this.txtAIModelPath.TabIndex = 13;
             // 
             // AIModuleProp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.cbAIEngineType);
             this.Controls.Add(this.btnInspAI);
             this.Controls.Add(this.btnLoadModel);
             this.Controls.Add(this.btnSelAIModel);
             this.Controls.Add(this.txtAIModelPath);
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "AIModuleProp";
-            this.Size = new System.Drawing.Size(435, 235);
+            this.Size = new System.Drawing.Size(621, 352);
             this.ResumeLayout(false);
             this.PerformLayout();
 

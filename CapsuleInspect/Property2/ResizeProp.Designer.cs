@@ -39,15 +39,15 @@
             // 
             // numericUpDown2
             // 
-            this.numericUpDown2.Location = new System.Drawing.Point(166, 107);
-            this.numericUpDown2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.numericUpDown2.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.numericUpDown2.Location = new System.Drawing.Point(151, 92);
             this.numericUpDown2.Maximum = new decimal(new int[] {
             1000,
             0,
             0,
             0});
             this.numericUpDown2.Name = "numericUpDown2";
-            this.numericUpDown2.Size = new System.Drawing.Size(132, 32);
+            this.numericUpDown2.Size = new System.Drawing.Size(120, 34);
             this.numericUpDown2.TabIndex = 25;
             this.numericUpDown2.Value = new decimal(new int[] {
             100,
@@ -57,15 +57,15 @@
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(167, 60);
-            this.numericUpDown1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.numericUpDown1.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.numericUpDown1.Location = new System.Drawing.Point(152, 51);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             1000,
             0,
             0,
             0});
             this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(132, 32);
+            this.numericUpDown1.Size = new System.Drawing.Size(120, 34);
             this.numericUpDown1.TabIndex = 24;
             this.numericUpDown1.Value = new decimal(new int[] {
             100,
@@ -76,41 +76,45 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(15, 14);
+            this.label3.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.label3.Location = new System.Drawing.Point(14, 12);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(282, 21);
+            this.label3.Size = new System.Drawing.Size(231, 26);
             this.label3.TabIndex = 23;
             this.label3.Text = "범위: 0~1000 권장, 기준:100";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(15, 61);
+            this.label1.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.label1.Location = new System.Drawing.Point(14, 52);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(141, 21);
+            this.label1.Size = new System.Drawing.Size(134, 26);
             this.label1.TabIndex = 21;
             this.label1.Text = "Width 비율 (%)";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(15, 111);
+            this.label2.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.label2.Location = new System.Drawing.Point(14, 95);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(147, 21);
+            this.label2.Size = new System.Drawing.Size(140, 26);
             this.label2.TabIndex = 22;
             this.label2.Text = "Height 비율 (%)";
             // 
             // ResizeProp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.numericUpDown2);
             this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label2);
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Name = "ResizeProp";
-            this.Size = new System.Drawing.Size(336, 150);
+            this.Size = new System.Drawing.Size(305, 129);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);

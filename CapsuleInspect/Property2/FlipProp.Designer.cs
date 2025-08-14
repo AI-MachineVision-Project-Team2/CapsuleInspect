@@ -36,10 +36,10 @@
             // xFlip
             // 
             this.xFlip.AutoSize = true;
-            this.xFlip.Location = new System.Drawing.Point(13, 21);
-            this.xFlip.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.xFlip.Font = new System.Drawing.Font("Noto Sans KR", 10F);
+            this.xFlip.Location = new System.Drawing.Point(12, 18);
             this.xFlip.Name = "xFlip";
-            this.xFlip.Size = new System.Drawing.Size(70, 25);
+            this.xFlip.Size = new System.Drawing.Size(74, 33);
             this.xFlip.TabIndex = 11;
             this.xFlip.TabStop = true;
             this.xFlip.Text = "수평";
@@ -48,10 +48,10 @@
             // yFlip
             // 
             this.yFlip.AutoSize = true;
-            this.yFlip.Location = new System.Drawing.Point(13, 56);
-            this.yFlip.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.yFlip.Font = new System.Drawing.Font("Noto Sans KR", 10F);
+            this.yFlip.Location = new System.Drawing.Point(12, 48);
             this.yFlip.Name = "yFlip";
-            this.yFlip.Size = new System.Drawing.Size(70, 25);
+            this.yFlip.Size = new System.Drawing.Size(74, 33);
             this.yFlip.TabIndex = 12;
             this.yFlip.TabStop = true;
             this.yFlip.Text = "수직";
@@ -60,10 +60,10 @@
             // xyFlip
             // 
             this.xyFlip.AutoSize = true;
-            this.xyFlip.Location = new System.Drawing.Point(13, 91);
-            this.xyFlip.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.xyFlip.Font = new System.Drawing.Font("Noto Sans KR", 10F);
+            this.xyFlip.Location = new System.Drawing.Point(12, 78);
             this.xyFlip.Name = "xyFlip";
-            this.xyFlip.Size = new System.Drawing.Size(123, 25);
+            this.xyFlip.Size = new System.Drawing.Size(121, 33);
             this.xyFlip.TabIndex = 13;
             this.xyFlip.TabStop = true;
             this.xyFlip.Text = "수평+수직";
@@ -71,12 +71,14 @@
             // 
             // FlipProp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.xFlip);
             this.Controls.Add(this.yFlip);
             this.Controls.Add(this.xyFlip);
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Name = "FlipProp";
+            this.Size = new System.Drawing.Size(136, 129);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -40,7 +40,7 @@ namespace CapsuleInspect.Inspect
         {
             Global.Inst.InspStage.SetWorkingState(WorkingState.INSPECT);
 
-            SLogger.Write("InspectionLoop Start");
+            SLogger.Write("자동 반복 검사 시작");
 
             IsRunning = true;
 
@@ -53,7 +53,7 @@ namespace CapsuleInspect.Inspect
 
             IsRunning = false;
 
-            SLogger.Write("InspectionLoop End");
+            SLogger.Write("자동 반복 검사 종료");
         }
 
         //InspStage내의 모든 InspWindow들을 검사하는 함수
