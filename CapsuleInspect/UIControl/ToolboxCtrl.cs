@@ -16,5 +16,11 @@ namespace CapsuleInspect.UIControl
         {
             InitializeComponent();
         }
+
+        private void btnHelp_Click(object sender, EventArgs e)
+        {
+            var helpForm = MainForm.GetDockForm<HelpForm>();
+            helpForm.Show();
+        }
     }
 }

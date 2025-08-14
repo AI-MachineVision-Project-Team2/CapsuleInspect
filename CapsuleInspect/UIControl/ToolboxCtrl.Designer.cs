@@ -31,9 +31,9 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ToolboxCtrl));
             this.toolboxImgList = new System.Windows.Forms.ImageList(this.components);
-            this.btnLive = new System.Windows.Forms.Button();
-            this.btnInsp = new System.Windows.Forms.Button();
-            this.btnGrab = new System.Windows.Forms.Button();
+            this.btnModelSave = new System.Windows.Forms.Button();
+            this.btnHelp = new System.Windows.Forms.Button();
+            this.btnXmlOpen = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // toolboxImgList
@@ -44,61 +44,66 @@
             this.toolboxImgList.Images.SetKeyName(1, "imagesave-removebg-preview.png");
             this.toolboxImgList.Images.SetKeyName(2, "help-removebg-preview.png");
             // 
-            // btnLive
+            // btnModelSave
             // 
-            this.btnLive.BackColor = System.Drawing.Color.Transparent;
-            this.btnLive.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnLive.ImageIndex = 1;
-            this.btnLive.ImageList = this.toolboxImgList;
-            this.btnLive.Location = new System.Drawing.Point(36, 3);
-            this.btnLive.Name = "btnLive";
-            this.btnLive.Size = new System.Drawing.Size(18, 17);
-            this.btnLive.TabIndex = 11;
-            this.btnLive.UseVisualStyleBackColor = false;
+            this.btnModelSave.BackColor = System.Drawing.Color.Transparent;
+            this.btnModelSave.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnModelSave.ImageIndex = 1;
+            this.btnModelSave.ImageList = this.toolboxImgList;
+            this.btnModelSave.Location = new System.Drawing.Point(34, 0);
+            this.btnModelSave.Margin = new System.Windows.Forms.Padding(1);
+            this.btnModelSave.Name = "btnModelSave";
+            this.btnModelSave.Size = new System.Drawing.Size(25, 20);
+            this.btnModelSave.TabIndex = 11;
+            this.btnModelSave.UseVisualStyleBackColor = false;
             // 
-            // btnInsp
+            // btnHelp
             // 
-            this.btnInsp.BackColor = System.Drawing.Color.Transparent;
-            this.btnInsp.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnInsp.ImageIndex = 2;
-            this.btnInsp.ImageList = this.toolboxImgList;
-            this.btnInsp.Location = new System.Drawing.Point(62, 3);
-            this.btnInsp.Name = "btnInsp";
-            this.btnInsp.Size = new System.Drawing.Size(18, 17);
-            this.btnInsp.TabIndex = 10;
-            this.btnInsp.UseVisualStyleBackColor = false;
+            this.btnHelp.BackColor = System.Drawing.Color.Transparent;
+            this.btnHelp.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.btnHelp.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnHelp.ImageIndex = 2;
+            this.btnHelp.ImageList = this.toolboxImgList;
+            this.btnHelp.Location = new System.Drawing.Point(62, 0);
+            this.btnHelp.Margin = new System.Windows.Forms.Padding(1);
+            this.btnHelp.Name = "btnHelp";
+            this.btnHelp.Size = new System.Drawing.Size(25, 20);
+            this.btnHelp.TabIndex = 10;
+            this.btnHelp.UseVisualStyleBackColor = false;
+            this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
             // 
-            // btnGrab
+            // btnXmlOpen
             // 
-            this.btnGrab.BackColor = System.Drawing.Color.Transparent;
-            this.btnGrab.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnGrab.ImageIndex = 0;
-            this.btnGrab.ImageList = this.toolboxImgList;
-            this.btnGrab.Location = new System.Drawing.Point(10, 3);
-            this.btnGrab.Name = "btnGrab";
-            this.btnGrab.Size = new System.Drawing.Size(18, 17);
-            this.btnGrab.TabIndex = 9;
-            this.btnGrab.UseVisualStyleBackColor = false;
+            this.btnXmlOpen.BackColor = System.Drawing.Color.Transparent;
+            this.btnXmlOpen.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnXmlOpen.ImageIndex = 0;
+            this.btnXmlOpen.ImageList = this.toolboxImgList;
+            this.btnXmlOpen.Location = new System.Drawing.Point(4, 0);
+            this.btnXmlOpen.Margin = new System.Windows.Forms.Padding(1);
+            this.btnXmlOpen.Name = "btnXmlOpen";
+            this.btnXmlOpen.Size = new System.Drawing.Size(25, 20);
+            this.btnXmlOpen.TabIndex = 9;
+            this.btnXmlOpen.UseVisualStyleBackColor = false;
             // 
             // ToolboxCtrl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.btnLive);
-            this.Controls.Add(this.btnInsp);
-            this.Controls.Add(this.btnGrab);
+            this.Controls.Add(this.btnModelSave);
+            this.Controls.Add(this.btnHelp);
+            this.Controls.Add(this.btnXmlOpen);
             this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "ToolboxCtrl";
-            this.Size = new System.Drawing.Size(580, 21);
+            this.Size = new System.Drawing.Size(580, 24);
             this.ResumeLayout(false);
 
         }
 
         #endregion
         private System.Windows.Forms.ImageList toolboxImgList;
-        private System.Windows.Forms.Button btnLive;
-        private System.Windows.Forms.Button btnInsp;
-        private System.Windows.Forms.Button btnGrab;
+        private System.Windows.Forms.Button btnModelSave;
+        private System.Windows.Forms.Button btnHelp;
+        private System.Windows.Forms.Button btnXmlOpen;
     }
 }
