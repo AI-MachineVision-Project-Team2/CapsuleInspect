@@ -28,8 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
+            this.SuspendLayout();
+            // 
+            // RangeSliderCtrl
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 26F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.Name = "RangeSliderCtrl";
+            this.Size = new System.Drawing.Size(150, 217);
+            this.ResumeLayout(false);
+
         }
 
         #endregion

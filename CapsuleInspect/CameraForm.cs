@@ -43,7 +43,7 @@ namespace CapsuleInspect
         }
         private void ImageViewer_DiagramEntityEvent(object sender, DiagramEntityEventArgs e)
         {
-            SLogger.Write($"ImageViewer Action {e.ActionType.ToString()}");
+            SLogger.Write($"ImageViewer 동작 {e.ActionType.ToString()}");
             switch (e.ActionType)
             {
                 case EntityActionType.Select:

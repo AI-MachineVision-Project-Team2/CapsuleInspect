@@ -32,12 +32,12 @@
             // 
             // ResultForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 29F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(640, 425);
-            this.Cursor = System.Windows.Forms.Cursors.PanNW;
-            this.Font = new System.Drawing.Font("한컴 말랑말랑 Bold", 9.749998F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.ClientSize = new System.Drawing.Size(698, 493);
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.Font = new System.Drawing.Font("Noto Sans KR", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.Name = "ResultForm";
             this.Text = "결과창";

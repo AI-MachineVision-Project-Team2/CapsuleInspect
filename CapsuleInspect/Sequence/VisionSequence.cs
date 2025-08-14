@@ -124,7 +124,7 @@ namespace CapsuleInspect.Sequence
 
                 if (_communicator.State != System.ServiceModel.CommunicationState.Opened)
                 {
-                    SLogger.Write("MMI 연결 실패!", SLogger.LogType.Error);
+                    SLogger.Write("!경고! MMI 연결 실패", SLogger.LogType.Error);
                     return false;
                 }
 
@@ -217,7 +217,7 @@ namespace CapsuleInspect.Sequence
                             break;
                         }
 
-                        SLogger.Write("Vision Seq : " + _visionState.ToString());
+                        SLogger.Write("비전 시퀀스 상태 : " + _visionState.ToString());
                         _mmiOpenRecipe = false;
                         //OpenRecipe 명령 전달
                         _message.Command = Message.MessageCommand.OpenRecipe;
@@ -235,7 +235,7 @@ namespace CapsuleInspect.Sequence
                         if (!_mmiOpenRecipe)
                             break;
 
-                        SLogger.Write("Vision Seq : " + _visionState.ToString());
+                        SLogger.Write("비전 시퀀스 상태 : " + _visionState.ToString());
 
                         //#WCF_FSM#3 비젼 -> 제어에 전체 검사 요청
                         _message.Command = Message.MessageCommand.MmiStart;
@@ -249,7 +249,7 @@ namespace CapsuleInspect.Sequence
                 case VisionSeq.MmiStop:
                     {
                         //#WCF_FSM#9 제어에 자동 검사 정지 요청
-                        SLogger.Write("Vision Seq : " + _visionState.ToString());
+                        SLogger.Write("비전 시퀀스 상태 : " + _visionState.ToString());
 
                         _message.Command = Message.MessageCommand.MmiStop;
                         _message.Status = CommandStatus.None;
@@ -399,7 +399,7 @@ namespace CapsuleInspect.Sequence
                 if (_communicator.State == System.ServiceModel.CommunicationState.Opened)
                 {
                     _communicator.SendMachineInfo();
-                    SLogger.Write("WCF " + machineName + " : Opened", LogType.Info);
+                    SLogger.Write("WCF " + machineName + " : 연결 성공", LogType.Info);
                     IsMmiConnected = true;
                 }
                 else
@@ -418,7 +418,7 @@ namespace CapsuleInspect.Sequence
         private void Communicator_Closed(object sender, EventArgs e)
         {
             _timerReConnect.Start();
-            SLogger.Write("서버와의 연결이 끊어졌습니다.", SLogger.LogType.Error);
+            SLogger.Write("!경고! 서버와의 연결이 끊어졌습니다.", SLogger.LogType.Error);
             IsMmiConnected = false;
         }
 

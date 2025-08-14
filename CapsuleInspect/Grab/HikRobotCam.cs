@@ -47,7 +47,7 @@ namespace CapsuleInspect.Grab
                     int result = _device.PixelTypeConverter.ConvertPixelType(inputImage, out outImage, dstPixelType);
                     if (result != MvError.MV_OK)
                     {
-                        SLogger.Write($"Image Convert failed:{result:x8}", SLogger.LogType.Error);
+                        SLogger.Write($"!경고! 이미지 변환 실패:{result:x8}", SLogger.LogType.Error);
                         return;
                     }
 
@@ -90,11 +90,11 @@ namespace CapsuleInspect.Grab
                 int ret = DeviceEnumerator.EnumDevices(devLayerType, out devInfoList);
                 if (ret != MvError.MV_OK)
                 {
-                    SLogger.Write($"Enum device failed:{ret:x8}", SLogger.LogType.Error);
+                    SLogger.Write($"!경고! 장치 검색 실패:{ret:x8}", SLogger.LogType.Error);
                     return false;
                 }
 
-                SLogger.Write($"Enum device count : {devInfoList.Count}");
+                SLogger.Write($"검색된 장치 수 : {devInfoList.Count}");
 
                 if (0 == devInfoList.Count)
                 {
@@ -117,7 +117,7 @@ namespace CapsuleInspect.Grab
                         uint nIp4 = (gigeDevInfo.CurrentIp & 0x000000ff);
 
                         string strIP = nIp1 + "." + nIp2 + "." + nIp3 + "." + nIp4;
-                        SLogger.Write($"Device {devIndex}, DevIP : " + strIP);
+                        SLogger.Write($"장치 : {devIndex}, IP주소 : " + strIP);
 
                         if (_strIpAddr is null || strIP == strIpAddr)
                         {
@@ -126,15 +126,15 @@ namespace CapsuleInspect.Grab
                         }
                     }
 
-                    SLogger.Write("ModelName:" + devInfo.ModelName);
-                    SLogger.Write("SerialNumber:" + devInfo.SerialNumber);
+                    SLogger.Write("모델이름 :" + devInfo.ModelName);
+                    SLogger.Write("시리얼 넘버:" + devInfo.SerialNumber);
 
                     devIndex++;
                 }
 
                 if (selDevIndex < 0 || selDevIndex > devInfoList.Count - 1)
                 {
-                    SLogger.Write($"Invalid selected device number:{selDevIndex}", SLogger.LogType.Error);
+                    SLogger.Write($"!경고! 선택한 장치 번호가 잘못되었습니다:{selDevIndex}", SLogger.LogType.Error);
                     return false;
                 }
 
@@ -202,8 +202,8 @@ namespace CapsuleInspect.Grab
                     if (MvError.MV_OK != ret)
                     {
                         _device.Dispose();
-                        SLogger.Write($"Device open fail! [{ret:x8}]", SLogger.LogType.Error);
-                        MessageBox.Show($"Device open fail! {ret:X8}");
+                        SLogger.Write($"!경고! HikRobot 장치 열기 실패! [{ret:x8}]", SLogger.LogType.Error);
+                        MessageBox.Show($"HikRobot 장치 열기 실패! {ret:X8}");
                         return false;
                     }
 
@@ -216,16 +216,16 @@ namespace CapsuleInspect.Grab
                             ret = _device.Parameters.SetIntValue("GevSCPSPacketSize", packetSize);
                             if (ret != MvError.MV_OK)
                             {
-                                SLogger.Write($"Warning: Set Packet Size failed {ret:x8}", SLogger.LogType.Error);
+                                SLogger.Write($"!경고! 패킷 크기 설정 실패:{ret:x8}", SLogger.LogType.Error);
                             }
                             else
                             {
-                                SLogger.Write($"Set PacketSize to {packetSize}");
+                                SLogger.Write($"패킷 크기를 {packetSize}으로 설정했습니다");
                             }
                         }
                         else
                         {
-                            SLogger.Write($"Warning: Get Packet Size failed {ret:x8}", SLogger.LogType.Error);
+                            SLogger.Write($"!경고! 패킷 크기 설정 실패:{ret:x8}", SLogger.LogType.Error);
                         }
                     }
 
@@ -233,7 +233,7 @@ namespace CapsuleInspect.Grab
                     ret = _device.Parameters.SetEnumValue("TriggerMode", 1);
                     if (ret != MvError.MV_OK)
                     {
-                        SLogger.Write($"Set TriggerMode failed:{ret:x8}", SLogger.LogType.Error);
+                        SLogger.Write($"!경고! 트리거 모드 설정 실패:{ret:x8}", SLogger.LogType.Error);
                         return false;
                     }
 
@@ -253,7 +253,7 @@ namespace CapsuleInspect.Grab
                     ret = _device.StreamGrabber.StartGrabbing();
                     if (ret != MvError.MV_OK)
                     {
-                        SLogger.Write("$Start grabbing failed:{ret:x8}", SLogger.LogType.Error);
+                        SLogger.Write("$ !경고! 그랩 시작 실패:{ret:x8}", SLogger.LogType.Error);
                         return false;
                     }
                 }
@@ -288,7 +288,7 @@ namespace CapsuleInspect.Grab
             int result = _device.Parameters.GetEnumValue("PixelFormat", out enumValue);
             if (result != MvError.MV_OK)
             {
-                SLogger.Write($"Get PixelFormat failed:{result:x8}", SLogger.LogType.Error);
+                SLogger.Write($"!경고! 픽셀 포맷 조회 실패:{result:x8}", SLogger.LogType.Error);
                 return false;
             }
 
@@ -312,7 +312,7 @@ namespace CapsuleInspect.Grab
             int result = _device.Parameters.SetFloatValue("ExposureTime", exposure);
             if (result != MvError.MV_OK)
             {
-                SLogger.Write($"Set Exposure Time Fail:{result:x8}", SLogger.LogType.Error);
+                SLogger.Write($"!경고! 노출 시간 설정 실패:{result:x8}", SLogger.LogType.Error);
                 return false;
             }
 
@@ -344,7 +344,7 @@ namespace CapsuleInspect.Grab
             int result = _device.Parameters.SetFloatValue("Gain", gain);
             if (result != MvError.MV_OK)
             {
-                SLogger.Write($"Set Gain Fail:{result:x8}", SLogger.LogType.Error);
+                SLogger.Write($"!경고! 이득(Gain) 값 설정 실패:{result:x8}", SLogger.LogType.Error);
 
                 return false;
             }
@@ -386,7 +386,7 @@ namespace CapsuleInspect.Grab
             result = _device.Parameters.GetIntValue("Width", out intValue);
             if (result != MvError.MV_OK)
             {
-                SLogger.Write($"Set Gain Fail:{result:x8}", SLogger.LogType.Error);
+                SLogger.Write($"!경고! 이득(Gain) 값 설정 실패:{result:x8}", SLogger.LogType.Error);
                 return false;
             }
             width = (int)intValue.CurValue;
@@ -394,7 +394,7 @@ namespace CapsuleInspect.Grab
             result = _device.Parameters.GetIntValue("Height", out intValue);
             if (result != MvError.MV_OK)
             {
-                SLogger.Write($"Get Height Fail:{result:x8}", SLogger.LogType.Error);
+                SLogger.Write($"!경고! 이미지 높이 값 읽기 실패:{result:x8}", SLogger.LogType.Error);
                 return false;
             }
             height = (int)intValue.CurValue;
@@ -402,7 +402,7 @@ namespace CapsuleInspect.Grab
             result = _device.Parameters.GetEnumValue("PixelFormat", out enumValue);
             if (result != MvError.MV_OK)
             {
-                SLogger.Write($"Get PixelFormat Fail:{result:x8}", SLogger.LogType.Error);
+                SLogger.Write($"!경고! 픽셀 형식 읽기 실패:{result:x8}", SLogger.LogType.Error);
                 return false;
             }
             pixelType = (MvGvspPixelType)enumValue.CurEnumEntry.Value;

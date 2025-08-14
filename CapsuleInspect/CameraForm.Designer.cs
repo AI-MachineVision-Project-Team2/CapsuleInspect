@@ -28,37 +28,44 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.imageViewer = new CapsuleInspect.UIControl.ImageViewCtrl();
             this.mainViewToolbar = new CapsuleInspect.UIControl.MainViewToolbar();
+            this.imageViewer = new CapsuleInspect.UIControl.ImageViewCtrl();
             this.SuspendLayout();
+            // 
+            // mainViewToolbar
+            // 
+            this.mainViewToolbar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.mainViewToolbar.Dock = System.Windows.Forms.DockStyle.Right;
+            this.mainViewToolbar.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.mainViewToolbar.Location = new System.Drawing.Point(987, 0);
+            this.mainViewToolbar.Margin = new System.Windows.Forms.Padding(6);
+            this.mainViewToolbar.Name = "mainViewToolbar";
+            this.mainViewToolbar.Size = new System.Drawing.Size(156, 675);
+            this.mainViewToolbar.TabIndex = 1;
             // 
             // imageViewer
             // 
             this.imageViewer.BackColor = System.Drawing.Color.White;
+            this.imageViewer.Cursor = System.Windows.Forms.Cursors.Hand;
             this.imageViewer.Dock = System.Windows.Forms.DockStyle.Left;
+            this.imageViewer.Font = new System.Drawing.Font("Noto Sans KR", 9F);
             this.imageViewer.Location = new System.Drawing.Point(0, 0);
-            this.imageViewer.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.imageViewer.Margin = new System.Windows.Forms.Padding(7, 6, 7, 6);
             this.imageViewer.Name = "imageViewer";
-            this.imageViewer.Size = new System.Drawing.Size(800, 450);
+            this.imageViewer.Size = new System.Drawing.Size(1143, 675);
             this.imageViewer.TabIndex = 0;
             this.imageViewer.WorkingState = "";
             // 
-            // mainViewToolbar
-            // 
-            this.mainViewToolbar.Dock = System.Windows.Forms.DockStyle.Right;
-            this.mainViewToolbar.Location = new System.Drawing.Point(691, 0);
-            this.mainViewToolbar.Name = "mainViewToolbar";
-            this.mainViewToolbar.Size = new System.Drawing.Size(109, 450);
-            this.mainViewToolbar.TabIndex = 1;
-            // 
             // CameraForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(211)))), ((int)(((byte)(211)))));
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1143, 675);
             this.Controls.Add(this.mainViewToolbar);
             this.Controls.Add(this.imageViewer);
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "CameraForm";
             this.Text = "이미지창";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.CameraForm_FormClosed);
