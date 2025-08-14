@@ -75,17 +75,6 @@ namespace CapsuleInspect.Algorithm
 
             switch (filter)
             {
-                case FilterType.Grayscale:
-                    if (src.Channels() == 1)
-                    {
-                        dst = src.Clone(); // 이미 흑백이면 그대로 복사
-                    }
-                    else
-                    {
-                        Cv2.CvtColor(src, dst, ColorConversionCodes.BGR2GRAY);
-                    }
-                    break;
-
                 case FilterType.HSVscale:
                     if (src.Channels() == 1)
                     {

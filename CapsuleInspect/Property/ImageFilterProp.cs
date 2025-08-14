@@ -17,7 +17,6 @@ namespace CapsuleInspect.Property
     public enum FilterType
     {
         None,
-        Grayscale,
         HSVscale,
         Flip,
         Pyramid,
@@ -68,18 +67,17 @@ namespace CapsuleInspect.Property
             switch (cbFilterType.SelectedIndex)
             {
                 case 0: _selectedFilter = FilterType.None; break;
-                case 1: _selectedFilter = FilterType.Grayscale; break;
-                case 2: _selectedFilter = FilterType.HSVscale; break;
-                case 3: _selectedFilter = FilterType.Flip; break;
-                case 4: _selectedFilter = FilterType.Pyramid; break;
-                case 5: _selectedFilter = FilterType.Resize; break;
-                case 6: _selectedFilter = FilterType.CannyEdge; break;
-                case 7: _selectedFilter = FilterType.Morphology; break;
-                case 8: _selectedFilter = FilterType.Rotation; break;
+                case 1: _selectedFilter = FilterType.HSVscale; break;
+                case 2: _selectedFilter = FilterType.Flip; break;
+                case 3: _selectedFilter = FilterType.Pyramid; break;
+                case 4: _selectedFilter = FilterType.Resize; break;
+                case 5: _selectedFilter = FilterType.CannyEdge; break;
+                case 6: _selectedFilter = FilterType.Morphology; break;
+                case 7: _selectedFilter = FilterType.Rotation; break;
                 default: _selectedFilter = FilterType.None; break;
             }
-            // None, Grayscale, HSVscale은 FilterForm 탭 호출 skip
-            if (_selectedFilter == FilterType.None || _selectedFilter == FilterType.Grayscale || _selectedFilter == FilterType.HSVscale)
+            // None, HSVscale은 FilterForm 탭 호출 skip
+            if (_selectedFilter == FilterType.None || _selectedFilter == FilterType.HSVscale)
                 return;
 
             var filterForm = MainForm.SharedFilterForm;
