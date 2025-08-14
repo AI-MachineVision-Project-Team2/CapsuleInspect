@@ -30,6 +30,7 @@
         {
             this.btnOpening = new System.Windows.Forms.RadioButton();
             this.btnClosing = new System.Windows.Forms.RadioButton();
+
             this.lblpixel = new System.Windows.Forms.Label();
             this.txtpixelsize = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
@@ -56,6 +57,7 @@
             this.btnClosing.Text = "Closing";
             this.btnClosing.UseVisualStyleBackColor = true;
             // 
+
             // lblpixel
             // 
             this.lblpixel.AutoSize = true;
@@ -72,17 +74,13 @@
             this.txtpixelsize.Size = new System.Drawing.Size(100, 28);
             this.txtpixelsize.TabIndex = 15;
             this.txtpixelsize.TextChanged += new System.EventHandler(this.txtpixelsize_TextChanged);
-            // 
-            // MorphologyProp
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.txtpixelsize);
+
             this.Controls.Add(this.lblpixel);
             this.Controls.Add(this.btnOpening);
             this.Controls.Add(this.btnClosing);
             this.Name = "MorphologyProp";
             this.Size = new System.Drawing.Size(258, 143);
+
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -92,7 +90,9 @@
 
         private System.Windows.Forms.RadioButton btnOpening;
         private System.Windows.Forms.RadioButton btnClosing;
+
         private System.Windows.Forms.Label lblpixel;
+
         private System.Windows.Forms.TextBox txtpixelsize;
     }
 }

@@ -39,7 +39,9 @@ namespace CapsuleInspect.Property2
 
         // txtpixelsize 값이 변경될 때 커널 크기 업데이트
 
+
         private void txtpixelsize_TextChanged(object sender, EventArgs e)
+
         {
             if (int.TryParse(txtpixelsize.Text, out int newSize))
             {
@@ -55,7 +57,9 @@ namespace CapsuleInspect.Property2
                 txtpixelsize.Text = _kernelSize.ToString();
             }
 
+
         }
+
         // 커널 크기를 반환하는 속성
         public int KernelSize
         {
@@ -63,4 +67,5 @@ namespace CapsuleInspect.Property2
         }
 
     }
+
 }

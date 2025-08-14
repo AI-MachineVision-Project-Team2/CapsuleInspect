@@ -1,6 +1,8 @@
 ﻿using CapsuleInspect.Algorithm;
+using CapsuleInspect.Core;
 using CapsuleInspect.Inspect;
 using CapsuleInspect.Property2;
+using CapsuleInspect.Util;
 using OpenCvSharp;
 using System;
 using System.Collections;
@@ -12,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 namespace CapsuleInspect.Property
 {
     public enum FilterType
@@ -110,140 +113,161 @@ namespace CapsuleInspect.Property
 
         private void btnApply_Click(object sender, EventArgs e)
         {
-            var cameraForm = MainForm.GetDockForm<CameraForm>();
-            if (cameraForm == null)
-            {
-                MessageBox.Show("카메라 창을 찾을 수 없습니다.");
-                return;
-            }
-
             dynamic options = null;
+            var cameraForm = MainForm.GetDockForm<CameraForm>();
+            if (cameraForm == null) return;
 
-            switch (_selectedFilter)
+            if (_selectedFilter != FilterType.None)
             {
-                case FilterType.Flip:
-                    {
-                        var filterForm = MainForm.SharedFilterForm;
-                        if (filterForm != null)
+                switch (_selectedFilter)
+                {
+                    case FilterType.Flip:
                         {
-                            var tab = filterForm.GetTabPage("Flip");
-                            if (tab != null && tab.Controls.Count > 0 && tab.Controls[0] is FlipProp flipProp)
+                            var filterForm = MainForm.SharedFilterForm;
+                            if (filterForm != null)
                             {
-                                var selected = flipProp.SelectedFlipMode;
-                                if (selected == null)
+                                var tab = filterForm.GetTabPage("Flip");
+                                if (tab != null && tab.Controls.Count > 0 && tab.Controls[0] is FlipProp flipProp)
                                 {
-                                    MessageBox.Show("반전 모드를 선택하세요.");
+                                    var selected = flipProp.SelectedFlipMode;
+                                    if (selected == null)
+                                    {
+                                        MessageBox.Show("반전 모드를 선택하세요.");
+                                        return;
+                                    }
+
+                                    options = new { FlipMode = selected.Value };
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Flip 설정을 찾을 수 없습니다.");
+                                    return;
+                                }
+                            }
+                            break;
+                        }
+
+                    case FilterType.Pyramid:
+                        {
+                            var filterForm = MainForm.SharedFilterForm;
+                            if (filterForm != null)
+                            {
+                                var tab = filterForm.GetTabPage("Pyramid");
+                                if (tab != null && tab.Controls.Count > 0 && tab.Controls[0] is PyramidProp pyramidProp)
+                                {
+                                    string direction = pyramidProp.SelectedDirection;
+                                    options = new { Direction = direction };
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Pyramid 설정을 찾을 수 없습니다.");
+                                    return;
+                                }
+                            }
+                            break;
+                        }
+
+                    case FilterType.Resize:
+                        {
+                            var filterForm = MainForm.SharedFilterForm;
+                            var tab = filterForm?.GetTabPage("Resize");
+                            if (tab != null && tab.Controls[0] is ResizeProp resizeProp)
+                            {
+                                double fx = (double)resizeProp.NumericUpDownX.Value;
+                                double fy = (double)resizeProp.NumericUpDownY.Value;
+
+                                if (fx <= 0 || fx > 1000 || fy <= 0 || fy > 1000)
+                                {
+                                    MessageBox.Show("0보다 크고 1000 이하의 값을 입력하세요.");
                                     return;
                                 }
 
-                                options = new { FlipMode = selected.Value };
+                                options = new { Fx = fx, Fy = fy };
                             }
                             else
                             {
-                                MessageBox.Show("Flip 설정을 찾을 수 없습니다.");
+                                MessageBox.Show("Resize 설정을 찾을 수 없습니다.");
                                 return;
                             }
+                            break;
                         }
-                        break;
-                    }
-
-                case FilterType.Pyramid:
-                    {
-                        var filterForm = MainForm.SharedFilterForm;
-                        if (filterForm != null)
+                    case FilterType.CannyEdge:
                         {
-                            var tab = filterForm.GetTabPage("Pyramid");
-                            if (tab != null && tab.Controls.Count > 0 && tab.Controls[0] is PyramidProp pyramidProp)
+                            var filterForm = MainForm.SharedFilterForm;
+                            var tab = filterForm.GetTabPage("CannyEdge");
+                            if (tab != null && tab.Controls[0] is CannyEdgeProp cannyEdgeProp)
                             {
-                                string direction = pyramidProp.SelectedDirection;
-                                options = new { Direction = direction };
+                                int min = cannyEdgeProp.Min;
+                                int max = cannyEdgeProp.Max;
+                                options = new { Min = min, Max = max };
+                            }
+                            break;
+                        }
+                    case FilterType.Morphology:
+                        {
+                            var filterForm = MainForm.SharedFilterForm;
+                            var tab = filterForm?.GetTabPage("Morphology");
+
+                            if (tab != null && tab.Controls[0] is MorphologyProp morphProp)
+                            {
+                                var morphType = morphProp.SelectedMorphType;
+                                options = new { MorphType = morphType };
                             }
                             else
                             {
-                                MessageBox.Show("Pyramid 설정을 찾을 수 없습니다.");
+                                MessageBox.Show("Morphology 설정을 찾을 수 없습니다.");
                                 return;
                             }
+                            break;
                         }
-                        break;
-                    }
-
-                case FilterType.Resize:
-                    {
-                        var filterForm = MainForm.SharedFilterForm;
-                        var tab = filterForm?.GetTabPage("Resize");
-                        if (tab != null && tab.Controls[0] is ResizeProp resizeProp)
+                    case FilterType.Rotation:
                         {
-                            double fx = (double)resizeProp.NumericUpDownX.Value;
-                            double fy = (double)resizeProp.NumericUpDownY.Value;
+                            var filterForm = MainForm.SharedFilterForm;
+                            var tab = filterForm?.GetTabPage("Rotation");
 
-                            if (fx <= 0 || fx > 1000 || fy <= 0 || fy > 1000)
+                            if (tab != null && tab.Controls[0] is RotateProp rotateProp)
                             {
-                                MessageBox.Show("0보다 크고 1000 이하의 값을 입력하세요.");
+                                int angle = rotateProp.Angle;
+                                options = new { Angle = angle };
+                                rotateProp.Preview -= OnRotationPreview; // 중복 방지
+                                rotateProp.Preview += OnRotationPreview;
+                            }
+                            else
+                            {
+                                MessageBox.Show("Rotation  설정을 찾을 수 없습니다.");
                                 return;
                             }
-
-                            options = new { Fx = fx, Fy = fy };
+                            break;
                         }
-                        else
-                        {
-                            MessageBox.Show("Resize 설정을 찾을 수 없습니다.");
-                            return;
-                        }
-                        break;
-                    }
-                case FilterType.CannyEdge:
-                    {
-                        var filterForm = MainForm.SharedFilterForm;
-                        var tab = filterForm.GetTabPage("CannyEdge");
-                        if (tab != null && tab.Controls[0] is CannyEdgeProp cannyEdgeProp)
-                        {
-                            int min = cannyEdgeProp.Min;
-                            int max = cannyEdgeProp.Max;
-                            options = new { Min = min, Max = max };
-                        }
-                        break;
-                    }
-                case FilterType.Morphology:
-                    {
-                        var filterForm = MainForm.SharedFilterForm;
-                        var tab = filterForm?.GetTabPage("Morphology");
-
-                        if (tab != null && tab.Controls[0] is MorphologyProp morphProp)
-                        {
-                            var morphType = morphProp.SelectedMorphType;
-                            options = new { MorphType = morphType };
-                        }
-                        else
-                        {
-                            MessageBox.Show("Morphology 설정을 찾을 수 없습니다.");
-                            return;
-                        }
-                        break;
-                    }
-                case FilterType.Rotation:
-                    {
-                        var filterForm = MainForm.SharedFilterForm;
-                        var tab = filterForm?.GetTabPage("Rotation");
-
-                        if (tab != null && tab.Controls[0] is RotateProp rotateProp)
-                        {
-                            int angle = rotateProp.Angle;
-                            options = new { Angle = angle };
-                            rotateProp.Preview -= OnRotationPreview; // 중복 방지
-                            rotateProp.Preview += OnRotationPreview;
-                        }
-                        else
-                        {
-                            MessageBox.Show("Rotation  설정을 찾을 수 없습니다.");
-                            return;
-                        }
-                        break;
-                    }
+                }
+                // 필터 적용 및 결과 이미지 저장
+                Bitmap filteredImage = cameraForm.RunFilterAlgorithm(_selectedFilter, options);
+                if (filteredImage != null)
+                {
+                    //Global.Inst.InspStage.SetFilteredImage(filteredImage); // 필터링된 이미지 저장
+                    cameraForm.UpdateDisplay(filteredImage); // CameraForm에 표시
+                    SLogger.Write($"필터 적용: {_selectedFilter}", SLogger.LogType.Info);
+                }
+                else
+                {
+                    MessageBox.Show("필터 적용 실패", "에러", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-
-            cameraForm.RunFilterAlgorithm(_selectedFilter, options);
-            //cameraForm.ApplyFilter(_selectedFilter, options);
-            FilterApplied?.Invoke(this, EventArgs.Empty);
+            else
+            {
+                // None 상태일 때는 현재 이미지를 그대로 유지
+                Bitmap currentImage = cameraForm.GetCurrentBitmap();
+                if (currentImage != null)
+                {
+                    //Global.Inst.InspStage.SetFilteredImage(currentImage);
+                    cameraForm.UpdateDisplay(currentImage); // 현재 이미지 다시 표시
+                    SLogger.Write("현재 이미지 유지 (필터 없음)", SLogger.LogType.Info);
+                }
+                else
+                {
+                    MessageBox.Show("이미지를 찾을 수 없습니다.", "에러", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
         private void btnUndo_Click(object sender, EventArgs e)
