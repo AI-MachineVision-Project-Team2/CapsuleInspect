@@ -79,6 +79,7 @@
             this.txtpixelsize.Name = "txtpixelsize";
             this.txtpixelsize.Size = new System.Drawing.Size(100, 23);
             this.txtpixelsize.TabIndex = 15;
+            this.txtpixelsize.TextChanged += new System.EventHandler(this.txtpixelsize_TextChanged);
             // 
             // MorphologyProp
             // 

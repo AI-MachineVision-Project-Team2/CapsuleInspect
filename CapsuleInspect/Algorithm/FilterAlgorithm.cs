@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using CapsuleInspect.Util;
 namespace CapsuleInspect.Algorithm
 {
     public class FilterAlgorithm : InspAlgorithm
@@ -15,8 +16,8 @@ namespace CapsuleInspect.Algorithm
         public FilterType Filter { get; set; } = FilterType.None;
         [XmlIgnore]
         public dynamic Options { get; set; } = null;
-        [XmlIgnore]
-        public new Mat ResultImage { get; private set; } // new 키워드 추가
+        //[XmlIgnore]
+        //public new Mat ResultImage { get; private set; } // new 키워드 추가
         public FilterAlgorithm()
         {
             InspectType = InspectType.InspFilter;
@@ -128,8 +129,7 @@ namespace CapsuleInspect.Algorithm
                         else
                             Cv2.CvtColor(src, binary, ColorConversionCodes.BGR2GRAY);
                         Cv2.Threshold(binary, binary, 0, 255, ThresholdTypes.Binary | ThresholdTypes.Otsu);
-                        // MorphologyProp에서 가져온 커널 크기 사용
-                        int kernelSize = options?.MorphProp?.KernelSize ?? 3; // MorphProp이 null이면 기본값 3
+                        int kernelSize = options?.KernelSize ?? 3; // MorphProp 대신 KernelSize 사용
                         Mat kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(kernelSize, kernelSize));
 
                         MorphTypes morphType = options.MorphType;
@@ -167,11 +167,6 @@ namespace CapsuleInspect.Algorithm
 
             // Apply를 호출하여 필터 적용 (프로퍼티로 저장된 Filter와 Options 사용)
             Mat filteredImage = Apply(_srcImage, Filter, Options);
-            // 필터링 결과를 InspStage에 저장
-            Global.Inst.InspStage.SetFilteredImage(filteredImage);
-            // 필터 적용 결과를 _srcImage에 업데이트 (후속 검사나 표시를 위해)
-            // 필요 시 이 부분을 조정 (예: 별도 결과 저장)
-            ResultImage = filteredImage.Clone();
             _srcImage = filteredImage.Clone();
 
             // 검사 완료 표시 (BlobAlgorithm과 유사)
@@ -188,8 +183,6 @@ namespace CapsuleInspect.Algorithm
         public override void ResetResult()
         {
             base.ResetResult();
-            ResultImage?.Dispose();
-            ResultImage = null;
         }
     }
 }

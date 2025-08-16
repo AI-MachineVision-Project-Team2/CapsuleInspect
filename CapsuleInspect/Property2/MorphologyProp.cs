@@ -1,4 +1,5 @@
-﻿using OpenCvSharp;
+﻿using CapsuleInspect.Util;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,7 +9,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
 namespace CapsuleInspect.Property2
 {
     public partial class MorphologyProp : UserControl
@@ -23,7 +23,7 @@ namespace CapsuleInspect.Property2
             {
                 txtpixelsize.Text = "3";
                 _kernelSize = 3;
-                // 이벤트는 InitializeComponent()에서 이미 연결됨
+               
             }
         }
 
@@ -41,7 +41,6 @@ namespace CapsuleInspect.Property2
 
 
         private void txtpixelsize_TextChanged(object sender, EventArgs e)
-
         {
             if (int.TryParse(txtpixelsize.Text, out int newSize))
             {
@@ -50,15 +49,16 @@ namespace CapsuleInspect.Property2
                 if (newSize % 2 == 0) newSize++; // 짝수면 다음 홀수로 조정
                 _kernelSize = newSize;
                 txtpixelsize.Text = _kernelSize.ToString(); // 유효한 값으로 업데이트
+
             }
             else
             {
                 // 유효한 숫자가 아닌 경우 초기값으로 복원
                 txtpixelsize.Text = _kernelSize.ToString();
             }
-
-
         }
+
+        
 
         // 커널 크기를 반환하는 속성
         public int KernelSize
@@ -66,6 +66,7 @@ namespace CapsuleInspect.Property2
             get { return _kernelSize; }
         }
 
+      
     }
 
 }

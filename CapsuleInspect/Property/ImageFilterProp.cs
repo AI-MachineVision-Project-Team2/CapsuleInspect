@@ -60,7 +60,7 @@ namespace CapsuleInspect.Property
 
             if (sender is RotateProp rotateProp)
             {
-                int angle = rotateProp.Angle;
+                double angle = rotateProp.Angle;
                 cameraForm.PreviewFilter(FilterType.Rotation, new { Angle = angle });
             }
         }
@@ -110,7 +110,6 @@ namespace CapsuleInspect.Property
                 cameraForm.SetFilterMode(checkFilter.Checked);
             }
         }
-
         private void btnApply_Click(object sender, EventArgs e)
         {
             dynamic options = null;
@@ -146,7 +145,6 @@ namespace CapsuleInspect.Property
                             }
                             break;
                         }
-
                     case FilterType.Pyramid:
                         {
                             var filterForm = MainForm.SharedFilterForm;
@@ -211,7 +209,10 @@ namespace CapsuleInspect.Property
                             if (tab != null && tab.Controls[0] is MorphologyProp morphProp)
                             {
                                 var morphType = morphProp.SelectedMorphType;
-                                options = new { MorphType = morphType };
+                                var kernelSize = morphProp.KernelSize;
+                            
+                                options = new { MorphType = morphType, KernelSize = kernelSize };
+                                SLogger.Write($"options 설정: MorphType={morphType}, KernelSize={kernelSize}");
                             }
                             else
                             {
@@ -227,7 +228,7 @@ namespace CapsuleInspect.Property
 
                             if (tab != null && tab.Controls[0] is RotateProp rotateProp)
                             {
-                                int angle = rotateProp.Angle;
+                                double angle = rotateProp.Angle;
                                 options = new { Angle = angle };
                                 rotateProp.Preview -= OnRotationPreview; // 중복 방지
                                 rotateProp.Preview += OnRotationPreview;
@@ -239,36 +240,19 @@ namespace CapsuleInspect.Property
                             }
                             break;
                         }
+                        
                 }
-                // 필터 적용 및 결과 이미지 저장
-                Bitmap filteredImage = cameraForm.RunFilterAlgorithm(_selectedFilter, options);
-                if (filteredImage != null)
-                {
-                    //Global.Inst.InspStage.SetFilteredImage(filteredImage); // 필터링된 이미지 저장
-                    cameraForm.UpdateDisplay(filteredImage); // CameraForm에 표시
-                    SLogger.Write($"필터 적용: {_selectedFilter}", SLogger.LogType.Info);
-                }
-                else
-                {
-                    MessageBox.Show("필터 적용 실패", "에러", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                // 필터 적용 (void 호출만 함)
+                cameraForm.RunFilterAlgorithm(_selectedFilter, options);
+                SLogger.Write($"필터 적용: {_selectedFilter}", SLogger.LogType.Info);
             }
             else
             {
-                // None 상태일 때는 현재 이미지를 그대로 유지
-                Bitmap currentImage = cameraForm.GetCurrentBitmap();
-                if (currentImage != null)
-                {
-                    //Global.Inst.InspStage.SetFilteredImage(currentImage);
-                    cameraForm.UpdateDisplay(currentImage); // 현재 이미지 다시 표시
-                    SLogger.Write("현재 이미지 유지 (필터 없음)", SLogger.LogType.Info);
-                }
-                else
-                {
-                    MessageBox.Show("이미지를 찾을 수 없습니다.", "에러", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+              
+                SLogger.Write("현재 이미지 유지 (필터 없음)", SLogger.LogType.Info);
             }
         }
+
 
         private void btnUndo_Click(object sender, EventArgs e)
         {

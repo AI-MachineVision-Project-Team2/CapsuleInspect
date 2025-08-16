@@ -171,10 +171,9 @@ namespace CapsuleInspect
                 imageViewer.LoadBitmap(filterAlgo.ResultImage.ToBitmap(), autoFit);
                 _imgHistory.Push(filterAlgo.ResultImage.Clone());
                 _redoImg.Clear();
-                // 필터링된 이미지를 InspStage에 저장
                 Global.Inst.InspStage.SetFilteredImage(filterAlgo.ResultImage);
                 Global.Inst.InspStage.UpdateDisplay(filterAlgo.ResultImage.ToBitmap());
-            }
+            }   
             else
             {
                 MessageBox.Show("필터 적용에 실패했습니다.");

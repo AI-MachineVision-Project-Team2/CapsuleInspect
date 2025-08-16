@@ -28,8 +28,9 @@ namespace CapsuleInspect
         }
         private void LoadDefaultTabs()
         {
+           
+            LoadOptionControl(InspectType.InspAIModule); 
             LoadOptionControl(InspectType.InspFilter);
-            LoadOptionControl(InspectType.InspAIModule);
         }
         private void LoadOptionControl(InspectType inspType)
         {
