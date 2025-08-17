@@ -230,6 +230,7 @@ namespace CapsuleInspect.Property
                             {
                                 double angle = rotateProp.Angle;
                                 options = new { Angle = angle };
+                                SLogger.Write($"options 설정: Angle={angle}");
                                 rotateProp.Preview -= OnRotationPreview; // 중복 방지
                                 rotateProp.Preview += OnRotationPreview;
                             }
@@ -244,11 +245,12 @@ namespace CapsuleInspect.Property
                 }
                 // 필터 적용 (void 호출만 함)
                 cameraForm.RunFilterAlgorithm(_selectedFilter, options);
+                FilterApplied?.Invoke(this, EventArgs.Empty);
                 SLogger.Write($"필터 적용: {_selectedFilter}", SLogger.LogType.Info);
             }
             else
             {
-              
+                cameraForm.UpdateDisplay();
                 SLogger.Write("현재 이미지 유지 (필터 없음)", SLogger.LogType.Info);
             }
         }

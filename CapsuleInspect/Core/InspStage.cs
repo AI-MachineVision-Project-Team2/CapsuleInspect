@@ -22,6 +22,17 @@ using BrightIdeasSoftware;
 
 namespace CapsuleInspect.Core
 {
+    //누적 카운트 증가 
+    public class AccumCounter
+    {
+        public long Total { get; private set; }
+        public long OK { get; private set; }
+        public long NG { get; private set; }
+
+        public void Reset() { Total = OK = NG = 0; }
+        public void Add(int total, int ok, int ng)
+        { Total += total; OK += ok; NG += ng; }
+    }
     //추가 
     //검사와 관련된 클래스를 관리하는 클래스
     public class InspStage : IDisposable
@@ -75,6 +86,7 @@ namespace CapsuleInspect.Core
             }
         }
 
+       
 
         public PreviewImage PreView
         {
@@ -94,7 +106,20 @@ namespace CapsuleInspect.Core
         public int SelBufferIndex { get; set; } = 0;
         public eImageChannel SelImageChannel { get; set; } = eImageChannel.Gray;
 
+        public AccumCounter Accum { get; } = new AccumCounter();
+        public event Action<AccumCounter> AccumChanged;
 
+        public void ResetAccum()
+        {
+            Accum.Reset();
+            AccumChanged?.Invoke(Accum);
+        }
+
+        public void AddAccumCount(int total, int ok, int ng)
+        {
+            Accum.Add(total, ok, ng);
+            AccumChanged?.Invoke(Accum);
+        }
 
         public void ToggleLiveMode()
         {
@@ -657,7 +682,7 @@ namespace CapsuleInspect.Core
             if (bufferIndex >= 0)
                 SelBufferIndex = bufferIndex;
 
-            //#BINARY FILTER#13 채널 정보가 유지되도록, eImageChannel.None 타입을 추가
+            //채널 정보가 유지되도록, eImageChannel.None 타입을 추가
             if (imageChannel != eImageChannel.None)
                 SelImageChannel = imageChannel;
 
@@ -714,7 +739,7 @@ namespace CapsuleInspect.Core
                 cameraForm.ResetDisplay();
             }
         }
-        //#12_MODEL SAVE#4 Mainform에서 호출되는 모델 열기와 저장 함수        
+        // Mainform에서 호출되는 모델 열기와 저장 함수        
         public bool LoadModel(string filePath)
         {
             SLogger.Write($"모델 로딩:{filePath}");
@@ -938,7 +963,7 @@ namespace CapsuleInspect.Core
             return true;
         }
 
-        //#17_WORKING_STATE#2 작업 상태 설정
+        // 작업 상태 설정
         public void SetWorkingState(WorkingState workingState)
         {
             var cameraForm = MainForm.GetDockForm<CameraForm>();
@@ -947,6 +972,8 @@ namespace CapsuleInspect.Core
                 cameraForm.SetWorkingState(workingState);
             }
         }
+       
+
 
         #region Disposable
 

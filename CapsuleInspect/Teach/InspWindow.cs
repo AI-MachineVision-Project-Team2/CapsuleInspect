@@ -1,5 +1,7 @@
 ﻿using CapsuleInspect.Algorithm;
 using CapsuleInspect.Core;
+using CapsuleInspect.Inspect;
+using CapsuleInspect.Util;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System;
@@ -10,7 +12,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using CapsuleInspect.Inspect;
 
 namespace CapsuleInspect.Teach
 {
@@ -102,7 +103,7 @@ namespace CapsuleInspect.Teach
 
             return cloneWindow;
         }
-        //#11_MATCHING#2 InspWindow에 있는 템플릿 이미지를 MatchAlgorithm에 등록하는 함수
+        //InspWindow에 있는 템플릿 이미지를 MatchAlgorithm에 등록하는 함수
         public bool PatternLearn()
         {
             if (IsPatternLearn == true)
@@ -154,6 +155,9 @@ namespace CapsuleInspect.Teach
                 case InspectType.InspMatch:
                     inspAlgo = new MatchAlgorithm();
                     break;
+                case InspectType.InspFilter:
+                    inspAlgo = new FilterAlgorithm();
+                    break;
             }
 
             if (inspAlgo is null)
@@ -175,7 +179,12 @@ namespace CapsuleInspect.Teach
         public virtual bool DoInpsect(InspectType inspType)
         {
             // 필터링된 이미지를 가져옴
-            Mat inputImage = Global.Inst.InspStage.GetFilteredImage() ?? Global.Inst.InspStage.GetMat();
+            Mat inputImage = Global.Inst.InspStage.GetFilteredImage() ?? Global.Inst.InspStage.GetMat(0, eImageChannel.Color);
+            if (inputImage == null)
+            {
+                SLogger.Write("검사에 사용할 이미지가 없습니다.", SLogger.LogType.Error);
+                return false;
+            }
             // 1. 먼저 InspFilter 실행하여 _filteredImage 설정
             var filterAlgo = AlgorithmList.Find(algo => algo.InspectType == InspectType.InspFilter);
             if (filterAlgo != null && filterAlgo.IsUse && (inspType == InspectType.InspNone || inspType == InspectType.InspFilter))

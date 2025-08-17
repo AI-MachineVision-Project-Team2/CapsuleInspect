@@ -75,6 +75,9 @@ namespace CapsuleInspect.Inspect
             int totalCnt = 0;
             int okCnt = 0;
             int ngCnt = 0;
+
+            var allRects = new List<DrawInspectInfo>();
+
             foreach (var inspWindow in inspWindowList)
             {
                 totalCnt++;
@@ -93,24 +96,33 @@ namespace CapsuleInspect.Inspect
 
                 DisplayResult(inspWindow, InspectType.InspNone);
             }
-
-            if (totalCnt > 0)
+            var cameraForm = MainForm.GetDockForm<CameraForm>();
+            if (cameraForm != null)
             {
-                //찾은 위치를 이미지상에서 표시
-                var cameraForm = MainForm.GetDockForm<CameraForm>();
-                if (cameraForm != null)
-                {
-                    cameraForm.SetInspResultCount(totalCnt, okCnt, ngCnt);
-                }
-                var resultForm = MainForm.GetDockForm<ResultForm>();
-                if (resultForm != null)
-                {
-                    if (resultForm.InvokeRequired)
-                        resultForm.BeginInvoke(new Action(() => resultForm.AddModelResult(curMode)));
-                    else
-                        resultForm.AddModelResult(curMode);
-                }
+                cameraForm.AddRect(allRects);                        // (있다면)
+                cameraForm.SetInspResultCount(totalCnt, okCnt, ngCnt);
             }
+
+            // ★ 누적 카운트 갱신 (이미지 1장 단위로)
+            Global.Inst.InspStage.AddAccumCount(1, isDefect ? 0 : 1, isDefect ? 1 : 0);
+            //if (totalCnt > 0)
+            //{
+            //    //찾은 위치를 이미지상에서 표시
+            //    var cameraForm = MainForm.GetDockForm<CameraForm>();
+            //    if (cameraForm != null)
+            //    {
+            //        cameraForm.SetInspResultCount(totalCnt, okCnt, ngCnt);
+            //    }
+            //    var resultForm = MainForm.GetDockForm<ResultForm>();
+            //    if (resultForm != null)
+            //    {
+            //        if (resultForm.InvokeRequired)
+            //            resultForm.BeginInvoke(new Action(() => resultForm.AddModelResult(curMode)));
+            //        else
+            //            resultForm.AddModelResult(curMode);
+            //    }
+            //}
+
 
             return true;
         }

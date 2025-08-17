@@ -16,8 +16,8 @@ namespace CapsuleInspect.Algorithm
         public FilterType Filter { get; set; } = FilterType.None;
         [XmlIgnore]
         public dynamic Options { get; set; } = null;
-        //[XmlIgnore]
-        //public new Mat ResultImage { get; private set; } // new 키워드 추가
+        [XmlIgnore]
+        public new Mat ResultImage { get; private set; } // new 키워드 추가
         public FilterAlgorithm()
         {
             InspectType = InspectType.InspFilter;
@@ -168,7 +168,7 @@ namespace CapsuleInspect.Algorithm
             // Apply를 호출하여 필터 적용 (프로퍼티로 저장된 Filter와 Options 사용)
             Mat filteredImage = Apply(_srcImage, Filter, Options);
             _srcImage = filteredImage.Clone();
-
+            ResultImage = filteredImage.Clone();
             // 검사 완료 표시 (BlobAlgorithm과 유사)
             IsInspected = true;
 
@@ -183,6 +183,8 @@ namespace CapsuleInspect.Algorithm
         public override void ResetResult()
         {
             base.ResetResult();
+            ResultImage?.Dispose();
+            ResultImage = null;
         }
     }
 }
