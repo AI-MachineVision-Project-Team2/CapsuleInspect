@@ -28,7 +28,8 @@ namespace CapsuleInspect
             _contextMenu = new ContextMenuStrip();
 
             List<InspWindowType> windowTypeList;
-            windowTypeList = new List<InspWindowType> { InspWindowType.Base, InspWindowType.Body, InspWindowType.Sub, InspWindowType.ID };
+            windowTypeList = new List<InspWindowType> { InspWindowType.Crack, InspWindowType.Scratch, 
+                InspWindowType.Squeeze,InspWindowType.PrintDefect, InspWindowType.ID };
 
             foreach (InspWindowType windowType in windowTypeList)
                 _contextMenu.Items.Add(new ToolStripMenuItem(windowType.ToString(), null, AddNode_Click) { Tag = windowType });

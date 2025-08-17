@@ -20,9 +20,10 @@ namespace CapsuleInspect.Core
     public enum InspWindowType
     {
         None = 0,
-        Base,
-        Body,
-        Sub,
+        Crack,
+        Scratch,
+        Squeeze,
+        PrintDefect,
         ID
     }
 

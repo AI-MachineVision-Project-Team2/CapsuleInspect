@@ -50,6 +50,7 @@ namespace CapsuleInspect.Property
             var filter = _filterAlgo?.Filter ?? FilterType.None;
             // 콤보박스가 이미 Enum 리스트로 바인딩되어 있으니 그대로 선택만 반영
             cbFilterType.SelectedItem = filter;
+            Console.WriteLine($"SetAlgorithm: FilterType={filter}");
         }
 
 

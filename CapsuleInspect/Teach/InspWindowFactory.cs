@@ -58,19 +58,25 @@ namespace CapsuleInspect.Teach
         {
             switch (inspWindow.InspWindowType)
             {
-                case InspWindowType.Base:
+                case InspWindowType.Crack:
                     inspWindow.AddInspAlgorithm(InspectType.InspFilter);
                     inspWindow.AddInspAlgorithm(InspectType.InspAIModule);
                     inspWindow.AddInspAlgorithm(InspectType.InspBinary);
                     inspWindow.AddInspAlgorithm(InspectType.InspMatch);
                     break;
-                case InspWindowType.Body:
+                case InspWindowType.Scratch:
                     inspWindow.AddInspAlgorithm(InspectType.InspFilter);
                     inspWindow.AddInspAlgorithm(InspectType.InspAIModule);
                     inspWindow.AddInspAlgorithm(InspectType.InspBinary);
                     inspWindow.AddInspAlgorithm(InspectType.InspMatch);
                     break;
-                case InspWindowType.Sub:
+                case InspWindowType.Squeeze:
+                    inspWindow.AddInspAlgorithm(InspectType.InspFilter);
+                    inspWindow.AddInspAlgorithm(InspectType.InspAIModule);
+                    inspWindow.AddInspAlgorithm(InspectType.InspBinary);
+                    inspWindow.AddInspAlgorithm(InspectType.InspMatch);
+                    break;
+                case InspWindowType.PrintDefect:
                     inspWindow.AddInspAlgorithm(InspectType.InspFilter);
                     inspWindow.AddInspAlgorithm(InspectType.InspAIModule);
                     inspWindow.AddInspAlgorithm(InspectType.InspBinary);
@@ -91,17 +97,21 @@ namespace CapsuleInspect.Teach
             prefix = string.Empty;
             switch (windowType)
             {
-                case InspWindowType.Base:
-                    name = "Base";
-                    prefix = "BAS";
+                case InspWindowType.Crack:
+                    name = "Crack";
+                    prefix = "Crack";
                     break;
-                case InspWindowType.Body:
-                    name = "Body";
-                    prefix = "BDY";
+                case InspWindowType.Scratch:
+                    name = "Scratch";
+                    prefix = "Scratch";
                     break;
-                case InspWindowType.Sub:
-                    name = "Sub";
-                    prefix = "SUB";
+                case InspWindowType.Squeeze:
+                    name = "Squeeze";
+                    prefix = "Squeeze";
+                    break;
+                case InspWindowType.PrintDefect:
+                    name = "PrintDefect";
+                    prefix = "PrintDefect";
                     break;
                 case InspWindowType.ID:
                     name = "ID";

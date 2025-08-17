@@ -115,7 +115,7 @@
             this.Font = new System.Drawing.Font("Noto Sans KR", 9F);
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "RunForm";
-            this.Text = " ";
+            this.Text = "실행창";
             this.ResumeLayout(false);
 
         }

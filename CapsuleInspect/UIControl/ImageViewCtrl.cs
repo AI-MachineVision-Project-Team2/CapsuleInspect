@@ -152,14 +152,17 @@ namespace CapsuleInspect.UIControl
 
             switch (inspWindowType)
             {
-                case InspWindowType.Base:
+                case InspWindowType.Crack:
                     color = Color.LightBlue;
                     break;
-                case InspWindowType.Body:
+                case InspWindowType.Scratch:
                     color = Color.Yellow;
                     break;
-                case InspWindowType.Sub:
+                case InspWindowType.Squeeze:
                     color = Color.Orange;
+                    break;
+                case InspWindowType.PrintDefect:
+                    color = Color.Brown;
                     break;
                 case InspWindowType.ID:
                     color = Color.Magenta;
