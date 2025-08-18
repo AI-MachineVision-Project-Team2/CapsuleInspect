@@ -202,6 +202,13 @@ namespace CapsuleInspect.Algorithm
             // 흰색 픽셀(255)의 총 개수 계산
             int pixelCount = Cv2.CountNonZero(binImage);
 
+            //모델을 불러온 후 검사 시 오류가 계속 떠서 오류가 안나게 수정한거
+            if (_findArea == null)
+                _findArea = new List<DrawInspectInfo>();
+
+            if (ResultString == null)
+                ResultString = new List<string>();
+
             _findArea.Clear();
 
             IsDefect = false;
