@@ -183,6 +183,12 @@ namespace CapsuleInspect
             }
         }
 
+        public void DoModelOpen()
+        {
+            modelOpenMenuItem_Click(this, EventArgs.Empty);
+        }
+
+
         private void modelSaveMenuItem_Click(object sender, EventArgs e)
         {
             //모델 파일 저장
@@ -206,6 +212,12 @@ namespace CapsuleInspect
                 }
             }
         }
+
+        public void DoModelSave()
+        {
+            modelSaveMenuItem_Click(this, EventArgs.Empty);
+        }
+
         //Cycle 모드 설정
         private void cycleModeMenuItem_Click(object sender, EventArgs e)
         {
