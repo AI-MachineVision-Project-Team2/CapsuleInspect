@@ -43,6 +43,7 @@
             this.inspectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cycleModeMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.txtFilePath = new System.Windows.Forms.TextBox();
+            this.cycleModeMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -61,7 +62,6 @@
             this.mainMenu.Name = "mainMenu";
             this.mainMenu.Padding = new System.Windows.Forms.Padding(8, 3, 0, 3);
             this.mainMenu.Size = new System.Drawing.Size(1534, 39);
-
             this.mainMenu.TabIndex = 2;
             this.mainMenu.Text = "menuStrip1";
             // 
@@ -85,7 +85,6 @@
             this.imageOpenToolStripMenuItem.Name = "imageOpenToolStripMenuItem";
             this.imageOpenToolStripMenuItem.Size = new System.Drawing.Size(314, 38);
             this.imageOpenToolStripMenuItem.Text = "이미지 열기";
-
             this.imageOpenToolStripMenuItem.Click += new System.EventHandler(this.imageOpenToolStripMenuItem_Click);
             // 
             // imageSaveToolStripMenuItem
@@ -93,20 +92,17 @@
             this.imageSaveToolStripMenuItem.Name = "imageSaveToolStripMenuItem";
             this.imageSaveToolStripMenuItem.Size = new System.Drawing.Size(314, 38);
             this.imageSaveToolStripMenuItem.Text = "이미지 저장";
-
             // 
             // toolStripSeparator
             // 
             this.toolStripSeparator.Name = "toolStripSeparator";
             this.toolStripSeparator.Size = new System.Drawing.Size(311, 6);
-
             // 
             // modelNewMenuItem
             // 
             this.modelNewMenuItem.Name = "modelNewMenuItem";
             this.modelNewMenuItem.Size = new System.Drawing.Size(314, 38);
             this.modelNewMenuItem.Text = "새 모델 만들기";
-
             this.modelNewMenuItem.Click += new System.EventHandler(this.modelNewMenuItem_Click);
             // 
             // modelOpenMenuItem
@@ -114,7 +110,6 @@
             this.modelOpenMenuItem.Name = "modelOpenMenuItem";
             this.modelOpenMenuItem.Size = new System.Drawing.Size(314, 38);
             this.modelOpenMenuItem.Text = "모델 열기";
-
             this.modelOpenMenuItem.Click += new System.EventHandler(this.modelOpenMenuItem_Click);
             // 
             // modelSaveMenuItem
@@ -139,7 +134,6 @@
             this.setupToolStripMenuItem.Name = "setupToolStripMenuItem";
             this.setupToolStripMenuItem.Size = new System.Drawing.Size(65, 33);
             this.setupToolStripMenuItem.Text = "설정";
-
             // 
             // SetupMenuItem
             // 
@@ -151,12 +145,12 @@
             // inspectToolStripMenuItem
             // 
             this.inspectToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.cycleModeMenuItem});
+            this.cycleModeMenuItem,
+            this.cycleModeMenuItem2});
             this.inspectToolStripMenuItem.Font = new System.Drawing.Font("Noto Sans KR Medium", 10F, System.Drawing.FontStyle.Bold);
             this.inspectToolStripMenuItem.Name = "inspectToolStripMenuItem";
             this.inspectToolStripMenuItem.Size = new System.Drawing.Size(65, 33);
             this.inspectToolStripMenuItem.Text = "검사";
-
             // 
             // cycleModeMenuItem
             // 
@@ -164,7 +158,7 @@
             this.cycleModeMenuItem.CheckOnClick = true;
             this.cycleModeMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.cycleModeMenuItem.Name = "cycleModeMenuItem";
-            this.cycleModeMenuItem.Size = new System.Drawing.Size(236, 38);
+            this.cycleModeMenuItem.Size = new System.Drawing.Size(279, 38);
             this.cycleModeMenuItem.Text = "자동 반복 검사";
             this.cycleModeMenuItem.Click += new System.EventHandler(this.cycleModeMenuItem_Click);
             // 
@@ -177,6 +171,14 @@
             this.txtFilePath.Name = "txtFilePath";
             this.txtFilePath.Size = new System.Drawing.Size(760, 33);
             this.txtFilePath.TabIndex = 3;
+            // 
+            // cycleModeMenuItem2
+            // 
+            this.cycleModeMenuItem2.CheckOnClick = true;
+            this.cycleModeMenuItem2.Name = "cycleModeMenuItem2";
+            this.cycleModeMenuItem2.Size = new System.Drawing.Size(279, 38);
+            this.cycleModeMenuItem2.Text = "자동 반복 검사(1번)";
+            this.cycleModeMenuItem2.Click += new System.EventHandler(this.cycleModeMenuItem2_Click);
             // 
             // MainForm
             // 
@@ -216,5 +218,6 @@
         private System.Windows.Forms.ToolStripMenuItem inspectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cycleModeMenuItem;
         private System.Windows.Forms.TextBox txtFilePath;
+        private System.Windows.Forms.ToolStripMenuItem cycleModeMenuItem2;
     }
 }

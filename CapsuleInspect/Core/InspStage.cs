@@ -803,43 +803,105 @@ namespace CapsuleInspect.Core
             if (!UseCamera)
             {
                 string inspImagePath = CurModel.InspectImagePath;
-                if (inspImagePath == "")
+                if (string.IsNullOrEmpty(inspImagePath))
+                {
+                    SLogger.Write("[InspStage] 검사 이미지 경로가 비어있음", SLogger.LogType.Error);
                     return;
+                }
 
                 string inspImageDir = Path.GetDirectoryName(inspImagePath);
                 if (!Directory.Exists(inspImageDir))
+                {
+                    SLogger.Write($"[InspStage] 이미지 폴더가 존재하지 않음: {inspImageDir}", SLogger.LogType.Error);
                     return;
+                }
 
                 if (!_imageLoader.IsLoadedImages())
                     _imageLoader.LoadImages(inspImageDir);
             }
-
-            if (isCycle)
+            // 검사 모드 분기
+            if (SettingXml.Inst.CycleMode) // 무한 자동 반복 검사
+            {
+                SLogger.Write("[InspStage] 무한 반복 검사 모드 시작");
+                _imageLoader.CyclicMode = true;
                 _inspWorker.StartCycleInspectImage();
-            else
-                OneCycle();
+            }
+            else if (SettingXml.Inst.CycleMode2) // 단일 사이클 자동 반복 검사
+            {
+                SLogger.Write("[InspStage] 단일 사이클 검사 모드 시작");
+                _imageLoader.CyclicMode = false;
+                _imageLoader.Reset(); // 인덱스 초기화
+                StartSingleCycleLoop();
+            }
+            else // 수동 단일 검사
+            {
+                SLogger.Write("[InspStage] 수동 단일 검사 모드 실행");
+                if (!OneCycle())
+                {
+                    SLogger.Write("[InspStage] 단일 검사 실패 또는 이미지 없음");
+                }
+            }
         }
-
-        public bool OneCycle()
+        // 단일 사이클 루프 시작
+        public void StartSingleCycleLoop()
         {
-            if (UseCamera)
+            if (InspWorker.IsRunning)
+                return;
+
+            if (!UseCamera)
             {
-                if (!Grab(0))
-                    return false;
+                string inspImagePath = CurModel.InspectImagePath;
+                if (string.IsNullOrEmpty(inspImagePath))
+                {
+                    SLogger.Write("[InspStage] 검사 이미지 경로가 비어있음", SLogger.LogType.Error);
+                    return;
+                }
+
+                string inspImageDir = Path.GetDirectoryName(inspImagePath);
+                if (!Directory.Exists(inspImageDir))
+                {
+                    SLogger.Write($"[InspStage] 이미지 폴더가 존재하지 않음: {inspImageDir}", SLogger.LogType.Error);
+                    return;
+                }
+
+                if (!_imageLoader.IsLoadedImages())
+                    _imageLoader.LoadImages(inspImageDir);
+
+                _imageLoader.CyclicMode = false;  // 단일 사이클
             }
-            else
+
+            // 수동 반복 없이, 이미지 개수만큼만 자동 반복 실행
+            Task.Run(() =>
             {
-                if (!VirtualGrab())
-                    return false;
-            }
+                while (true)
+                {
+                    bool result = OneCycle();
+                    if (!result)
+                    {
+                        SLogger.Write("[InspStage] 단일 사이클 검사 종료");
+                        break;
+                    }
 
-            ResetDisplay();
-
-            bool isDefect;
-            if (!_inspWorker.RunInspect(out isDefect))
-                return false;
-
-            return true;
+                    // 검사 간 약간의 지연을 둘 수 있음
+                    System.Threading.Thread.Sleep(200);
+                }
+            });
+        }
+        public bool OneCycle() 
+        { 
+            if (UseCamera) 
+            { 
+                if (!Grab(0)) return false; 
+            } 
+            else 
+            { 
+                if (!VirtualGrab()) return false; 
+            } 
+            ResetDisplay(); 
+            bool isDefect; 
+            if (!_inspWorker.RunInspect(out isDefect)) 
+                return false; 
+            return true; 
         }
 
         public void StopCycle()

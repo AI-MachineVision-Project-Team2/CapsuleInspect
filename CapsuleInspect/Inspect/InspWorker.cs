@@ -177,7 +177,8 @@ namespace CapsuleInspect.Inspect
                 inspAlgo.TeachRect = windowArea;
                 inspAlgo.InspRect = windowArea;
 
-                Mat srcImage = Global.Inst.InspStage.GetMat(0, inspAlgo.ImageChannel);
+                Mat srcImage = Global.Inst.InspStage.GetFilteredImage() ??
+                  Global.Inst.InspStage.GetMat(0, inspAlgo.ImageChannel);
                 inspAlgo.SetInspData(srcImage);
             }
 
