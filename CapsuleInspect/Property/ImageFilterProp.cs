@@ -20,13 +20,9 @@ namespace CapsuleInspect.Property
     public enum FilterType
     {
         None,
-        HSVscale,
         Flip,
-        Pyramid,
-        Resize,
         CannyEdge,
         Morphology,
-        Rotation
     }
     public partial class ImageFilterProp : UserControl
     {
@@ -54,51 +50,24 @@ namespace CapsuleInspect.Property
         }
 
 
-        private void OnRotationPreview(object sender, EventArgs e)
-        {
-            var cameraForm = MainForm.GetDockForm<CameraForm>();
-            if (cameraForm == null) return;
-
-            if (sender is RotateProp rotateProp)
-            {
-                double angle = rotateProp.Angle;
-                cameraForm.PreviewFilter(FilterType.Rotation, new { Angle = angle });
-            }
-        }
-
         private void cbFilterType_SelectedIndexChanged(object sender, EventArgs e)
         {
             switch (cbFilterType.SelectedIndex)
             {
                 case 0: _selectedFilter = FilterType.None; break;
-                case 1: _selectedFilter = FilterType.HSVscale; break;
-                case 2: _selectedFilter = FilterType.Flip; break;
-                case 3: _selectedFilter = FilterType.Pyramid; break;
-                case 4: _selectedFilter = FilterType.Resize; break;
-                case 5: _selectedFilter = FilterType.CannyEdge; break;
-                case 6: _selectedFilter = FilterType.Morphology; break;
-                case 7: _selectedFilter = FilterType.Rotation; break;
+                case 1: _selectedFilter = FilterType.Flip; break;
+                case 2: _selectedFilter = FilterType.CannyEdge; break;
+                case 3: _selectedFilter = FilterType.Morphology; break;
                 default: _selectedFilter = FilterType.None; break;
             }
-            // None, HSVscale은 FilterForm 탭 호출 skip
-            if (_selectedFilter == FilterType.None || _selectedFilter == FilterType.HSVscale)
+            // None FilterForm 탭 호출 skip
+            if (_selectedFilter == FilterType.None)
                 return;
 
             var filterForm = MainForm.SharedFilterForm;
             if (filterForm != null)
             {
                 filterForm.SelectTab(_selectedFilter.ToString());
-                // 회전 필터 선택 시 Preview 이벤트 연결
-                if (_selectedFilter == FilterType.Rotation)
-                {
-                    var tab = filterForm.GetTabPage("Rotation");
-                    if (tab != null && tab.Controls[0] is RotateProp rotateProp)
-                    {
-                        // 중복 연결 방지
-                        rotateProp.Preview -= OnRotationPreview;
-                        rotateProp.Preview += OnRotationPreview;
-                    }
-                }
             }
         }
         
@@ -146,50 +115,6 @@ namespace CapsuleInspect.Property
                             }
                             break;
                         }
-                    case FilterType.Pyramid:
-                        {
-                            var filterForm = MainForm.SharedFilterForm;
-                            if (filterForm != null)
-                            {
-                                var tab = filterForm.GetTabPage("Pyramid");
-                                if (tab != null && tab.Controls.Count > 0 && tab.Controls[0] is PyramidProp pyramidProp)
-                                {
-                                    string direction = pyramidProp.SelectedDirection;
-                                    options = new { Direction = direction };
-                                }
-                                else
-                                {
-                                    MessageBox.Show("Pyramid 설정을 찾을 수 없습니다.");
-                                    return;
-                                }
-                            }
-                            break;
-                        }
-
-                    case FilterType.Resize:
-                        {
-                            var filterForm = MainForm.SharedFilterForm;
-                            var tab = filterForm?.GetTabPage("Resize");
-                            if (tab != null && tab.Controls[0] is ResizeProp resizeProp)
-                            {
-                                double fx = (double)resizeProp.NumericUpDownX.Value;
-                                double fy = (double)resizeProp.NumericUpDownY.Value;
-
-                                if (fx <= 0 || fx > 1000 || fy <= 0 || fy > 1000)
-                                {
-                                    MessageBox.Show("0보다 크고 1000 이하의 값을 입력하세요.");
-                                    return;
-                                }
-
-                                options = new { Fx = fx, Fy = fy };
-                            }
-                            else
-                            {
-                                MessageBox.Show("Resize 설정을 찾을 수 없습니다.");
-                                return;
-                            }
-                            break;
-                        }
                     case FilterType.CannyEdge:
                         {
                             var filterForm = MainForm.SharedFilterForm;
@@ -199,6 +124,38 @@ namespace CapsuleInspect.Property
                                 int min = cannyEdgeProp.Min;
                                 int max = cannyEdgeProp.Max;
                                 options = new { Min = min, Max = max };
+
+                                var curWindow = Global.Inst.InspStage.PreView?.CurrentInspWindow;
+                                if (curWindow != null)
+                                {
+                                    var blob = curWindow.FindInspAlgorithm(InspectType.InspBinary) as BlobAlgorithm;
+                                    if (blob != null)
+                                    {
+                                        blob.Filter = FilterType.CannyEdge;
+                                        blob.FilterOptions = options;
+                                        SLogger.Write($"btnApply: BlobAlgorithm 업데이트 (CannyEdge, Min={min}, Max={max})", SLogger.LogType.Info);
+                                    }
+                                }
+
+                                // Canny 적용 및 _previewImage 업데이트
+                                var preview = Global.Inst.InspStage.PreView;
+                                if (preview != null)
+                                {
+                                    preview.SetCannyPreview(min, max);
+                                    Mat currentPreview = cameraForm.GetDisplayImage();
+                                    preview.UpdatePreviewImage(currentPreview);
+                                    SLogger.Write("btnApply: _previewImage를 Canny 결과로 업데이트", SLogger.LogType.Info);
+                                }
+                                else
+                                {
+                                    SLogger.Write("btnApply: Preview 객체 null", SLogger.LogType.Error);
+                                }
+
+                                SLogger.Write($"Canny Edge 적용: Min={min}, Max={max}", SLogger.LogType.Info);
+                            }
+                            else
+                            {
+                                SLogger.Write("btnApply: CannyEdgeProp 탭 또는 컨트롤 null", SLogger.LogType.Error);
                             }
                             break;
                         }
@@ -221,37 +178,13 @@ namespace CapsuleInspect.Property
                                 return;
                             }
                             break;
-                        }
-                    case FilterType.Rotation:
-                        {
-                            var filterForm = MainForm.SharedFilterForm;
-                            var tab = filterForm?.GetTabPage("Rotation");
-
-                            if (tab != null && tab.Controls[0] is RotateProp rotateProp)
-                            {
-                                double angle = rotateProp.Angle;
-                                options = new { Angle = angle };
-                                SLogger.Write($"options 설정: Angle={angle}");
-                                rotateProp.Preview -= OnRotationPreview; // 중복 방지
-                                rotateProp.Preview += OnRotationPreview;
-                            }
-                            else
-                            {
-                                MessageBox.Show("Rotation  설정을 찾을 수 없습니다.");
-                                return;
-                            }
-                            break;
-                        }
-                        
+                        } 
                 }
-                // 필터 적용 (void 호출만 함)
-                cameraForm.RunFilterAlgorithm(_selectedFilter, options);
-                FilterApplied?.Invoke(this, EventArgs.Empty);
                 SLogger.Write($"필터 적용: {_selectedFilter}", SLogger.LogType.Info);
             }
             else
             {
-                cameraForm.UpdateDisplay();
+
                 SLogger.Write("현재 이미지 유지 (필터 없음)", SLogger.LogType.Info);
             }
         }

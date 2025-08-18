@@ -1,4 +1,6 @@
 ﻿using CapsuleInspect.Core;
+using CapsuleInspect.Property;
+using CapsuleInspect.Util;
 using OpenCvSharp;
 using System;
 using System.Collections.Generic;
@@ -8,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+
 namespace CapsuleInspect.Algorithm
 {
     //이진화 임계값 설정을 구조체로 만들기
@@ -63,6 +66,10 @@ namespace CapsuleInspect.Algorithm
         //검사로 찾은 영역을 최외곽박스로 표시할 지 여부
         public bool UseRotatedRect { get; set; } = false;
 
+        // Canny 옵션 필드 추가
+        public FilterType Filter = FilterType.None;
+        public dynamic FilterOptions = null;
+
         List<BlobFilter> _filterBlobs = new List<BlobFilter>();
         public List<BlobFilter> BlobFilters
         {
@@ -79,7 +86,7 @@ namespace CapsuleInspect.Algorithm
             BinThreshold = new BinaryThreshold(100, 200, false);
         }
 
-        //#10_INSPWINDOW#3 InspWindow 복사를 위한 BlobAlgorithm 복사 함수
+        //InspWindow 복사를 위한 BlobAlgorithm 복사 함수
         public override InspAlgorithm Clone()
         {
             var cloneAlgo = new BlobAlgorithm();
@@ -146,7 +153,7 @@ namespace CapsuleInspect.Algorithm
                 MessageBox.Show("소스 이미지를 가져올 수 없습니다!");
                 return false;
             }
-                
+
 
             //검사 영역이 검사 대상 이미지를 벗어나지 않는지 확인
             if (InspRect.Right > _srcImage.Width ||
@@ -159,7 +166,7 @@ namespace CapsuleInspect.Algorithm
             if (targetImage.Type() == MatType.CV_8UC3)
                 Cv2.CvtColor(targetImage, grayImage, ColorConversionCodes.BGR2GRAY);
             else
-                grayImage = targetImage;
+                grayImage = targetImage.Clone();
 
             // 이진화 처리
             Mat binaryImage = new Mat();
@@ -167,24 +174,43 @@ namespace CapsuleInspect.Algorithm
 
             if (BinThreshold.invert)
                 binaryImage = ~binaryImage;
+            // Canny 적용 전에 이진화 결과 등록
+            Global.Inst.InspStage.PreView?.SetBinaryResultImage(binaryImage);
+
+            // ✅ Canny 필터 적용 (btnApply 눌렀을 때만)
+            if (Filter == FilterType.CannyEdge && FilterOptions != null)
+            {
+                try
+                {
+                    int min = FilterOptions.Min;
+                    int max = FilterOptions.Max;
+                    Mat canny = new Mat();
+                    Cv2.Canny(binaryImage, canny, min, max);
+                    binaryImage = canny.Clone();
+                }
+                catch (Exception ex)
+                {
+                    SLogger.Write($"Canny 필터 적용 실패: {ex.Message}", SLogger.LogType.Error);
+                }
+            }
 
             //이진화 검사 타입에 따른 검사 함수 분기
             if (BinaryMethod.PixelCount == BinMethod)
-            {
-                if (!InspPixelCount(binaryImage))
-                    return false;
+                {
+                    if (!InspPixelCount(binaryImage))
+                        return false;
+                }
+                else if (BinaryMethod.Feature == BinMethod)
+                {
+                    if (!InspBlobFilter(binaryImage))
+                        return false;
+                }
+
+                IsInspected = true;
+
+                return true;
             }
-            else if (BinaryMethod.Feature == BinMethod)
-            {
-                if (!InspBlobFilter(binaryImage))
-                    return false;
-            }
-
-            IsInspected = true;
-
-            return true;
-        }
-
+        
         //검사 결과 초기화
         public override void ResetResult()
         {

@@ -1,4 +1,7 @@
-﻿using CapsuleInspect.Property;
+﻿using CapsuleInspect.Algorithm;
+using CapsuleInspect.Property;
+using CapsuleInspect.Teach;
+using CapsuleInspect.Util;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System;
@@ -7,7 +10,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CapsuleInspect.Teach;
 
 namespace CapsuleInspect.Core
 {
@@ -17,13 +19,19 @@ namespace CapsuleInspect.Core
         private Mat _previewImage = null;
         // 프리뷰를 위한 InspWindow 변수
         private InspWindow _inspWindow = null;
+        private Mat _binaryResultImage = null;
         private bool _usePreview = true;
-
+        public InspWindow CurrentInspWindow => _inspWindow;
         public void SetImage(Mat image)
         {
             _orinalImage = image;
             _previewImage = new Mat();
         }
+        public void SetBinaryResultImage(Mat binary)
+        {
+            _binaryResultImage = binary.Clone();
+        }
+
         // 프리뷰를 위한 InspWindow 설정
         public void SetInspWindow(InspWindow inspwindow)
         {
@@ -72,7 +80,10 @@ namespace CapsuleInspect.Core
             if (invert)
                 binaryMask = ~binaryMask;
 
-            // binaryMask는 ROI 사이즈이므로 fullBinaryMask로 확장
+            // 추가: 순수 binaryMask를 _binaryResultImage에 저장 (ROI 크기)
+            _binaryResultImage = binaryMask.Clone();
+            SLogger.Write("SetBinary: _binaryResultImage 저장 완료 (순수 binary)", SLogger.LogType.Info);// binaryMask는 ROI 사이즈이므로 fullBinaryMask로 확장
+          
             Mat fullBinaryMask = Mat.Zeros(_orinalImage.Size(), MatType.CV_8UC1);
             binaryMask.CopyTo(new Mat(fullBinaryMask, windowArea));
 
@@ -129,6 +140,76 @@ namespace CapsuleInspect.Core
 
             bmpImage = BitmapConverter.ToBitmap(_previewImage);
             cameraForm.UpdateDisplay(bmpImage);
+        }
+
+        public void SetCannyPreview(int min, int max)
+        {
+            // 1. 입력 검증: 원본 이미지 또는 ROI가 없으면 종료
+            if (_orinalImage == null || _inspWindow == null)
+            {
+                SLogger.Write("SetCannyPreview: 원본 이미지 또는 InspWindow가 null입니다.", SLogger.LogType.Error);
+                return;
+            }
+
+            var cameraForm = MainForm.GetDockForm<CameraForm>();
+            if (cameraForm == null)
+            {
+                SLogger.Write("SetCannyPreview: CameraForm을 찾을 수 없습니다.", SLogger.LogType.Error);
+                return;
+            }
+
+            // 2. ROI 영역 가져오기
+            Rect roi = _inspWindow.WindowArea;
+
+            // baseImage: 현재 프리뷰 유지 (ShowBinaryOnly면 이진화 이미지)
+            Mat baseImage = (_previewImage != null && !_previewImage.Empty()) ? _previewImage.Clone() : _orinalImage.Clone();
+            SLogger.Write($"SetCannyPreview: baseImage 크기 (W={baseImage.Width}, H={baseImage.Height})", SLogger.LogType.Info);
+
+            // _binaryResultImage (ROI 크기의 순수 binary) 사용
+            Mat gray = new Mat();
+            if (_binaryResultImage != null && !_binaryResultImage.Empty())
+            {
+                gray = _binaryResultImage.Clone(); // ROI 크기의 binary 마스크
+                SLogger.Write($"SetCannyPreview: _binaryResultImage 사용 (Size: {gray.Width}x{gray.Height})", SLogger.LogType.Info);
+            }
+            else
+            {
+                // fallback: 원본 ROI에서 gray 생성
+                Mat roiImage = baseImage[roi];
+                if (roiImage.Channels() == 3)
+                    Cv2.CvtColor(roiImage, gray, ColorConversionCodes.BGR2GRAY);
+                else
+                    gray = roiImage.Clone();
+                SLogger.Write("SetCannyPreview: _binaryResultImage 없음, 원본 ROI로 gray 생성", SLogger.LogType.Error);
+            }
+
+            // Canny 적용 (binary 마스크 기반, sharp 엣지 검출)
+            Mat canny = new Mat();
+            Cv2.Canny(gray, canny, min, max);
+            SLogger.Write($"SetCannyPreview: Canny 적용 (Min={min}, Max={max})", SLogger.LogType.Info);
+
+            // Canny 결과를 전체 이미지 크기로 확장
+            Mat fullCanny = Mat.Zeros(_orinalImage.Size(), MatType.CV_8UC1);
+            canny.CopyTo(new Mat(fullCanny, roi));
+
+            // Canny 결과를 컬러로 변환 (화면 표시용)
+            Mat cannyColor = new Mat();
+            Cv2.CvtColor(fullCanny, cannyColor, ColorConversionCodes.GRAY2BGR);
+
+            // baseImage에 Canny 결과 오버레이
+            Mat preview = baseImage.Clone();
+            cannyColor.CopyTo(preview);
+            // 또는 하이라이트 스타일로 오버레이: Cv2.AddWeighted(baseImage, 0.7, cannyColor, 0.3, 0, preview);
+
+            cameraForm.UpdateDisplay(preview.ToBitmap());
+            SLogger.Write("SetCannyPreview: CameraForm 업데이트 완료", SLogger.LogType.Info);
+        }
+
+        // 추가: _previewImage를 외부에서 업데이트 가능하도록
+        public void UpdatePreviewImage(Mat newImage)
+        {
+            _previewImage = newImage.Clone();
+            SLogger.Write($"UpdatePreviewImage: _previewImage 업데이트 (Size: {_previewImage.Width}x{_previewImage.Height})", SLogger.LogType.Info);
         }
     }
 }

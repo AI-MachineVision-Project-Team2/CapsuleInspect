@@ -37,11 +37,11 @@
             // btnOpening
             // 
             this.btnOpening.AutoSize = true;
-            this.btnOpening.Font = new System.Drawing.Font("Noto Sans KR", 8.25F);
-            this.btnOpening.Location = new System.Drawing.Point(10, 12);
+            this.btnOpening.Font = new System.Drawing.Font("Noto Sans KR", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.btnOpening.Location = new System.Drawing.Point(10, 11);
             this.btnOpening.Margin = new System.Windows.Forms.Padding(2);
             this.btnOpening.Name = "btnOpening";
-            this.btnOpening.Size = new System.Drawing.Size(69, 20);
+            this.btnOpening.Size = new System.Drawing.Size(73, 21);
             this.btnOpening.TabIndex = 12;
             this.btnOpening.TabStop = true;
             this.btnOpening.Text = "Opening";
@@ -50,11 +50,11 @@
             // btnClosing
             // 
             this.btnClosing.AutoSize = true;
-            this.btnClosing.Font = new System.Drawing.Font("Noto Sans KR", 8.25F);
-            this.btnClosing.Location = new System.Drawing.Point(10, 35);
+            this.btnClosing.Font = new System.Drawing.Font("Noto Sans KR", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.btnClosing.Location = new System.Drawing.Point(10, 34);
             this.btnClosing.Margin = new System.Windows.Forms.Padding(2);
             this.btnClosing.Name = "btnClosing";
-            this.btnClosing.Size = new System.Drawing.Size(63, 20);
+            this.btnClosing.Size = new System.Drawing.Size(67, 21);
             this.btnClosing.TabIndex = 13;
             this.btnClosing.TabStop = true;
             this.btnClosing.Text = "Closing";
@@ -63,11 +63,11 @@
             // lblpixel
             // 
             this.lblpixel.AutoSize = true;
-            this.lblpixel.Font = new System.Drawing.Font("Noto Sans KR", 8.25F);
-            this.lblpixel.Location = new System.Drawing.Point(8, 67);
+            this.lblpixel.Font = new System.Drawing.Font("Noto Sans KR", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.lblpixel.Location = new System.Drawing.Point(8, 66);
             this.lblpixel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblpixel.Name = "lblpixel";
-            this.lblpixel.Size = new System.Drawing.Size(55, 16);
+            this.lblpixel.Size = new System.Drawing.Size(61, 17);
             this.lblpixel.TabIndex = 14;
             this.lblpixel.Text = "픽셀 크기: ";
             // 
@@ -75,7 +75,7 @@
             // 
             this.txtpixelsize.Cursor = System.Windows.Forms.Cursors.Hand;
             this.txtpixelsize.Font = new System.Drawing.Font("Noto Sans KR", 8.25F);
-            this.txtpixelsize.Location = new System.Drawing.Point(72, 65);
+            this.txtpixelsize.Location = new System.Drawing.Point(72, 64);
             this.txtpixelsize.Name = "txtpixelsize";
             this.txtpixelsize.Size = new System.Drawing.Size(100, 23);
             this.txtpixelsize.TabIndex = 15;
@@ -92,7 +92,7 @@
             this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "MorphologyProp";
-            this.Size = new System.Drawing.Size(201, 103);
+            this.Size = new System.Drawing.Size(266, 103);
             this.ResumeLayout(false);
             this.PerformLayout();
 

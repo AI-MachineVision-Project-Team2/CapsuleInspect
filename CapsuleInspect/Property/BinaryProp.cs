@@ -1,4 +1,7 @@
 ﻿using CapsuleInspect.Algorithm;
+using CapsuleInspect.Core;
+using CapsuleInspect.Teach;
+using CapsuleInspect.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,7 +11,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CapsuleInspect.Core;
 
 namespace CapsuleInspect.Property
 {
@@ -367,6 +369,7 @@ namespace CapsuleInspect.Property
             _blobAlgo.ImageChannel = (eImageChannel)cbChannel.SelectedIndex + 1;
             ImageChannelChanged?.Invoke(this, new ImageChannelEventArgs(_blobAlgo.ImageChannel));
         }
+
     }
     public class ImageChannelEventArgs : EventArgs
     {
