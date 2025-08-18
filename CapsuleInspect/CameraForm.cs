@@ -173,7 +173,7 @@ namespace CapsuleInspect
                 _redoImg.Clear();
                 Global.Inst.InspStage.SetFilteredImage(filterAlgo.ResultImage);
                 Global.Inst.InspStage.UpdateDisplay(filterAlgo.ResultImage.ToBitmap());
-            }   
+            }
             else
             {
                 MessageBox.Show("필터 적용에 실패했습니다.");
