@@ -93,6 +93,7 @@ namespace CapsuleInspect
         private void LoadSetting()
         {
             cycleModeMenuItem.Checked = SettingXml.Inst.CycleMode;
+            cycleModeMenuItem2.Checked = SettingXml.Inst.CycleMode2;
         }
 
         //쉽게 도킹패널에 접근하기 위한 정적 함수
@@ -212,7 +213,24 @@ namespace CapsuleInspect
             // 현재 체크 상태 확인
             bool isChecked = cycleModeMenuItem.Checked;
             SettingXml.Inst.CycleMode = isChecked;
+            if (isChecked)
+            {
+                cycleModeMenuItem2.Checked = false;
+                SettingXml.Inst.CycleMode2 = false;
+            }
         }
-        
+
+        private void cycleModeMenuItem2_Click(object sender, EventArgs e)
+        {
+            SLogger.Write($"자동 반복 검사(한 번) 클릭됨");
+            // 현재 체크 상태 확인
+            bool isChecked = cycleModeMenuItem2.Checked;
+            SettingXml.Inst.CycleMode2 = isChecked;
+            if (isChecked)
+            {
+                cycleModeMenuItem.Checked = false;
+                SettingXml.Inst.CycleMode = false;
+            }
+        }
     }
 }

@@ -18,7 +18,7 @@ namespace CapsuleInspect
 
     public partial class RunForm : DockContent
     {
-        
+
         public RunForm()
         {
             InitializeComponent();
@@ -27,7 +27,7 @@ namespace CapsuleInspect
         private void btnGrab_Click(object sender, EventArgs e)
         {
             // 그랩시 이미지 버퍼를 먼저 설정하도록 변경
-           
+
             var stage = Global.Inst.InspStage;
             SLogger.Write($"[RunForm] 촬상 클릭됨 CameraType: {stage.GetCurrentCameraType()}");
 
@@ -67,8 +67,9 @@ namespace CapsuleInspect
             if (SettingXml.Inst.CamType == Grab.CameraType.None ||
                 SettingXml.Inst.CommType == Sequence.CommunicatorType.None)
             {
-                bool cycleMode = SettingXml.Inst.CycleMode;
-                Global.Inst.InspStage.CycleInspect(cycleMode);
+
+                Global.Inst.InspStage.CycleInspect(true); // 무한 루프 검사
+
             }
             else
             {
@@ -82,4 +83,3 @@ namespace CapsuleInspect
         }
     }
 }
-    
