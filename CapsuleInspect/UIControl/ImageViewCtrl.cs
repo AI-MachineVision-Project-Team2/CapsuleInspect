@@ -204,7 +204,7 @@ namespace CapsuleInspect.UIControl
                     color = Color.Orange;
                     break;
                 case InspWindowType.PrintDefect:
-                    color = Color.Brown;
+                    color = Color.Gray;
                     break;
                 case InspWindowType.ID:
                     color = Color.Magenta;

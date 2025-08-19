@@ -25,14 +25,21 @@ namespace CapsuleInspect.Core
     //누적 카운트 증가 
     public class AccumCounter
     {
-        public long Total { get; private set; }
-        public long OK { get; private set; }
-        public long NG { get; private set; }
+        public long Total { get;  set; }
+        public long OK { get;  set; }
+        public long NG { get; set; }
+        public long NG_Scratch { get;  set; }
+        public long NG_Squeeze { get;  set; }
+        public long NG_PrintDefect { get;  set; }
+        public long NG_Crack { get;  set; }
 
-        public void Reset() { Total = OK = NG = 0; }
+        public void Reset() { Total = OK= NG = NG_Scratch = NG_Squeeze = NG_PrintDefect = NG_Crack = 0; }
         public void Add(int total, int ok, int ng)
         { Total += total; OK += ok; NG += ng; }
+    
     }
+   
+
     //추가 
     //검사와 관련된 클래스를 관리하는 클래스
     public class InspStage : IDisposable
@@ -55,9 +62,13 @@ namespace CapsuleInspect.Core
         private InspWindow _selectedInspWindow = null;
         //#15_INSP_WORKER#5 InspWorker 클래스 선언
         private InspWorker _inspWorker = null;
-        private ImageLoader _imageLoader = null;
-
-        //#16_LAST_MODELOPEN#1 가장 최근 모델 파일 경로와 저장할 REGISTRY 키 변수 선언
+        public ImageLoader _imageLoader = null;
+        public ImageLoader ImageLoader
+        {
+            get => _imageLoader;
+            private set => _imageLoader = value; // 필요 시 setter 추가
+        }
+        // 가장 최근 모델 파일 경로와 저장할 REGISTRY 키 변수 선언
 
         // 레지스트리 키 생성 또는 열기
         RegistryKey _regKey = null;
@@ -75,6 +86,7 @@ namespace CapsuleInspect.Core
         {
             get => _imageSpace;
         }
+
 
         public SaigeAI AIModule
         {
@@ -120,7 +132,15 @@ namespace CapsuleInspect.Core
             Accum.Add(total, ok, ng);
             AccumChanged?.Invoke(Accum);
         }
+        public void AddNgDetailCount(int crack, int scratch, int squeeze, int printDefect)
+        {
+            Accum.NG_Crack += crack;
+            Accum.NG_Scratch += scratch;
+            Accum.NG_Squeeze += squeeze;
+            Accum.NG_PrintDefect += printDefect;
 
+            AccumChanged?.Invoke(Accum);
+        }
         public void ToggleLiveMode()
         {
             LiveMode = !LiveMode;
@@ -831,7 +851,7 @@ namespace CapsuleInspect.Core
                 SLogger.Write("[InspStage] 단일 사이클 검사 모드 시작");
                 _imageLoader.CyclicMode = false;
                 _imageLoader.Reset(); // 인덱스 초기화
-                StartSingleCycleLoop();
+                _inspWorker.StartSingleCycleLoop();
             }
             else // 수동 단일 검사
             {
@@ -842,51 +862,7 @@ namespace CapsuleInspect.Core
                 }
             }
         }
-        // 단일 사이클 루프 시작
-        public void StartSingleCycleLoop()
-        {
-            if (InspWorker.IsRunning)
-                return;
-
-            if (!UseCamera)
-            {
-                string inspImagePath = CurModel.InspectImagePath;
-                if (string.IsNullOrEmpty(inspImagePath))
-                {
-                    SLogger.Write("[InspStage] 검사 이미지 경로가 비어있음", SLogger.LogType.Error);
-                    return;
-                }
-
-                string inspImageDir = Path.GetDirectoryName(inspImagePath);
-                if (!Directory.Exists(inspImageDir))
-                {
-                    SLogger.Write($"[InspStage] 이미지 폴더가 존재하지 않음: {inspImageDir}", SLogger.LogType.Error);
-                    return;
-                }
-
-                if (!_imageLoader.IsLoadedImages())
-                    _imageLoader.LoadImages(inspImageDir);
-
-                _imageLoader.CyclicMode = false;  // 단일 사이클
-            }
-
-            // 수동 반복 없이, 이미지 개수만큼만 자동 반복 실행
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    bool result = OneCycle();
-                    if (!result)
-                    {
-                        SLogger.Write("[InspStage] 단일 사이클 검사 종료");
-                        break;
-                    }
-
-                    // 검사 간 약간의 지연을 둘 수 있음
-                    System.Threading.Thread.Sleep(200);
-                }
-            });
-        }
+      
         public bool OneCycle() 
         { 
             if (UseCamera) 

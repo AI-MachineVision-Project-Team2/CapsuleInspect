@@ -146,7 +146,7 @@ namespace CapsuleInspect
 
             var filterAlgo = new FilterAlgorithm();
             Mat src;
-            if (filterType == FilterType.Pyramid || filterType == FilterType.Flip)
+            if (filterType == FilterType.Flip)
             {
                 src = BitmapConverter.ToMat(GetCurrentBitmap());
             }
@@ -166,9 +166,8 @@ namespace CapsuleInspect
 
             if (filterAlgo.DoInspect())
             {
-                bool autoFit = !(filterType == FilterType.Resize || filterType == FilterType.Pyramid);
                 // DoInspect 결과로 업데이트된 _srcImage를 표시
-                imageViewer.LoadBitmap(filterAlgo.ResultImage.ToBitmap(), autoFit);
+                //imageViewer.LoadBitmap(filterAlgo.ResultImage.ToBitmap(), autoFit);
                 _imgHistory.Push(filterAlgo.ResultImage.Clone());
                 _redoImg.Clear();
                 Global.Inst.InspStage.SetFilteredImage(filterAlgo.ResultImage);

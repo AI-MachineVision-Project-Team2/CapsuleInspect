@@ -30,7 +30,6 @@ namespace CapsuleInspect
         {
            
             LoadOptionControl(InspectType.InspAIModule); 
-            LoadOptionControl(InspectType.InspFilter);
         }
         private void LoadOptionControl(InspectType inspType)
         {
@@ -74,6 +73,11 @@ namespace CapsuleInspect
             UserControl curProp = null;
             switch (inspPropType)
             {
+                case InspectType.InspFilter:
+                    ImageFilterProp filterProp = new ImageFilterProp();
+                    filterProp.FilterApplied += FilterApplied; // 적용 버튼 이벤트 핸들러 추가
+                    curProp = filterProp;
+                    break;
                 case InspectType.InspBinary:
                     BinaryProp blobProp = new BinaryProp();
                     //이진화 속성 변경시 발생하는 이벤트 추가
@@ -83,21 +87,16 @@ namespace CapsuleInspect
 
                     curProp = blobProp;
                     break;
-                case InspectType.InspFilter:
-                    ImageFilterProp filterProp = new ImageFilterProp();
-                    filterProp.FilterApplied += FilterApplied; // 적용 버튼 이벤트 핸들러 추가
-                    curProp = filterProp;
+                //패턴매칭 속성창 추가
+                case InspectType.InspMatch:
+                    MatchInspProp matchProp = new MatchInspProp();
+                    curProp = matchProp;
                     break;
                 case InspectType.InspAIModule:
                     AIModuleProp aiModuleProp = new AIModuleProp();
                     curProp = aiModuleProp;
                     break;
-                //패턴매칭 속성창 추가
-                case InspectType.InspMatch:
-                    MatchInspProp matchProp = new MatchInspProp();
-                    
-                    curProp = matchProp;
-                    break;
+                
                 default:
                     MessageBox.Show("유효하지 않은 옵션입니다.");
                     return null;
@@ -128,6 +127,7 @@ namespace CapsuleInspect
                 ResetProperty(); // 클리어 후 기본 탭 로드
                 return;
             }
+            LoadOptionControl(InspectType.InspFilter);
             LoadOptionControl(InspectType.InspBinary);
             LoadOptionControl(InspectType.InspMatch);
             foreach (TabPage tabPage in tabPropControl.TabPages)
@@ -135,16 +135,7 @@ namespace CapsuleInspect
                 if (tabPage.Controls.Count > 0)
                 {
                     UserControl uc = tabPage.Controls[0] as UserControl;
-
-                    if (uc is BinaryProp binaryProp)
-                    {
-                        BlobAlgorithm blobAlgo = (BlobAlgorithm)window.FindInspAlgorithm(InspectType.InspBinary);
-                        if (blobAlgo is null)
-                            continue;
-
-                        binaryProp.SetAlgorithm(blobAlgo);
-                    }
-                    else if (uc is ImageFilterProp filterProp)
+                    if (uc is ImageFilterProp filterProp)
                     {
                         FilterAlgorithm filterAlgo = (FilterAlgorithm)window.FindInspAlgorithm(InspectType.InspFilter);
                         if (filterAlgo is null)
@@ -152,6 +143,15 @@ namespace CapsuleInspect
 
                         filterProp.SetAlgorithm(filterAlgo);
                     }
+                    else if (uc is BinaryProp binaryProp)
+                    {
+                        BlobAlgorithm blobAlgo = (BlobAlgorithm)window.FindInspAlgorithm(InspectType.InspBinary);
+                        if (blobAlgo is null)
+                            continue;
+
+                        binaryProp.SetAlgorithm(blobAlgo);
+                    }
+                   
                     else if (uc is MatchInspProp matchProp)
                     {
                         MatchAlgorithm matchAlgo = (MatchAlgorithm)window.FindInspAlgorithm(InspectType.InspMatch);

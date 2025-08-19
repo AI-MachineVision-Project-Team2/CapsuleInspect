@@ -52,10 +52,9 @@
             this.chkUse.Checked = true;
             this.chkUse.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkUse.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.chkUse.Location = new System.Drawing.Point(13, 10);
-            this.chkUse.Margin = new System.Windows.Forms.Padding(4);
+            this.chkUse.Location = new System.Drawing.Point(7, 5);
             this.chkUse.Name = "chkUse";
-            this.chkUse.Size = new System.Drawing.Size(72, 30);
+            this.chkUse.Size = new System.Drawing.Size(49, 21);
             this.chkUse.TabIndex = 6;
             this.chkUse.Text = "검사";
             this.chkUse.UseVisualStyleBackColor = true;
@@ -69,11 +68,9 @@
             this.grpBinary.Controls.Add(this.cbHighlight);
             this.grpBinary.Controls.Add(this.lbHighlight);
             this.grpBinary.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.grpBinary.Location = new System.Drawing.Point(4, 42);
-            this.grpBinary.Margin = new System.Windows.Forms.Padding(4);
+            this.grpBinary.Location = new System.Drawing.Point(3, 28);
             this.grpBinary.Name = "grpBinary";
-            this.grpBinary.Padding = new System.Windows.Forms.Padding(4);
-            this.grpBinary.Size = new System.Drawing.Size(357, 212);
+            this.grpBinary.Size = new System.Drawing.Size(250, 141);
             this.grpBinary.TabIndex = 5;
             this.grpBinary.TabStop = false;
             this.grpBinary.Text = "이진화";
@@ -82,20 +79,18 @@
             // 
             this.cbChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbChannel.FormattingEnabled = true;
-            this.cbChannel.Location = new System.Drawing.Point(129, 114);
-            this.cbChannel.Margin = new System.Windows.Forms.Padding(4);
+            this.cbChannel.Location = new System.Drawing.Point(90, 76);
             this.cbChannel.Name = "cbChannel";
-            this.cbChannel.Size = new System.Drawing.Size(165, 34);
+            this.cbChannel.Size = new System.Drawing.Size(117, 25);
             this.cbChannel.TabIndex = 9;
             this.cbChannel.SelectedIndexChanged += new System.EventHandler(this.cbChannel_SelectedIndexChanged);
             // 
             // lbChannel
             // 
             this.lbChannel.AutoSize = true;
-            this.lbChannel.Location = new System.Drawing.Point(16, 118);
-            this.lbChannel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lbChannel.Location = new System.Drawing.Point(11, 79);
             this.lbChannel.Name = "lbChannel";
-            this.lbChannel.Size = new System.Drawing.Size(102, 26);
+            this.lbChannel.Size = new System.Drawing.Size(66, 17);
             this.lbChannel.TabIndex = 10;
             this.lbChannel.Text = "이미지 채널";
             // 
@@ -103,20 +98,18 @@
             // 
             this.cbHighlight.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbHighlight.FormattingEnabled = true;
-            this.cbHighlight.Location = new System.Drawing.Point(129, 160);
-            this.cbHighlight.Margin = new System.Windows.Forms.Padding(4);
+            this.cbHighlight.Location = new System.Drawing.Point(90, 107);
             this.cbHighlight.Name = "cbHighlight";
-            this.cbHighlight.Size = new System.Drawing.Size(165, 34);
+            this.cbHighlight.Size = new System.Drawing.Size(117, 25);
             this.cbHighlight.TabIndex = 2;
             this.cbHighlight.SelectedIndexChanged += new System.EventHandler(this.cbHighlight_SelectedIndexChanged);
             // 
             // lbHighlight
             // 
             this.lbHighlight.AutoSize = true;
-            this.lbHighlight.Location = new System.Drawing.Point(16, 165);
-            this.lbHighlight.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lbHighlight.Location = new System.Drawing.Point(11, 110);
             this.lbHighlight.Name = "lbHighlight";
-            this.lbHighlight.Size = new System.Drawing.Size(97, 26);
+            this.lbHighlight.Size = new System.Drawing.Size(63, 17);
             this.lbHighlight.TabIndex = 7;
             this.lbHighlight.Text = "하이라이트";
             // 
@@ -125,10 +118,9 @@
             this.cbBinMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbBinMethod.Font = new System.Drawing.Font("Noto Sans KR", 9F);
             this.cbBinMethod.FormattingEnabled = true;
-            this.cbBinMethod.Location = new System.Drawing.Point(131, 262);
-            this.cbBinMethod.Margin = new System.Windows.Forms.Padding(4);
+            this.cbBinMethod.Location = new System.Drawing.Point(92, 175);
             this.cbBinMethod.Name = "cbBinMethod";
-            this.cbBinMethod.Size = new System.Drawing.Size(167, 34);
+            this.cbBinMethod.Size = new System.Drawing.Size(118, 25);
             this.cbBinMethod.TabIndex = 15;
             this.cbBinMethod.SelectedIndexChanged += new System.EventHandler(this.cbBinMethod_SelectedIndexChanged);
             // 
@@ -136,22 +128,20 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.label1.Location = new System.Drawing.Point(19, 266);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Location = new System.Drawing.Point(13, 177);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(85, 26);
+            this.label1.Size = new System.Drawing.Size(55, 17);
             this.label1.TabIndex = 16;
             this.label1.Text = "검사 타입";
             // 
             // dataGridViewFilter
             // 
             this.dataGridViewFilter.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewFilter.Location = new System.Drawing.Point(16, 321);
-            this.dataGridViewFilter.Margin = new System.Windows.Forms.Padding(4);
+            this.dataGridViewFilter.Location = new System.Drawing.Point(11, 214);
             this.dataGridViewFilter.Name = "dataGridViewFilter";
             this.dataGridViewFilter.RowHeadersWidth = 62;
             this.dataGridViewFilter.RowTemplate.Height = 23;
-            this.dataGridViewFilter.Size = new System.Drawing.Size(357, 177);
+            this.dataGridViewFilter.Size = new System.Drawing.Size(250, 118);
             this.dataGridViewFilter.TabIndex = 14;
             this.dataGridViewFilter.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewFilter_CellValueChanged);
             this.dataGridViewFilter.CurrentCellDirtyStateChanged += new System.EventHandler(this.dataGridViewFilter_CurrentCellDirtyStateChanged);
@@ -162,10 +152,9 @@
             this.chkRotatedRect.Checked = true;
             this.chkRotatedRect.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkRotatedRect.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.chkRotatedRect.Location = new System.Drawing.Point(16, 520);
-            this.chkRotatedRect.Margin = new System.Windows.Forms.Padding(4);
+            this.chkRotatedRect.Location = new System.Drawing.Point(11, 338);
             this.chkRotatedRect.Name = "chkRotatedRect";
-            this.chkRotatedRect.Size = new System.Drawing.Size(123, 30);
+            this.chkRotatedRect.Size = new System.Drawing.Size(82, 21);
             this.chkRotatedRect.TabIndex = 17;
             this.chkRotatedRect.Text = "회전사각형";
             this.chkRotatedRect.UseVisualStyleBackColor = true;
@@ -174,17 +163,16 @@
             // binRangeTrackbar
             // 
             this.binRangeTrackbar.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.binRangeTrackbar.Location = new System.Drawing.Point(11, 30);
-            this.binRangeTrackbar.Margin = new System.Windows.Forms.Padding(4);
+            this.binRangeTrackbar.Location = new System.Drawing.Point(8, 20);
             this.binRangeTrackbar.Name = "binRangeTrackbar";
-            this.binRangeTrackbar.Size = new System.Drawing.Size(337, 80);
+            this.binRangeTrackbar.Size = new System.Drawing.Size(236, 53);
             this.binRangeTrackbar.TabIndex = 8;
             this.binRangeTrackbar.ValueLeft = 80;
             this.binRangeTrackbar.ValueRight = 200;
             // 
             // BinaryProp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.chkRotatedRect);
             this.Controls.Add(this.cbBinMethod);
@@ -193,9 +181,8 @@
             this.Controls.Add(this.chkUse);
             this.Controls.Add(this.grpBinary);
             this.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "BinaryProp";
-            this.Size = new System.Drawing.Size(396, 554);
+            this.Size = new System.Drawing.Size(277, 369);
             this.grpBinary.ResumeLayout(false);
             this.grpBinary.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewFilter)).EndInit();

@@ -76,32 +76,9 @@ namespace CapsuleInspect.Algorithm
 
             switch (filter)
             {
-                case FilterType.HSVscale:
-                    if (src.Channels() == 1)
-                    {
-                        MessageBox.Show("흑백 이미지에는 HSV 변환을 적용할 수 없습니다.");
-                        dst = src.Clone();
-                    }
-                    else
-                    {
-                        Cv2.CvtColor(src, dst, ColorConversionCodes.BGR2HSV);
-                    }
-                    break;
                 case FilterType.Flip:
                     FlipMode mode = (FlipMode)options.FlipMode;
                     Cv2.Flip(src, dst, mode);
-                    break;
-                case FilterType.Pyramid:
-                    string direction = options?.Direction ?? "Down";
-                    if (direction == "Up")
-                        Cv2.PyrUp(src, dst);
-                    else
-                        Cv2.PyrDown(src, dst);
-                    break;
-                case FilterType.Resize:
-                    double fx = options.Fx / 100.0;
-                    double fy = options.Fy / 100.0;
-                    Cv2.Resize(src, dst, new Size(), fx, fy);
                     break;
                 case FilterType.CannyEdge:
                     {
@@ -136,17 +113,7 @@ namespace CapsuleInspect.Algorithm
                         Cv2.MorphologyEx(binary, dst, morphType, kernel);
                     }
                     break;
-                case FilterType.Rotation:
-                    {
 
-                        double angle = (double)options.Angle;
-
-                        Point2f center = new Point2f(src.Width / 2f, src.Height / 2f);
-                        Mat matrix = Cv2.GetRotationMatrix2D(center, angle, 1.0);
-                        Cv2.WarpAffine(src, dst, matrix, new Size(src.Width, src.Height),
-                                       InterpolationFlags.Linear, BorderTypes.Constant, Scalar.All(0));
-                    }
-                    break;
                 default:
                     dst = src.Clone();
                     break;

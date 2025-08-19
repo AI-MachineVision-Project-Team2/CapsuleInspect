@@ -34,11 +34,12 @@
             // rangeSlider
             // 
             this.rangeSlider.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.rangeSlider.Location = new System.Drawing.Point(13, 22);
+            this.rangeSlider.Location = new System.Drawing.Point(9, 15);
+            this.rangeSlider.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.rangeSlider.Maximum = 255;
             this.rangeSlider.Minimum = 0;
             this.rangeSlider.Name = "rangeSlider";
-            this.rangeSlider.Size = new System.Drawing.Size(265, 45);
+            this.rangeSlider.Size = new System.Drawing.Size(186, 40);
             this.rangeSlider.SliderMax = 200;
             this.rangeSlider.SliderMin = 30;
             this.rangeSlider.TabIndex = 0;
@@ -46,12 +47,13 @@
             // 
             // CannyEdgeProp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.rangeSlider);
             this.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "CannyEdgeProp";
-            this.Size = new System.Drawing.Size(405, 148);
+            this.Size = new System.Drawing.Size(284, 99);
             this.ResumeLayout(false);
 
         }

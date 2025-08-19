@@ -1,4 +1,7 @@
 ﻿using CapsuleInspect.Algorithm;
+using CapsuleInspect.Core;
+using CapsuleInspect.Teach;
+using CapsuleInspect.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,7 +11,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CapsuleInspect.Core;
 
 namespace CapsuleInspect.Property
 {
@@ -77,6 +79,32 @@ namespace CapsuleInspect.Property
 
         private void InitializeFilterDataGridView()
         {
+            // 스타일 설정
+            dataGridViewFilter.EnableHeadersVisualStyles = false;
+            dataGridViewFilter.ColumnHeadersHeight = 36;
+            dataGridViewFilter.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            dataGridViewFilter.CellBorderStyle = DataGridViewCellBorderStyle.Single;
+            dataGridViewFilter.GridColor = Color.LightGray;
+            dataGridViewFilter.BackgroundColor = Color.White;
+            dataGridViewFilter.Font = new Font("Noto Sans KR", 9F, FontStyle.Bold);
+            dataGridViewFilter.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            dataGridViewFilter.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+            {
+                Font = new Font("Noto Sans KR", 9F, FontStyle.Bold),
+                Alignment = DataGridViewContentAlignment.MiddleCenter,
+                BackColor = Color.White,
+                ForeColor = Color.Black,
+                SelectionBackColor = SystemColors.Highlight,
+                SelectionForeColor = SystemColors.HighlightText,
+                Padding = new Padding(0, 2, 0, 0)
+            };
+
+            dataGridViewFilter.DefaultCellStyle = new DataGridViewCellStyle
+            {
+                Alignment = DataGridViewContentAlignment.MiddleCenter
+            };
+
             // 컬럼 설정
             dataGridViewFilter.Columns.Add(new DataGridViewTextBoxColumn()
             {
@@ -341,6 +369,7 @@ namespace CapsuleInspect.Property
             _blobAlgo.ImageChannel = (eImageChannel)cbChannel.SelectedIndex + 1;
             ImageChannelChanged?.Invoke(this, new ImageChannelEventArgs(_blobAlgo.ImageChannel));
         }
+
     }
     public class ImageChannelEventArgs : EventArgs
     {

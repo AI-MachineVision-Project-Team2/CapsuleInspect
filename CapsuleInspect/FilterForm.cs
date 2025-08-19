@@ -21,11 +21,9 @@ namespace CapsuleInspect
         {
             InitializeComponent();
             LoadOptionControl(FilterType.Flip);
-            LoadOptionControl(FilterType.Resize);
-            LoadOptionControl(FilterType.Pyramid);
             LoadOptionControl(FilterType.CannyEdge);
             LoadOptionControl(FilterType.Morphology);
-            LoadOptionControl(FilterType.Rotation);
+          
         }
         private void LoadOptionControl(FilterType filterType)
         {
@@ -80,11 +78,7 @@ namespace CapsuleInspect
                 case FilterType.None:
                     return null; // None은 탭 생성 skip
                 case FilterType.Flip:
-                    curProp = new FlipProp(); // 클래스명 오타 수정 주의!
-                    break;
-
-                case FilterType.Resize:
-                    curProp = new ResizeProp();
+                    curProp = new FlipProp(); 
                     break;
 
                 case FilterType.CannyEdge:
@@ -94,15 +88,6 @@ namespace CapsuleInspect
                 case FilterType.Morphology:
                     curProp = new MorphologyProp();
                     break;
-
-                case FilterType.Pyramid:
-                    curProp = new PyramidProp();
-                    break;
-
-                case FilterType.Rotation:
-                    curProp = new RotateProp();
-                    break;
-
                 default:
                     MessageBox.Show("유효하지 않은 옵션입니다."); // 주석 처리하여 조용히 실패
                     return null;
