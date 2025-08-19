@@ -204,9 +204,7 @@
       <DependentUpon>PropertiesForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Property2\CannyEdgeProp.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Property2\CannyEdgeProp.cs" />
     <Compile Include="Property2\CannyEdgeProp.Designer.cs">
       <DependentUpon>CannyEdgeProp.cs</DependentUpon>
     </Compile>

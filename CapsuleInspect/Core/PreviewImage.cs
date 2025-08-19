@@ -2,6 +2,7 @@
 using CapsuleInspect.Property;
 using CapsuleInspect.Teach;
 using CapsuleInspect.Util;
+using MvCameraControl;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System;
@@ -100,6 +101,7 @@ namespace CapsuleInspect.Core
                 }
 
                 bmpImage = BitmapConverter.ToBitmap(_previewImage);
+
                 cameraForm.UpdateDisplay(bmpImage);
                 return;
             }
@@ -158,29 +160,41 @@ namespace CapsuleInspect.Core
 
             // 2. ROI 영역 가져오기
             Rect roi = _inspWindow.WindowArea;
-            // 3. ROI 범위 유효성 검사 (오류 방지용)
-            if (roi.X < 0 || roi.Y < 0 || roi.Right > _binaryResultImage.Width || roi.Bottom > _binaryResultImage.Height)
+            // baseImage: 현재 프리뷰 유지 (ShowBinaryOnly면 이진화 이미지)
+            Mat baseImage = _orinalImage.Clone();
+            Mat gray = new Mat();
+            if (_binaryResultImage != null && !_binaryResultImage.Empty())
             {
-                SLogger.Write("SetCannyPreview: ROI가 _binaryResultImage 범위를 초과함", SLogger.LogType.Error);
-                return;
+                gray = _binaryResultImage.Clone(); // ROI 크기의 binary 마스크 (binaryImage와 동일)
+                
             }
-            // 4. ROI 내에서 Canny Edge 수행
-            Mat roiImage = _binaryResultImage[roi];
+            else
+            {
+                // fallback: 원본 ROI에서 gray 생성
+                Mat roiImage = baseImage[roi];
+                if (roiImage.Channels() == 3)
+                    Cv2.CvtColor(roiImage, gray, ColorConversionCodes.BGR2GRAY);
+                else
+                    gray = roiImage.Clone();
+               
+            }
+            //Cv2.ImShow("Base", baseImage);
+            //Cv2.ImShow("Gray", gray);
+            //Cv2.ImShow("ROI", baseImage[roi]);
+            //Cv2.WaitKey(1); // OpenCV 창 업데이트
+
+            // Canny 적용 (binary 마스크 기반, sharp 엣지 검출, ROI 내)
             Mat canny = new Mat();
-            Cv2.Canny(roiImage, canny, min, max);
+            Cv2.Canny(gray, canny, min, max);
+            
+            // Canny 결과를 컬러로 변환 (baseImage는 CV_8UC3이므로)
 
-            // 5. Canny 결과를 컬러로 변환
-            Mat cannyColor = new Mat();
-            Cv2.CvtColor(canny, cannyColor, ColorConversionCodes.GRAY2BGR);
-            // 6. _previewImage 초기화 (없으면 _orinalImage로부터 복사)
-            if (_previewImage == null || _previewImage.Empty())
-                _previewImage = _orinalImage.Clone();
-
-            // 7. Canny 결과를 ROI 위치에 복사
-            cannyColor.CopyTo(new Mat(_previewImage, roi));
-            // 8. 화면 업데이트
+            // baseImage의 ROI 영역을 Canny 이미지로 교체 (오버레이 대신)
+            canny.CopyTo(new Mat(baseImage, roi));
+           
+            _previewImage=baseImage.Clone(); // 프리뷰 이미지 업데이트
             cameraForm.UpdateDisplay(_previewImage.ToBitmap());
-            SLogger.Write("SetCannyPreview: CameraForm 업데이트 완료", SLogger.LogType.Info);
+            
         }
 
         // 추가: _previewImage를 외부에서 업데이트 가능하도록

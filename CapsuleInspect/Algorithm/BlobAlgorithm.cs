@@ -168,16 +168,17 @@ namespace CapsuleInspect.Algorithm
             else
                 grayImage = targetImage.Clone();
 
-            // 이진화 처리
+            // ROI 영역 안에서 이진화 처리 
             Mat binaryImage = new Mat();
             Cv2.InRange(grayImage, BinThreshold.lower, BinThreshold.upper, binaryImage);
 
             if (BinThreshold.invert)
                 binaryImage = ~binaryImage;
+
+
             // Canny 적용 전에 이진화 결과 등록
             Global.Inst.InspStage.PreView?.SetBinaryResultImage(binaryImage);
-
-            // ✅ Canny 필터 적용 (btnApply 눌렀을 때만)
+            // Canny 필터 적용 (Filter가 CannyEdge이고 Options가 있을 때)
             if (Filter == FilterType.CannyEdge && FilterOptions != null)
             {
                 try
@@ -185,12 +186,14 @@ namespace CapsuleInspect.Algorithm
                     int min = FilterOptions.Min;
                     int max = FilterOptions.Max;
                     Mat canny = new Mat();
-                    Cv2.Canny(binaryImage, canny, min, max);
-                    binaryImage = canny.Clone();
+                    Cv2.Canny(binaryImage, canny, min, max);  // binaryImage (ROI 크기)에 Canny 적용
+                    binaryImage = canny.Clone();  // Canny 결과를 binaryImage로 업데이트 (후속 검사에 사용)
+                    SLogger.Write($"DoInspect: Canny 적용 (Min={min}, Max={max}) on binaryImage (ROI 내)", SLogger.LogType.Info);
                 }
                 catch (Exception ex)
                 {
-                    SLogger.Write($"Canny 필터 적용 실패: {ex.Message}", SLogger.LogType.Error);
+                    SLogger.Write($"DoInspect: Canny 적용 실패 - {ex.Message}", SLogger.LogType.Error);
+                    return false;
                 }
             }
 
