@@ -1,6 +1,7 @@
 ﻿using CapsuleInspect.Algorithm;
 using CapsuleInspect.Core;
 using CapsuleInspect.Teach;
+using OpenCvSharp.Dnn;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -47,6 +48,10 @@ namespace CapsuleInspect.UIControl
 
     public partial class ImageViewCtrl : UserControl
     {
+
+        // 숨김 ROI 관리를 위한 집합
+        private readonly HashSet<InspWindow> _hiddenWindows = new HashSet<InspWindow>(); //추가한거
+
         //ROI를 추가,수정,삭제 등으로 변경 시, 이벤트 발생
         public event EventHandler<DiagramEntityEventArgs> DiagramEntityEvent;
 
@@ -117,7 +122,44 @@ namespace CapsuleInspect.UIControl
         private ContextMenuStrip _contextMenu;
 
         private readonly object _lock = new object();
+        private void RemoveSelectedEntitiesByWindow(InspWindow window)
+        {
+            if (window == null) return;
+            if (_multiSelectedEntities == null || _multiSelectedEntities.Count == 0) return;
 
+            // 뒤에서 앞으로 제거 (인덱스 안정)
+            for (int i = _multiSelectedEntities.Count - 1; i >= 0; i--)
+            {
+                var ent = _multiSelectedEntities[i];
+                if (ent != null && ent.LinkedWindow == window)
+                    _multiSelectedEntities.RemoveAt(i);
+            }
+        }
+
+        //추가 한거
+        //추가한거
+        public void SetWindowVisible(InspWindow window, bool visible)
+        {
+            if (window == null) return;
+
+            if (visible)
+            {
+                _hiddenWindows.Remove(window); //추가한거
+            }
+            else
+            {
+                _hiddenWindows.Add(window); //추가한거
+
+                // 현재 선택 엔티티가 해당 ROI면 선택 해제
+                if (_selEntity != null && _selEntity.LinkedWindow == window)
+                    _selEntity = null; //추가한거
+
+                // 멀티 선택 목록에서도 제거 (보수적 방식)
+                RemoveSelectedEntitiesByWindow(window); //추가한거
+            }
+
+            Invalidate(); //추가한거
+        }
         public ImageViewCtrl()
         {
             InitializeComponent();
@@ -353,6 +395,8 @@ namespace CapsuleInspect.UIControl
             _screenSelectedRect = new Rectangle(0, 0, 0, 0);
             foreach (DiagramEntity entity in _diagramEntityList)
             {
+                if (entity.LinkedWindow != null && _hiddenWindows.Contains(entity.LinkedWindow))
+                    continue; // 숨김 ROI는 제외
                 Rectangle screenRect = VirtualToScreen(entity.EntityROI);
                 using (Pen pen = new Pen(entity.EntityColor, 2))
                 {
@@ -826,6 +870,9 @@ namespace CapsuleInspect.UIControl
                     _selEntity = null;
                     foreach (DiagramEntity entity in _diagramEntityList)
                     {
+                        if (entity.LinkedWindow != null && _hiddenWindows.Contains(entity.LinkedWindow))
+                            continue; //추가한거 // 숨김 ROI는 제외
+
                         Rectangle screenRect = VirtualToScreen(entity.EntityROI);
                         if (!screenRect.Contains(e.Location))
                             continue;
@@ -1039,6 +1086,9 @@ namespace CapsuleInspect.UIControl
 
                     foreach (DiagramEntity entity in _diagramEntityList)
                     {
+                        // 숨김 ROI는 건너뜀 (루프 안에서 체크해야 함)
+                        if (entity.LinkedWindow != null && _hiddenWindows.Contains(entity.LinkedWindow))
+                            continue; //추가한거
                         if (selectionVirtual.IntersectsWith(entity.EntityROI))
                         {
                             _multiSelectedEntities.Add(entity);
