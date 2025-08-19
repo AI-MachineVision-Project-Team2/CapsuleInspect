@@ -75,7 +75,6 @@ namespace CapsuleInspect
             {
                 case InspectType.InspFilter:
                     ImageFilterProp filterProp = new ImageFilterProp();
-                    filterProp.FilterApplied += FilterApplied; // 적용 버튼 이벤트 핸들러 추가
                     curProp = filterProp;
                     break;
                 case InspectType.InspBinary:

@@ -52,7 +52,7 @@
             this.chkUse.Checked = true;
             this.chkUse.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkUse.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.chkUse.Location = new System.Drawing.Point(7, 5);
+            this.chkUse.Location = new System.Drawing.Point(12, 5);
             this.chkUse.Name = "chkUse";
             this.chkUse.Size = new System.Drawing.Size(49, 21);
             this.chkUse.TabIndex = 6;
@@ -68,9 +68,9 @@
             this.grpBinary.Controls.Add(this.cbHighlight);
             this.grpBinary.Controls.Add(this.lbHighlight);
             this.grpBinary.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.grpBinary.Location = new System.Drawing.Point(3, 28);
+            this.grpBinary.Location = new System.Drawing.Point(8, 28);
             this.grpBinary.Name = "grpBinary";
-            this.grpBinary.Size = new System.Drawing.Size(250, 141);
+            this.grpBinary.Size = new System.Drawing.Size(295, 141);
             this.grpBinary.TabIndex = 5;
             this.grpBinary.TabStop = false;
             this.grpBinary.Text = "이진화";
@@ -118,7 +118,7 @@
             this.cbBinMethod.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbBinMethod.Font = new System.Drawing.Font("Noto Sans KR", 9F);
             this.cbBinMethod.FormattingEnabled = true;
-            this.cbBinMethod.Location = new System.Drawing.Point(92, 175);
+            this.cbBinMethod.Location = new System.Drawing.Point(100, 172);
             this.cbBinMethod.Name = "cbBinMethod";
             this.cbBinMethod.Size = new System.Drawing.Size(118, 25);
             this.cbBinMethod.TabIndex = 15;
@@ -128,7 +128,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.label1.Location = new System.Drawing.Point(13, 177);
+            this.label1.Location = new System.Drawing.Point(21, 174);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(55, 17);
             this.label1.TabIndex = 16;
@@ -137,11 +137,11 @@
             // dataGridViewFilter
             // 
             this.dataGridViewFilter.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewFilter.Location = new System.Drawing.Point(11, 214);
+            this.dataGridViewFilter.Location = new System.Drawing.Point(8, 199);
             this.dataGridViewFilter.Name = "dataGridViewFilter";
             this.dataGridViewFilter.RowHeadersWidth = 62;
             this.dataGridViewFilter.RowTemplate.Height = 23;
-            this.dataGridViewFilter.Size = new System.Drawing.Size(250, 118);
+            this.dataGridViewFilter.Size = new System.Drawing.Size(295, 118);
             this.dataGridViewFilter.TabIndex = 14;
             this.dataGridViewFilter.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewFilter_CellValueChanged);
             this.dataGridViewFilter.CurrentCellDirtyStateChanged += new System.EventHandler(this.dataGridViewFilter_CurrentCellDirtyStateChanged);
@@ -152,7 +152,7 @@
             this.chkRotatedRect.Checked = true;
             this.chkRotatedRect.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkRotatedRect.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.chkRotatedRect.Location = new System.Drawing.Point(11, 338);
+            this.chkRotatedRect.Location = new System.Drawing.Point(11, 320);
             this.chkRotatedRect.Name = "chkRotatedRect";
             this.chkRotatedRect.Size = new System.Drawing.Size(82, 21);
             this.chkRotatedRect.TabIndex = 17;
@@ -165,7 +165,7 @@
             this.binRangeTrackbar.Font = new System.Drawing.Font("Noto Sans KR", 9F);
             this.binRangeTrackbar.Location = new System.Drawing.Point(8, 20);
             this.binRangeTrackbar.Name = "binRangeTrackbar";
-            this.binRangeTrackbar.Size = new System.Drawing.Size(236, 53);
+            this.binRangeTrackbar.Size = new System.Drawing.Size(281, 53);
             this.binRangeTrackbar.TabIndex = 8;
             this.binRangeTrackbar.ValueLeft = 80;
             this.binRangeTrackbar.ValueRight = 200;
@@ -182,7 +182,7 @@
             this.Controls.Add(this.grpBinary);
             this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Name = "BinaryProp";
-            this.Size = new System.Drawing.Size(277, 369);
+            this.Size = new System.Drawing.Size(351, 369);
             this.grpBinary.ResumeLayout(false);
             this.grpBinary.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewFilter)).EndInit();

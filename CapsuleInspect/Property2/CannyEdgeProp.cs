@@ -55,8 +55,7 @@ namespace CapsuleInspect.Property2
             var preview = Global.Inst.InspStage.PreView;
             if (preview != null)
             {
-                preview.SetCannyPreview(min, max);
-               
+                preview.SetCannyPreview(min, max);    
             }
             else
             {

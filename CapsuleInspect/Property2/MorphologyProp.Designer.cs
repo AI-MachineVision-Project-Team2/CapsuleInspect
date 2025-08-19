@@ -32,13 +32,14 @@
             this.btnClosing = new System.Windows.Forms.RadioButton();
             this.lblpixel = new System.Windows.Forms.Label();
             this.txtpixelsize = new System.Windows.Forms.TextBox();
+            this.btnApply = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnOpening
             // 
             this.btnOpening.AutoSize = true;
             this.btnOpening.Font = new System.Drawing.Font("Noto Sans KR", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btnOpening.Location = new System.Drawing.Point(10, 11);
+            this.btnOpening.Location = new System.Drawing.Point(8, 7);
             this.btnOpening.Margin = new System.Windows.Forms.Padding(2);
             this.btnOpening.Name = "btnOpening";
             this.btnOpening.Size = new System.Drawing.Size(73, 21);
@@ -51,7 +52,7 @@
             // 
             this.btnClosing.AutoSize = true;
             this.btnClosing.Font = new System.Drawing.Font("Noto Sans KR", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btnClosing.Location = new System.Drawing.Point(10, 34);
+            this.btnClosing.Location = new System.Drawing.Point(8, 30);
             this.btnClosing.Margin = new System.Windows.Forms.Padding(2);
             this.btnClosing.Name = "btnClosing";
             this.btnClosing.Size = new System.Drawing.Size(67, 21);
@@ -64,7 +65,7 @@
             // 
             this.lblpixel.AutoSize = true;
             this.lblpixel.Font = new System.Drawing.Font("Noto Sans KR", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.lblpixel.Location = new System.Drawing.Point(8, 66);
+            this.lblpixel.Location = new System.Drawing.Point(7, 58);
             this.lblpixel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lblpixel.Name = "lblpixel";
             this.lblpixel.Size = new System.Drawing.Size(61, 17);
@@ -75,16 +76,29 @@
             // 
             this.txtpixelsize.Cursor = System.Windows.Forms.Cursors.Hand;
             this.txtpixelsize.Font = new System.Drawing.Font("Noto Sans KR", 8.25F);
-            this.txtpixelsize.Location = new System.Drawing.Point(72, 64);
+            this.txtpixelsize.Location = new System.Drawing.Point(71, 56);
             this.txtpixelsize.Name = "txtpixelsize";
             this.txtpixelsize.Size = new System.Drawing.Size(100, 23);
             this.txtpixelsize.TabIndex = 15;
             this.txtpixelsize.TextChanged += new System.EventHandler(this.txtpixelsize_TextChanged);
             // 
+            // btnApply
+            // 
+            this.btnApply.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.btnApply.Location = new System.Drawing.Point(8, 84);
+            this.btnApply.Margin = new System.Windows.Forms.Padding(2);
+            this.btnApply.Name = "btnApply";
+            this.btnApply.Size = new System.Drawing.Size(50, 25);
+            this.btnApply.TabIndex = 27;
+            this.btnApply.Text = "적용";
+            this.btnApply.UseVisualStyleBackColor = true;
+            this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
+            // 
             // MorphologyProp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.btnApply);
             this.Controls.Add(this.txtpixelsize);
             this.Controls.Add(this.lblpixel);
             this.Controls.Add(this.btnOpening);
@@ -92,7 +106,7 @@
             this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "MorphologyProp";
-            this.Size = new System.Drawing.Size(266, 103);
+            this.Size = new System.Drawing.Size(266, 120);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -107,5 +121,6 @@
 
        
         private System.Windows.Forms.TextBox txtpixelsize;
+        private System.Windows.Forms.Button btnApply;
     }
 }

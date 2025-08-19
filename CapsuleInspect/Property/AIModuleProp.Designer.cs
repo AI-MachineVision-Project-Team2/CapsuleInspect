@@ -40,10 +40,9 @@
             // btnInspAI
             // 
             this.btnInspAI.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.btnInspAI.Location = new System.Drawing.Point(332, 93);
-            this.btnInspAI.Margin = new System.Windows.Forms.Padding(4);
+            this.btnInspAI.Location = new System.Drawing.Point(232, 62);
             this.btnInspAI.Name = "btnInspAI";
-            this.btnInspAI.Size = new System.Drawing.Size(96, 41);
+            this.btnInspAI.Size = new System.Drawing.Size(67, 27);
             this.btnInspAI.TabIndex = 16;
             this.btnInspAI.Text = "AI 검사";
             this.btnInspAI.UseVisualStyleBackColor = true;
@@ -52,10 +51,9 @@
             // btnLoadModel
             // 
             this.btnLoadModel.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.btnLoadModel.Location = new System.Drawing.Point(166, 93);
-            this.btnLoadModel.Margin = new System.Windows.Forms.Padding(4);
+            this.btnLoadModel.Location = new System.Drawing.Point(116, 62);
             this.btnLoadModel.Name = "btnLoadModel";
-            this.btnLoadModel.Size = new System.Drawing.Size(108, 41);
+            this.btnLoadModel.Size = new System.Drawing.Size(76, 27);
             this.btnLoadModel.TabIndex = 15;
             this.btnLoadModel.Text = "모델 로딩";
             this.btnLoadModel.UseVisualStyleBackColor = true;
@@ -64,10 +62,9 @@
             // btnSelAIModel
             // 
             this.btnSelAIModel.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.btnSelAIModel.Location = new System.Drawing.Point(12, 93);
-            this.btnSelAIModel.Margin = new System.Windows.Forms.Padding(4);
+            this.btnSelAIModel.Location = new System.Drawing.Point(8, 62);
             this.btnSelAIModel.Name = "btnSelAIModel";
-            this.btnSelAIModel.Size = new System.Drawing.Size(109, 42);
+            this.btnSelAIModel.Size = new System.Drawing.Size(76, 28);
             this.btnSelAIModel.TabIndex = 14;
             this.btnSelAIModel.Text = "AI모델 선택";
             this.btnSelAIModel.UseVisualStyleBackColor = true;
@@ -77,39 +74,38 @@
             // 
             this.txtAIModelPath.BackColor = System.Drawing.Color.White;
             this.txtAIModelPath.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.txtAIModelPath.Location = new System.Drawing.Point(12, 51);
-            this.txtAIModelPath.Margin = new System.Windows.Forms.Padding(4);
+            this.txtAIModelPath.Location = new System.Drawing.Point(8, 34);
             this.txtAIModelPath.Name = "txtAIModelPath";
             this.txtAIModelPath.ReadOnly = true;
-            this.txtAIModelPath.Size = new System.Drawing.Size(416, 34);
+            this.txtAIModelPath.Size = new System.Drawing.Size(292, 25);
             this.txtAIModelPath.TabIndex = 13;
             // 
             // lbl_SEG
             // 
             this.lbl_SEG.AutoSize = true;
             this.lbl_SEG.BackColor = System.Drawing.Color.Transparent;
-            this.lbl_SEG.Font = new System.Drawing.Font("Noto Sans KR Black", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.lbl_SEG.Font = new System.Drawing.Font("Noto Sans KR", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.lbl_SEG.ForeColor = System.Drawing.SystemColors.MenuText;
-            this.lbl_SEG.Location = new System.Drawing.Point(4, 0);
+            this.lbl_SEG.Location = new System.Drawing.Point(3, 0);
+            this.lbl_SEG.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lbl_SEG.Name = "lbl_SEG";
-            this.lbl_SEG.Size = new System.Drawing.Size(272, 46);
+            this.lbl_SEG.Size = new System.Drawing.Size(176, 30);
             this.lbl_SEG.TabIndex = 18;
             this.lbl_SEG.Text = "SEGMENTATION";
             // 
             // dataGridViewFilter
             // 
             this.dataGridViewFilter.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewFilter.Location = new System.Drawing.Point(12, 148);
-            this.dataGridViewFilter.Margin = new System.Windows.Forms.Padding(4);
+            this.dataGridViewFilter.Location = new System.Drawing.Point(8, 99);
             this.dataGridViewFilter.Name = "dataGridViewFilter";
             this.dataGridViewFilter.RowHeadersWidth = 62;
             this.dataGridViewFilter.RowTemplate.Height = 23;
-            this.dataGridViewFilter.Size = new System.Drawing.Size(416, 177);
+            this.dataGridViewFilter.Size = new System.Drawing.Size(291, 118);
             this.dataGridViewFilter.TabIndex = 19;
             // 
             // AIModuleProp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.dataGridViewFilter);
             this.Controls.Add(this.lbl_SEG);
@@ -118,9 +114,8 @@
             this.Controls.Add(this.btnSelAIModel);
             this.Controls.Add(this.txtAIModelPath);
             this.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "AIModuleProp";
-            this.Size = new System.Drawing.Size(621, 352);
+            this.Size = new System.Drawing.Size(435, 235);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewFilter)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
