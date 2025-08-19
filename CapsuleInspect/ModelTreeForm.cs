@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
+using static OpenCvSharp.ML.DTrees;
 namespace CapsuleInspect
 {
     public partial class ModelTreeForm : DockContent
@@ -20,6 +21,11 @@ namespace CapsuleInspect
         public ModelTreeForm()
         {
             InitializeComponent();
+
+            tvModelTree.CheckBoxes = true;
+            //추가한거
+            tvModelTree.AfterCheck += tvModelTree_AfterCheck;
+            //추가한거
 
             //초기 트리 노트의 기본값은 "Root"
             tvModelTree.Nodes.Add("Root");
@@ -73,26 +79,81 @@ namespace CapsuleInspect
         //현재 모델 전체의 ROI를 트리 모델에 업데이트
         public void UpdateDiagramEntity()
         {
-            tvModelTree.Nodes.Clear();
-            TreeNode rootNode = tvModelTree.Nodes.Add("Root");
+            // 트리 갱신 중 깜빡임/이벤트 폭주 방지  //추가한거
+            tvModelTree.BeginUpdate();                         //추가한거
+            tvModelTree.AfterCheck -= tvModelTree_AfterCheck;  //추가한거
 
-            Model model = Global.Inst.InspStage.CurModel;
-            List<InspWindow> windowList = model.InspWindowList;
-            if (windowList.Count <= 0)
-                return;
-
-            foreach (InspWindow window in model.InspWindowList)
+            try                                                //추가한거
             {
-                if (window is null)
-                    continue;
+                tvModelTree.Nodes.Clear();
+                TreeNode rootNode = tvModelTree.Nodes.Add("Root");
 
-                string uid = window.UID;
+                // 널 가드                                        //추가한거
+                if (Global.Inst == null || Global.Inst.InspStage == null)
+                    return;                                     //추가한거
 
-                TreeNode node = new TreeNode(uid);
-                rootNode.Nodes.Add(node);
+                Model model = Global.Inst.InspStage.CurModel;
+                if (model == null || model.InspWindowList == null)  //추가한거
+                    return;                                         //추가한거
+
+                List<InspWindow> windowList = model.InspWindowList;
+                if (windowList.Count <= 0)
+                    return;
+
+                // UID 중복 대비를 위한 로컬 카운터(선택)               //추가한거
+                var seen = new Dictionary<string, int>();             //추가한거
+
+                foreach (InspWindow window in windowList)
+                {
+                    if (window == null)
+                        continue;
+
+                    // 표시에 쓸 라벨: UID 없으면 Name, 그것도 없으면 플레이스홀더  //추가한거
+                    string baseLabel = window.UID ?? window.Name ?? "(ROI)";       //추가한거
+                    string label = baseLabel;                                      //추가한거
+                    if (seen.TryGetValue(baseLabel, out int n))                    //추가한거
+                    {                                                              //추가한거
+                        n++; seen[baseLabel] = n;                                   //추가한거
+                        label = $"{baseLabel} ({n})";                               //추가한거
+                    }                                                              //추가한거
+                    else seen[baseLabel] = 1;                                      //추가한거
+
+                    TreeNode node = new TreeNode(label)
+                    {
+                        Tag = window,         // ★ ROI 객체 연결
+                                              // 현재 상태 반영: 검사 제외면 체크 해제(=숨김), 검사 대상이면 체크  //추가한거
+                        Checked = !(window.IgnoreInsp)                              //추가한거
+                    };
+                    rootNode.Nodes.Add(node);
+                }
+
+                tvModelTree.ExpandAll();
+            }
+            finally                                            //추가한거
+            {
+                // 이벤트 재연결 + 업데이트 종료                   //추가한거
+                tvModelTree.AfterCheck += tvModelTree_AfterCheck; //추가한거
+                tvModelTree.EndUpdate();                          //추가한거
+            }
+        }
+        private void tvModelTree_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            tvModelTree.AfterCheck -= tvModelTree_AfterCheck; // 재귀 방지
+
+            var win = e.Node.Tag as InspWindow;
+            if (win != null)
+            {
+                var viewerForm = MainForm.GetDockForm<CameraForm>();
+                if (viewerForm != null)
+                {
+                    viewerForm.SetWindowVisible(win, e.Node.Checked); //추가한거
+                }
+
+                win.IgnoreInsp = !e.Node.Checked; //추가한거// 체크=보임=검사대상
             }
 
-            tvModelTree.ExpandAll();
+            tvModelTree.AfterCheck += tvModelTree_AfterCheck;
+            //추가한거
         }
     }
 }

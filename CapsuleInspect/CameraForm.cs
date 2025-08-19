@@ -395,5 +395,11 @@ namespace CapsuleInspect
 
             this.FormClosed -= CameraForm_FormClosed;
         }
+
+        //추가한거
+        public void SetWindowVisible(InspWindow win, bool visible)
+        {
+            imageViewer?.SetWindowVisible(win, visible); //추가한거
+        }
     }
 }

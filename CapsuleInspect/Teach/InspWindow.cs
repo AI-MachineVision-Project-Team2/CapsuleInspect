@@ -15,7 +15,7 @@ using System.Xml.Serialization;
 
 namespace CapsuleInspect.Teach
 {
-    public class InspWindow
+    public partial class InspWindow
     {
         public InspWindowType InspWindowType { get; set; }
 
