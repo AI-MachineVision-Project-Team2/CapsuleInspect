@@ -25,14 +25,21 @@ namespace CapsuleInspect.Core
     //누적 카운트 증가 
     public class AccumCounter
     {
-        public long Total { get; private set; }
-        public long OK { get; private set; }
-        public long NG { get; private set; }
+        public long Total { get;  set; }
+        public long OK { get;  set; }
+        public long NG { get; set; }
+        public long NG_Scratch { get;  set; }
+        public long NG_Squeeze { get;  set; }
+        public long NG_PrintDefect { get;  set; }
+        public long NG_Crack { get;  set; }
 
-        public void Reset() { Total = OK = NG = 0; }
+        public void Reset() { Total = OK= NG = NG_Scratch = NG_Squeeze = NG_PrintDefect = NG_Crack = 0; }
         public void Add(int total, int ok, int ng)
         { Total += total; OK += ok; NG += ng; }
+    
     }
+   
+
     //추가 
     //검사와 관련된 클래스를 관리하는 클래스
     public class InspStage : IDisposable
@@ -80,6 +87,7 @@ namespace CapsuleInspect.Core
             get => _imageSpace;
         }
 
+
         public SaigeAI AIModule
         {
             get
@@ -124,7 +132,15 @@ namespace CapsuleInspect.Core
             Accum.Add(total, ok, ng);
             AccumChanged?.Invoke(Accum);
         }
+        public void AddNgDetailCount(int crack, int scratch, int squeeze, int printDefect)
+        {
+            Accum.NG_Crack += crack;
+            Accum.NG_Scratch += scratch;
+            Accum.NG_Squeeze += squeeze;
+            Accum.NG_PrintDefect += printDefect;
 
+            AccumChanged?.Invoke(Accum);
+        }
         public void ToggleLiveMode()
         {
             LiveMode = !LiveMode;

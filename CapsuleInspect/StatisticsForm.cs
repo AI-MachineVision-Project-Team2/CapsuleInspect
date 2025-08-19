@@ -79,6 +79,10 @@ namespace CapsuleInspect
             _grid.Rows.Add("Total", 0);
             _grid.Rows.Add("OK", 0);
             _grid.Rows.Add("NG", 0);
+            _grid.Rows.Add("NG_Scratch", 0);
+            _grid.Rows.Add("NG_Squeeze", 0);
+            _grid.Rows.Add("NG_Crack", 0);
+            _grid.Rows.Add("NG_PrintDefect", 0);
 
             // Reset 버튼
             _btnReset = new Button
@@ -114,6 +118,11 @@ namespace CapsuleInspect
             _grid.Rows[0].Cells[1].Value = c.Total;
             _grid.Rows[1].Cells[1].Value = c.OK;
             _grid.Rows[2].Cells[1].Value = c.NG;
+            _grid.Rows[3].Cells[1].Value = c.NG_Scratch;
+            _grid.Rows[4].Cells[1].Value = c.NG_Squeeze;
+            _grid.Rows[5].Cells[1].Value = c.NG_Crack;
+            _grid.Rows[6].Cells[1].Value = c.NG_PrintDefect;
+           
         }
     }
 }

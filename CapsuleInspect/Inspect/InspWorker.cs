@@ -130,6 +130,9 @@ namespace CapsuleInspect.Inspect
 
             var allRects = new List<DrawInspectInfo>();
 
+            // 누적 변수 선언
+            int ngCrack = 0, ngScratch = 0, ngSqueeze = 0, ngPrintDefect = 0;
+
             foreach (var inspWindow in inspWindowList)
             {
                 totalCnt++;
@@ -140,6 +143,16 @@ namespace CapsuleInspect.Inspect
                         isDefect = true;
 
                     ngCnt++;
+
+                    // 💡 ROI 이름 기준으로 세분화된 NG 카운트 분기
+                    if (inspWindow.Name.Contains("Crack"))
+                        ngCrack++;
+                    else if (inspWindow.Name.Contains("Scratch"))
+                        ngScratch++;
+                    else if (inspWindow.Name.Contains("Squeeze"))
+                        ngSqueeze++;
+                    else if (inspWindow.Name.Contains("PrintDefect"))
+                        ngPrintDefect++;
                 }
                 else
                 {
@@ -148,6 +161,7 @@ namespace CapsuleInspect.Inspect
 
                 DisplayResult(inspWindow, InspectType.InspNone);
             }
+
             var cameraForm = MainForm.GetDockForm<CameraForm>();
             if (cameraForm != null)
             {
@@ -157,6 +171,8 @@ namespace CapsuleInspect.Inspect
 
             // ★ 누적 카운트 갱신 (이미지 1장 단위로)
             Global.Inst.InspStage.AddAccumCount(1, isDefect ? 0 : 1, isDefect ? 1 : 0);
+            // 🎯 세분화된 NG 카운트 반영
+            Global.Inst.InspStage.AddNgDetailCount(ngCrack, ngScratch, ngSqueeze, ngPrintDefect);
             //if (totalCnt > 0)
             //{
             //    //찾은 위치를 이미지상에서 표시
