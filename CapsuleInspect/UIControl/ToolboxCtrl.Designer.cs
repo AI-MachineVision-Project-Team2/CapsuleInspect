@@ -133,6 +133,7 @@
             this.butCycleone.Size = new System.Drawing.Size(36, 30);
             this.butCycleone.TabIndex = 14;
             this.butCycleone.UseVisualStyleBackColor = false;
+            this.butCycleone.Click += new System.EventHandler(this.butCycleone_Click);
             // 
             // ToolboxCtrl
             // 

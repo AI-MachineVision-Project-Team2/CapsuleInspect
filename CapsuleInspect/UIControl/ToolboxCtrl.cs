@@ -8,7 +8,7 @@ namespace CapsuleInspect.UIControl
 {
     public partial class ToolboxCtrl : UserControl
     {
-        // ── Win32: 마우스 휠 메시지 보내기용 ──────────────────────────────
+        // ── 마우스 휠 메시지 보내기용 ──────────────────────────────
         private const int WM_MOUSEWHEEL = 0x020A;
         private const int WHEEL_DELTA = 120;
 
@@ -25,6 +25,7 @@ namespace CapsuleInspect.UIControl
         {
             var helpForm = MainForm.GetDockForm<HelpForm>();
             helpForm?.Show();
+            
         }
 
         private void btnModelOpen_Click(object sender, EventArgs e)
@@ -84,6 +85,55 @@ namespace CapsuleInspect.UIControl
             // 포커스 주고 메시지 전송
             ctrl.Focus();
             SendMessage(ctrl.Handle, WM_MOUSEWHEEL, wParam, lParam);
+        }
+
+        // ── [추가] ToolStripMenuItem 재귀 검색 도우미 ────────────────────
+        private ToolStripMenuItem FindMenuItemByName(ToolStripItemCollection items, string name)
+        {
+            foreach (ToolStripItem item in items)
+            {
+                if (item is ToolStripMenuItem mi)
+                {
+                    if (mi.Name == name)
+                        return mi;
+
+                    // 드롭다운(하위 메뉴)도 재귀적으로 탐색
+                    var child = FindMenuItemByName(mi.DropDownItems, name);
+                    if (child != null)
+                        return child;
+                }
+            }
+            return null;
+        }
+
+        // ──  버튼 클릭 → cycleModeMenuItem2 클릭 이벤트 연결 ───────
+        private void butCycleone_Click(object sender, EventArgs e)
+        {
+            var main = this.FindForm() as CapsuleInspect.MainForm;
+            if (main == null)
+            {
+                MessageBox.Show("MainForm를 찾지 못했습니다.");
+                return;
+            }
+
+            // 폼 내 MenuStrip 탐색 (여러 개면 첫 번째 사용)
+            var menuStrip = main.Controls.OfType<MenuStrip>().FirstOrDefault();
+            if (menuStrip == null)
+            {
+                MessageBox.Show("MenuStrip을 찾지 못했습니다.");
+                return;
+            }
+
+            // 이름이 "cycleModeMenuItem2" 인 메뉴 항목을 재귀적으로 찾는다
+            var target = FindMenuItemByName(menuStrip.Items, "cycleModeMenuItem2");
+            if (target == null)
+            {
+                MessageBox.Show("cycleModeMenuItem2 메뉴 항목을 찾지 못했습니다.");
+                return;
+            }
+
+            // 기존에 연결된 cycleModeMenuItem2_Click 핸들러가 그대로 실행되도록 클릭 수행
+            target.PerformClick();
         }
         // ────────────────────────────────────────────────────────────────
     }
