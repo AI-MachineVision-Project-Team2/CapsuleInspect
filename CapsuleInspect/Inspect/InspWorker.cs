@@ -35,7 +35,37 @@ namespace CapsuleInspect.Inspect
             _cts = new CancellationTokenSource();
             Task.Run(() => InspectionLoop(this, _cts.Token));
         }
+        // 단일 사이클 루프 시작
+        public void StartSingleCycleLoop()
+        {
+            if (IsRunning)
+                return;
 
+            if (!Global.Inst.InspStage.UseCamera)
+            {
+                string inspImagePath = Global.Inst.InspStage.CurModel.InspectImagePath;
+                if (string.IsNullOrEmpty(inspImagePath))
+                {
+                    SLogger.Write("[InspWorker] 검사 이미지 경로가 비어있음", SLogger.LogType.Error);
+                    return;
+                }
+
+                string inspImageDir = System.IO.Path.GetDirectoryName(inspImagePath);
+                if (!System.IO.Directory.Exists(inspImageDir))
+                {
+                    SLogger.Write($"[InspWorker] 이미지 폴더가 존재하지 않음: {inspImageDir}", SLogger.LogType.Error);
+                    return;
+                }
+
+                if (!Global.Inst.InspStage.ImageLoader.IsLoadedImages())
+                    Global.Inst.InspStage.ImageLoader.LoadImages(inspImageDir);
+
+                Global.Inst.InspStage.ImageLoader.CyclicMode = false; // 단일 사이클
+            }
+
+            _cts = new CancellationTokenSource();
+            Task.Run(() => SingleCycleLoop(this, _cts.Token));
+        }
         private void InspectionLoop(InspWorker inspWorker, CancellationToken token)
         {
             Global.Inst.InspStage.SetWorkingState(WorkingState.INSPECT);
@@ -48,7 +78,7 @@ namespace CapsuleInspect.Inspect
             {
                 Global.Inst.InspStage.OneCycle();
 
-                //Thread.Sleep(200); // 주기 설정
+                Thread.Sleep(200); // 주기 설정
             }
 
             IsRunning = false;
@@ -56,6 +86,28 @@ namespace CapsuleInspect.Inspect
             SLogger.Write("자동 반복 검사 종료");
         }
 
+        private void SingleCycleLoop(InspWorker inspWorker, CancellationToken token)
+        {
+            Global.Inst.InspStage.SetWorkingState(WorkingState.INSPECT);
+
+            SLogger.Write("[InspWorker] 단일 사이클 검사 시작");
+
+            IsRunning = true;
+
+            while (!token.IsCancellationRequested)
+            {
+                bool result = Global.Inst.InspStage.OneCycle();
+                if (!result)
+                {
+                    SLogger.Write("[InspWorker] 단일 사이클 검사 종료");
+                    break;
+                }
+                Thread.Sleep(200); // 검사 간 지연
+            }
+
+            IsRunning = false;
+            SLogger.Write("[InspWorker] 단일 사이클 검사 완료");
+        }
         //InspStage내의 모든 InspWindow들을 검사하는 함수
         public bool RunInspect(out bool isDefect)
         {
