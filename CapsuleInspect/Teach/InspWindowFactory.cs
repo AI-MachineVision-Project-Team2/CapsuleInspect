@@ -60,25 +60,25 @@ namespace CapsuleInspect.Teach
             {
                 case InspWindowType.Crack:
                     inspWindow.AddInspAlgorithm(InspectType.InspFilter);
-                    inspWindow.AddInspAlgorithm(InspectType.InspAIModule);
+                    inspWindow.AddInspAlgorithm(InspectType.InspAI);
                     inspWindow.AddInspAlgorithm(InspectType.InspBinary);
                     inspWindow.AddInspAlgorithm(InspectType.InspMatch);
                     break;
                 case InspWindowType.Scratch:
                     inspWindow.AddInspAlgorithm(InspectType.InspFilter);
-                    inspWindow.AddInspAlgorithm(InspectType.InspAIModule);
+                    inspWindow.AddInspAlgorithm(InspectType.InspAI);
                     inspWindow.AddInspAlgorithm(InspectType.InspBinary);
                     inspWindow.AddInspAlgorithm(InspectType.InspMatch);
                     break;
                 case InspWindowType.Squeeze:
                     inspWindow.AddInspAlgorithm(InspectType.InspFilter);
-                    inspWindow.AddInspAlgorithm(InspectType.InspAIModule);
+                    inspWindow.AddInspAlgorithm(InspectType.InspAI);
                     inspWindow.AddInspAlgorithm(InspectType.InspBinary);
                     inspWindow.AddInspAlgorithm(InspectType.InspMatch);
                     break;
                 case InspWindowType.PrintDefect:
                     inspWindow.AddInspAlgorithm(InspectType.InspFilter);
-                    inspWindow.AddInspAlgorithm(InspectType.InspAIModule);
+                    inspWindow.AddInspAlgorithm(InspectType.InspAI);
                     inspWindow.AddInspAlgorithm(InspectType.InspBinary);
                     inspWindow.AddInspAlgorithm(InspectType.InspMatch);
                     break;

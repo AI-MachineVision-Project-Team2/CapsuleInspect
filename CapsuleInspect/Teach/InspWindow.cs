@@ -209,7 +209,7 @@ namespace CapsuleInspect.Teach
             }
 
             // 3. InspAIModule 별도 처리
-            if (inspType == InspectType.InspNone || inspType == InspectType.InspAIModule)
+            if (inspType == InspectType.InspNone || inspType == InspectType.InspAI)
             {
                 Bitmap inputBitmap = inputImage.ToBitmap();
                 Global.Inst.InspStage.AIModule.Inspect(inputBitmap);

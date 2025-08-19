@@ -12,7 +12,7 @@ namespace CapsuleInspect.Core
         InspBinary,
         InspMatch,
         InspFilter,
-        InspAIModule,
+        InspAI,
         InspCount
     }
 

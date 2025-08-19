@@ -29,7 +29,7 @@ namespace CapsuleInspect
         private void LoadDefaultTabs()
         {
            
-            LoadOptionControl(InspectType.InspAIModule); 
+            LoadOptionControl(InspectType.InspAI); 
         }
         private void LoadOptionControl(InspectType inspType)
         {
@@ -92,7 +92,7 @@ namespace CapsuleInspect
                     MatchInspProp matchProp = new MatchInspProp();
                     curProp = matchProp;
                     break;
-                case InspectType.InspAIModule:
+                case InspectType.InspAI:
                     AIModuleProp aiModuleProp = new AIModuleProp();
                     curProp = aiModuleProp;
                     break;

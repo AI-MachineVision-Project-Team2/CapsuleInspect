@@ -25,7 +25,7 @@ namespace CapsuleInspect.Inspect
         [Description("Segmentation")]
         SEG,
         [Description("Detection")]
-        DET
+        DET,
     }
     public class SaigeAI : IDisposable
     {

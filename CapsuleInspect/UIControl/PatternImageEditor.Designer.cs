@@ -53,11 +53,11 @@
             this.listThumbnail.Alignment = System.Windows.Forms.ListViewAlignment.Left;
             this.listThumbnail.Dock = System.Windows.Forms.DockStyle.Right;
             this.listThumbnail.HideSelection = false;
-            this.listThumbnail.Location = new System.Drawing.Point(187, 0);
+            this.listThumbnail.Location = new System.Drawing.Point(144, 0);
             this.listThumbnail.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.listThumbnail.MultiSelect = false;
             this.listThumbnail.Name = "listThumbnail";
-            this.listThumbnail.Size = new System.Drawing.Size(243, 286);
+            this.listThumbnail.Size = new System.Drawing.Size(286, 286);
             this.listThumbnail.TabIndex = 4;
             this.listThumbnail.UseCompatibleStateImageBehavior = false;
             // 
@@ -65,10 +65,10 @@
             // 
             this.btnDel.ImageIndex = 5;
             this.btnDel.ImageList = this.toolbarImageList;
-            this.btnDel.Location = new System.Drawing.Point(9, 186);
+            this.btnDel.Location = new System.Drawing.Point(3, 99);
             this.btnDel.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnDel.Name = "btnDel";
-            this.btnDel.Size = new System.Drawing.Size(70, 72);
+            this.btnDel.Size = new System.Drawing.Size(40, 40);
             this.btnDel.TabIndex = 1;
             this.btnDel.UseVisualStyleBackColor = true;
             this.btnDel.Click += new System.EventHandler(this.btnDel_Click);
@@ -77,10 +77,10 @@
             // 
             this.btnAdd.ImageIndex = 3;
             this.btnAdd.ImageList = this.toolbarImageList;
-            this.btnAdd.Location = new System.Drawing.Point(9, 100);
+            this.btnAdd.Location = new System.Drawing.Point(2, 50);
             this.btnAdd.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(70, 72);
+            this.btnAdd.Size = new System.Drawing.Size(40, 40);
             this.btnAdd.TabIndex = 2;
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
@@ -89,10 +89,10 @@
             // 
             this.btnUpdate.ImageIndex = 0;
             this.btnUpdate.ImageList = this.toolbarImageList;
-            this.btnUpdate.Location = new System.Drawing.Point(9, 20);
+            this.btnUpdate.Location = new System.Drawing.Point(3, 3);
             this.btnUpdate.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.btnUpdate.Name = "btnUpdate";
-            this.btnUpdate.Size = new System.Drawing.Size(70, 69);
+            this.btnUpdate.Size = new System.Drawing.Size(40, 40);
             this.btnUpdate.TabIndex = 3;
             this.btnUpdate.UseVisualStyleBackColor = true;
             this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);

@@ -87,18 +87,20 @@ namespace CapsuleInspect.Core
             get => _imageSpace;
         }
 
-
         public SaigeAI AIModule
         {
             get
             {
                 if (_saigeAI is null)
+                {
                     _saigeAI = new SaigeAI();
+                    _saigeAI.SetEngineType(EngineType.SEG); // SEG로 고정
+                }
                 return _saigeAI;
             }
         }
 
-       
+
 
         public PreviewImage PreView
         {

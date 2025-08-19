@@ -17,33 +17,105 @@ namespace CapsuleInspect.Property
     {
         SaigeAI _saigeAI; // SaigeAI 인스턴스
         string _modelPath = string.Empty;
-        EngineType _engineType;
+        //EngineType _engineType;
 
         public AIModuleProp()
         {
             InitializeComponent();
-            cbAIEngineType.DataSource = Enum.GetValues(typeof(EngineType)).Cast<EngineType>().ToList();
-            cbAIEngineType.SelectedIndex = 0;
+            InitializeFilterDataGridView();
         }
 
+        private void InitializeFilterDataGridView()
+        {
+            // 스타일 설정
+            dataGridViewFilter.EnableHeadersVisualStyles = false;
+            dataGridViewFilter.ColumnHeadersHeight = 36;
+            dataGridViewFilter.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            dataGridViewFilter.CellBorderStyle = DataGridViewCellBorderStyle.Single;
+            dataGridViewFilter.GridColor = Color.LightGray;
+            dataGridViewFilter.BackgroundColor = Color.White;
+            dataGridViewFilter.Font = new Font("Noto Sans KR", 9F, FontStyle.Bold);
+            dataGridViewFilter.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            dataGridViewFilter.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+            {
+                Font = new Font("Noto Sans KR", 9F, FontStyle.Bold),
+                Alignment = DataGridViewContentAlignment.MiddleCenter,
+                BackColor = Color.White,
+                ForeColor = Color.Black,
+                SelectionBackColor = SystemColors.Highlight,
+                SelectionForeColor = SystemColors.HighlightText,
+                Padding = new Padding(0, 2, 0, 0)
+            };
+
+            dataGridViewFilter.DefaultCellStyle = new DataGridViewCellStyle
+            {
+                Alignment = DataGridViewContentAlignment.MiddleCenter
+            };
+
+            // 컬럼 설정
+            dataGridViewFilter.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                HeaderText = "필터명",
+                ReadOnly = true,
+                SortMode = DataGridViewColumnSortMode.NotSortable,
+                Width = 70
+            });
+
+            dataGridViewFilter.Columns.Add(new DataGridViewCheckBoxColumn()
+            {
+                HeaderText = "사용",
+                SortMode = DataGridViewColumnSortMode.NotSortable,
+                Width = 40
+            });
+
+            dataGridViewFilter.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                HeaderText = "최소값",
+                SortMode = DataGridViewColumnSortMode.NotSortable,
+                Width = 65
+            });
+
+            dataGridViewFilter.Columns.Add(new DataGridViewTextBoxColumn()
+            {
+                HeaderText = "최대값",
+                SortMode = DataGridViewColumnSortMode.NotSortable,
+                Width = 65
+            });
+
+            // 항목 추가
+            AddFilterRow("Area");
+            AddFilterRow("Length");
+            AddFilterRow("Width");
+            AddFilterRow("Count");
+
+            dataGridViewFilter.AllowUserToAddRows = false;
+            dataGridViewFilter.RowHeadersVisible = false;
+            dataGridViewFilter.AllowUserToResizeColumns = false;
+            dataGridViewFilter.AllowUserToResizeRows = false;
+            dataGridViewFilter.AllowUserToOrderColumns = false;
+            dataGridViewFilter.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+
+            // 이벤트 핸들러 추가
+            dataGridViewFilter.CurrentCellDirtyStateChanged += dataGridViewFilter_CurrentCellDirtyStateChanged;
+        }
+
+        private void AddFilterRow(string itemName)
+        {
+            dataGridViewFilter.Rows.Add(itemName, false, "", "");
+        }
+
+        private void dataGridViewFilter_CurrentCellDirtyStateChanged(object sender, EventArgs e)
+        {
+            if (dataGridViewFilter.CurrentCell is DataGridViewCheckBoxCell)
+            {
+                dataGridViewFilter.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
+        }
 
         private void btnSelAIModel_Click(object sender, EventArgs e)
         {
-            int selType = cbAIEngineType.SelectedIndex;
-            string filter = "AI Files|*.*;";
-
-            switch (selType)
-            {
-                case 0: //IAD
-                    filter = "Anomaly Detection Files|*.saigeiad;";
-                    break;
-                case 1: // SEG
-                    filter = "Segmentation Files|*.saigeseg;";
-                    break;
-                case 2: //DET
-                    filter = "Detection Files|*.saigedet;";
-                    break;
-            }
+            string filter = "Segmentation Files|*.saigeseg;";
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Title = "AI 모델 파일 선택";
@@ -54,11 +126,11 @@ namespace CapsuleInspect.Property
                     if (!string.IsNullOrEmpty(_modelPath) && Directory.Exists(Path.GetDirectoryName(_modelPath)))
                         openFileDialog.InitialDirectory = Path.GetDirectoryName(_modelPath);
                     else
-                        openFileDialog.InitialDirectory = @"C:\Saige\SaigeVision\engine\Examples\data\sfaw2023\models";
+                        openFileDialog.InitialDirectory = @"C:\model";
                 }
                 catch (Exception)
                 {
-                    openFileDialog.InitialDirectory = @"C:\Saige\SaigeVision\engine\Examples\data\sfaw2023\models";
+                    openFileDialog.InitialDirectory = @"C:\model";
                 }
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -107,33 +179,6 @@ namespace CapsuleInspect.Property
             Bitmap resultImage = _saigeAI.GetResultImage();
 
             Global.Inst.InspStage.UpdateDisplay(resultImage);
-        }
-
-        private void cbAIEngineType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            switch (cbAIEngineType.SelectedIndex)
-            {
-                case 0:
-                    _engineType = EngineType.IAD;
-                    break;
-                case 1:
-                    _engineType = EngineType.SEG;
-                    break;
-                case 2:
-                    _engineType = EngineType.DET;
-                    break;
-            }
-
-            if (_saigeAI != null)
-            {
-                _saigeAI.Dispose(); // 메모리 해제
-                _saigeAI = null;
-            }
-
-            if (_saigeAI == null)
-                _saigeAI = Global.Inst.InspStage.AIModule;
-
-            _saigeAI.SetEngineType(_engineType);
         }
     }
 }
