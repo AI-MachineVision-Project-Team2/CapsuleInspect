@@ -244,5 +244,16 @@ namespace CapsuleInspect
                 SettingXml.Inst.CycleMode = false;
             }
         }
+        public void UpdateFilePathTextBox(string path)
+        {
+            if (txtFilePath.InvokeRequired)
+            {
+                txtFilePath.Invoke(new Action(() => txtFilePath.Text = path));
+            }
+            else
+            {
+                txtFilePath.Text = path;
+            }
+        }
     }
 }

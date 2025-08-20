@@ -27,6 +27,7 @@ namespace CapsuleInspect.Core
         {
             _orinalImage = image;
             _previewImage = new Mat();
+            _binaryResultImage = null;
         }
         public void SetBinaryResultImage(Mat binary)
         {
@@ -68,6 +69,9 @@ namespace CapsuleInspect.Core
             }
 
             Mat orgRoi = _orinalImage[windowArea];
+            //Cv2.ImShow("org", _orinalImage); // 디버깅용
+            //Cv2.ImShow("orgRoi", orgRoi); // 디버깅용
+            //Cv2.WaitKey(1); // OpenCV 창 업데이트
 
             Mat grayImage = new Mat();
             if (orgRoi.Type() == MatType.CV_8UC3)
@@ -101,6 +105,8 @@ namespace CapsuleInspect.Core
                 }
 
                 bmpImage = BitmapConverter.ToBitmap(_previewImage);
+                _binaryResultImage = fullBinaryMask.Clone();
+                //Cv2.ImShow("Binary Result", _binaryResultImage); // 디버깅용
 
                 cameraForm.UpdateDisplay(bmpImage);
                 return;
@@ -138,7 +144,9 @@ namespace CapsuleInspect.Core
             }
 
             bmpImage = BitmapConverter.ToBitmap(_previewImage);
-            _binaryResultImage = _previewImage.Clone();
+
+           
+
             cameraForm.UpdateDisplay(bmpImage);
         }
 
@@ -161,25 +169,31 @@ namespace CapsuleInspect.Core
             // 2. ROI 영역 가져오기
             Rect roi = _inspWindow.WindowArea;
             // baseImage: 현재 프리뷰 유지 (ShowBinaryOnly면 이진화 이미지)
-            Mat baseImage = (_previewImage != null && !_previewImage.Empty()) ? _previewImage.Clone() : _orinalImage.Clone();
-
-            Mat gray = new Mat();
-            if (_binaryResultImage != null && !_binaryResultImage.Empty())
+            Mat baseImage;
+            if (_orinalImage.Channels() == 3)
             {
-                gray = _binaryResultImage.Clone(); // ROI 크기의 binary 마스크 (binaryImage와 동일)
-                
+                // 원본이 컬러일 경우 → 흑백 변환
+                baseImage = new Mat();
+                Cv2.CvtColor(_orinalImage, baseImage, ColorConversionCodes.BGR2GRAY);
             }
             else
             {
-                // fallback: 원본 ROI에서 gray 생성
-                Mat roiImage = baseImage[roi];
-                if (roiImage.Channels() == 3)
-                    Cv2.CvtColor(roiImage, gray, ColorConversionCodes.BGR2GRAY);
-                else
-                    gray = roiImage.Clone();
-               
+                // 원본이 이미 흑백이면 그대로 복사
+                baseImage = _orinalImage.Clone();
             }
 
+            Mat gray;
+            if (_binaryResultImage != null && !_binaryResultImage.Empty())
+            {
+                gray = _binaryResultImage[roi].Clone(); // 🔧 ROI 크기로 잘라낸 마스크
+            }
+            else
+            {
+                Mat roiImage = baseImage[roi];
+                gray = (roiImage.Channels() == 3) ? 
+                    roiImage.CvtColor(ColorConversionCodes.BGR2GRAY) : roiImage.Clone();
+            }
+           
             // Canny 적용 (binary 마스크 기반, sharp 엣지 검출, ROI 내)
             Mat canny = new Mat();
             Cv2.Canny(gray, canny, min, max);
@@ -191,7 +205,6 @@ namespace CapsuleInspect.Core
            
             _previewImage=baseImage.Clone(); // 프리뷰 이미지 업데이트
             cameraForm.UpdateDisplay(_previewImage.ToBitmap());
-            _binaryResultImage = _previewImage.Clone();
         }
 
         public void SetMorphologyPreview(int kernelSize, MorphTypes morphType)
@@ -211,31 +224,44 @@ namespace CapsuleInspect.Core
             }
 
             Rect roi = _inspWindow.WindowArea;
-            Mat baseImage = _orinalImage.Clone();
-
-            Mat input = null;
-            if (_binaryResultImage != null && !_binaryResultImage.Empty())
-                input = _binaryResultImage.Clone(); // ROI 크기 이진 이미지
+            Mat baseImage;
+            if (_orinalImage.Channels() == 3)
+            {
+                // 원본이 컬러일 경우 → 흑백 변환
+                baseImage = new Mat();
+                Cv2.CvtColor(_orinalImage, baseImage, ColorConversionCodes.BGR2GRAY);
+            }
             else
-                input = baseImage[roi].Channels() == 3 ? baseImage[roi].CvtColor(ColorConversionCodes.BGR2GRAY) : baseImage[roi].Clone();
+            {
+                // 원본이 이미 흑백이면 그대로 복사
+                baseImage = _orinalImage.Clone();
+            }
 
+
+            Mat gray;
+            if (_binaryResultImage != null && !_binaryResultImage.Empty())
+            {
+                gray = _binaryResultImage[roi].Clone(); // 🔧 ROI 크기로 잘라낸 마스크
+            }
+            else
+            {
+                Mat roiImage = baseImage[roi];
+                gray = (roiImage.Channels() == 3) ?
+                    roiImage.CvtColor(ColorConversionCodes.BGR2GRAY) : roiImage.Clone();
+            }
+           
             // Morphology 커널 생성
             Mat kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(kernelSize, kernelSize));
 
             // Morphology 적용
             Mat morph = new Mat();
-            //Cv2.MorphologyEx(input, morph, morphType, kernel);
-            //Cv2.ImShow("Morphology Result", morph); // 디버깅용
-            //Cv2.ImShow("Base Image[roi]", baseImage[roi]); // 디버깅용
-            //Cv2.ImShow("Base Image", baseImage); // 디버깅용
-            //Cv2.ImShow("Input ", input); // 디버깅용
-            //Cv2.WaitKey(1); // OpenCV 창 업데이트
+            Cv2.MorphologyEx(gray, morph, morphType, kernel);
             // baseImage ROI 영역에 결과 적용
             morph.CopyTo(new Mat(baseImage, roi));
 
             _previewImage = baseImage.Clone();
             cameraForm.UpdateDisplay(_previewImage.ToBitmap());
-            _binaryResultImage = _previewImage.Clone(); // 이진화 결과 이미지 업데이트
+            //_binaryResultImage = _previewImage.Clone(); // 이진화 결과 이미지 업데이트
             SLogger.Write("SetMorphologyPreview: Morphology 결과 적용 및 표시 완료", SLogger.LogType.Info);
         }
     }

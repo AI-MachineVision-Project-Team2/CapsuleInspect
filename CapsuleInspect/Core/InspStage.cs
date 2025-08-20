@@ -118,7 +118,7 @@ namespace CapsuleInspect.Core
         }
         public bool LiveMode { get; private set; } = false;
         public int SelBufferIndex { get; set; } = 0;
-        public eImageChannel SelImageChannel { get; set; } = eImageChannel.Gray;
+        public eImageChannel SelImageChannel { get; set; } = eImageChannel.Color;
 
         public AccumCounter Accum { get; } = new AccumCounter();
         public event Action<AccumCounter> AccumChanged;
@@ -282,7 +282,9 @@ namespace CapsuleInspect.Core
         }
         public void SetImageBuffer(string filePath)
         {
-            SLogger.Write($"이미지 불러오기 : {filePath}");
+            // SLogger.Write($"이미지 불러오기 : {filePath}");
+            var mainForm = Application.OpenForms.OfType<MainForm>().FirstOrDefault();
+            mainForm?.UpdateFilePathTextBox(filePath);
 
             Mat matImage = Cv2.ImRead(filePath);
 
@@ -319,7 +321,7 @@ namespace CapsuleInspect.Core
             Marshal.Copy(alignedMat.Data, ImageSpace.GetInspectionBuffer(bufferIndex), 0, bufSize);
 
             _imageSpace.Split(bufferIndex);
-
+            SetPreviewImage(SelImageChannel);
             DisplayGrabImage(bufferIndex);
         }
 

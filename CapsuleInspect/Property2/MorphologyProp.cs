@@ -48,7 +48,6 @@ namespace CapsuleInspect.Property2
             if (int.TryParse(txtpixelsize.Text, out int newSize))
             {
                 // 커널 크기는 홀수여야 하며, 최소 3 이상이어야 함
-                newSize = Math.Max(3, newSize);
                 if (newSize % 2 == 0) newSize++; // 짝수면 다음 홀수로 조정
                 _kernelSize = newSize;
                 txtpixelsize.Text = _kernelSize.ToString(); // 유효한 값으로 업데이트
