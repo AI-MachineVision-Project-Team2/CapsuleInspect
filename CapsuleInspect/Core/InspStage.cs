@@ -1,4 +1,5 @@
-﻿using CapsuleInspect.Algorithm;
+﻿using BrightIdeasSoftware;
+using CapsuleInspect.Algorithm;
 using CapsuleInspect.Grab;
 using CapsuleInspect.Inspect;
 using CapsuleInspect.Sequence;
@@ -18,7 +19,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using BrightIdeasSoftware;
+using System.Xml.Serialization;
 
 namespace CapsuleInspect.Core
 {
@@ -80,6 +81,7 @@ namespace CapsuleInspect.Core
 
         private string _lotNumber;
         private string _serialID;
+        [XmlIgnore]
         private Mat _filteredImage;
         public InspStage() { }
         public ImageSpace ImageSpace

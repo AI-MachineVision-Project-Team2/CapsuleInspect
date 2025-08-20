@@ -11,15 +11,19 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace CapsuleInspect.Core
 {
     public class PreviewImage
     {
+        [XmlIgnore]
         private Mat _orinalImage = null;
+        [XmlIgnore]
         private Mat _previewImage = null;
         // 프리뷰를 위한 InspWindow 변수
         private InspWindow _inspWindow = null;
+        [XmlIgnore]
         private Mat _binaryResultImage = null;
         private bool _usePreview = true;
         public InspWindow CurrentInspWindow => _inspWindow;
