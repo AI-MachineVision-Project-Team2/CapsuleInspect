@@ -1,10 +1,13 @@
-﻿using CapsuleInspect.Teach;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace CapsuleInspect.Teach
 {
     public partial class InspWindow
     {
-        //추가한거
-        public bool IgnoreInsp { get; set; }  //추가한거= false; // 체크 해제 시 검사 제외
+        public bool IgnoreInsp { get; set; }
     }
 }

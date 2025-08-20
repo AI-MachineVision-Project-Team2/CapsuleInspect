@@ -20,7 +20,6 @@ namespace CapsuleInspect.Property
     public enum FilterType
     {
         None,
-        Flip,
         CannyEdge,
         Morphology,
     }
@@ -30,7 +29,7 @@ namespace CapsuleInspect.Property
         public FilterType SelectedFilter => _selectedFilter;
         private FilterAlgorithm _filterAlgo;
         // 필터 적용 시 발생하는 이벤트 (예: PropertiesForm이나 CameraForm에서 구독 가능)
-        public event EventHandler FilterApplied;
+       
         public ImageFilterProp()
         {
             InitializeComponent();
@@ -55,9 +54,8 @@ namespace CapsuleInspect.Property
             switch (cbFilterType.SelectedIndex)
             {
                 case 0: _selectedFilter = FilterType.None; break;
-                case 1: _selectedFilter = FilterType.Flip; break;
-                case 2: _selectedFilter = FilterType.CannyEdge; break;
-                case 3: _selectedFilter = FilterType.Morphology; break;
+                case 1: _selectedFilter = FilterType.CannyEdge; break;
+                case 2: _selectedFilter = FilterType.Morphology; break;
                 default: _selectedFilter = FilterType.None; break;
             }
             // None FilterForm 탭 호출 skip
@@ -72,135 +70,89 @@ namespace CapsuleInspect.Property
         }
         
 
-        private void checkFilter_CheckedChanged(object sender, EventArgs e)
-        {
-            var cameraForm = MainForm.GetDockForm<CameraForm>();
-            if (cameraForm != null)
-            {
-                cameraForm.SetFilterMode(checkFilter.Checked);
-            }
-        }
-        private void btnApply_Click(object sender, EventArgs e)
-        {
-            dynamic options = null;
-            var cameraForm = MainForm.GetDockForm<CameraForm>();
-            if (cameraForm == null) return;
+        //private void btnApply_Click(object sender, EventArgs e)
+        //{
+        //    dynamic options = null;
+        //    var cameraForm = MainForm.GetDockForm<CameraForm>();
+        //    if (cameraForm == null) return;
 
-            if (_selectedFilter != FilterType.None)
-            {
-                switch (_selectedFilter)
-                {
-                    case FilterType.Flip:
-                        {
-                            var filterForm = MainForm.SharedFilterForm;
-                            if (filterForm != null)
-                            {
-                                var tab = filterForm.GetTabPage("Flip");
-                                if (tab != null && tab.Controls.Count > 0 && tab.Controls[0] is FlipProp flipProp)
-                                {
-                                    var selected = flipProp.SelectedFlipMode;
-                                    if (selected == null)
-                                    {
-                                        MessageBox.Show("반전 모드를 선택하세요.");
-                                        return;
-                                    }
+        //    if (_selectedFilter != FilterType.None)
+        //    {
+        //        switch (_selectedFilter)
+        //        {
+        //            case FilterType.CannyEdge:
+        //                {
+        //                    var filterForm = MainForm.SharedFilterForm;
+        //                    var tab = filterForm.GetTabPage("CannyEdge");
+        //                    if (tab != null && tab.Controls[0] is CannyEdgeProp cannyEdgeProp)
+        //                    {
+        //                        int min = cannyEdgeProp.Min;
+        //                        int max = cannyEdgeProp.Max;
+        //                        options = new { Min = min, Max = max };
 
-                                    options = new { FlipMode = selected.Value };
-                                }
-                                else
-                                {
-                                    MessageBox.Show("Flip 설정을 찾을 수 없습니다.");
-                                    return;
-                                }
-                            }
-                            break;
-                        }
-                    case FilterType.CannyEdge:
-                        {
-                            var filterForm = MainForm.SharedFilterForm;
-                            var tab = filterForm.GetTabPage("CannyEdge");
-                            if (tab != null && tab.Controls[0] is CannyEdgeProp cannyEdgeProp)
-                            {
-                                int min = cannyEdgeProp.Min;
-                                int max = cannyEdgeProp.Max;
-                                options = new { Min = min, Max = max };
+        //                        var curWindow = Global.Inst.InspStage.PreView?.CurrentInspWindow;
+        //                        if (curWindow != null)
+        //                        {
+        //                            var blob = curWindow.FindInspAlgorithm(InspectType.InspBinary) as BlobAlgorithm;
+        //                            if (blob != null)
+        //                            {
+        //                                blob.Filter = FilterType.CannyEdge;
+        //                                blob.FilterOptions = options;
+        //                                SLogger.Write($"btnApply: BlobAlgorithm 업데이트 (CannyEdge, Min={min}, Max={max})", SLogger.LogType.Info);
+        //                            }
+        //                        }
 
-                                var curWindow = Global.Inst.InspStage.PreView?.CurrentInspWindow;
-                                if (curWindow != null)
-                                {
-                                    var blob = curWindow.FindInspAlgorithm(InspectType.InspBinary) as BlobAlgorithm;
-                                    if (blob != null)
-                                    {
-                                        blob.Filter = FilterType.CannyEdge;
-                                        blob.FilterOptions = options;
-                                        SLogger.Write($"btnApply: BlobAlgorithm 업데이트 (CannyEdge, Min={min}, Max={max})", SLogger.LogType.Info);
-                                    }
-                                }
+        //                        // Canny 적용 및 _previewImage 업데이트
+        //                        var preview = Global.Inst.InspStage.PreView;
+        //                        if (preview != null)
+        //                        {
+        //                            preview.SetCannyPreview(min, max);
+        //                            Mat currentPreview = cameraForm.GetDisplayImage();
+        //                            preview.UpdatePreviewImage(currentPreview);
+        //                            SLogger.Write("btnApply: _previewImage를 Canny 결과로 업데이트", SLogger.LogType.Info);
+        //                        }
+        //                        else
+        //                        {
+        //                            SLogger.Write("btnApply: Preview 객체 null", SLogger.LogType.Error);
+        //                        }
 
-                                // Canny 적용 및 _previewImage 업데이트
-                                var preview = Global.Inst.InspStage.PreView;
-                                if (preview != null)
-                                {
-                                    preview.SetCannyPreview(min, max);
-                                    Mat currentPreview = cameraForm.GetDisplayImage();
-                                    preview.UpdatePreviewImage(currentPreview);
-                                    SLogger.Write("btnApply: _previewImage를 Canny 결과로 업데이트", SLogger.LogType.Info);
-                                }
-                                else
-                                {
-                                    SLogger.Write("btnApply: Preview 객체 null", SLogger.LogType.Error);
-                                }
+        //                        SLogger.Write($"Canny Edge 적용: Min={min}, Max={max}", SLogger.LogType.Info);
+        //                    }
+        //                    else
+        //                    {
+        //                        SLogger.Write("btnApply: CannyEdgeProp 탭 또는 컨트롤 null", SLogger.LogType.Error);
+        //                    }
+        //                    break;
+        //                }
+        //            case FilterType.Morphology:
+        //                {
+        //                    var filterForm = MainForm.SharedFilterForm;
+        //                    var tab = filterForm?.GetTabPage("Morphology");
 
-                                SLogger.Write($"Canny Edge 적용: Min={min}, Max={max}", SLogger.LogType.Info);
-                            }
-                            else
-                            {
-                                SLogger.Write("btnApply: CannyEdgeProp 탭 또는 컨트롤 null", SLogger.LogType.Error);
-                            }
-                            break;
-                        }
-                    case FilterType.Morphology:
-                        {
-                            var filterForm = MainForm.SharedFilterForm;
-                            var tab = filterForm?.GetTabPage("Morphology");
-
-                            if (tab != null && tab.Controls[0] is MorphologyProp morphProp)
-                            {
-                                var morphType = morphProp.SelectedMorphType;
-                                var kernelSize = morphProp.KernelSize;
+        //                    if (tab != null && tab.Controls[0] is MorphologyProp morphProp)
+        //                    {
+        //                        var morphType = morphProp.SelectedMorphType;
+        //                        var kernelSize = morphProp.KernelSize;
                             
-                                options = new { MorphType = morphType, KernelSize = kernelSize };
-                                SLogger.Write($"options 설정: MorphType={morphType}, KernelSize={kernelSize}");
-                            }
-                            else
-                            {
-                                MessageBox.Show("Morphology 설정을 찾을 수 없습니다.");
-                                return;
-                            }
-                            break;
-                        } 
-                }
-                SLogger.Write($"필터 적용: {_selectedFilter}", SLogger.LogType.Info);
-            }
-            else
-            {
+        //                        options = new { MorphType = morphType, KernelSize = kernelSize };
+        //                        SLogger.Write($"options 설정: MorphType={morphType}, KernelSize={kernelSize}");
+        //                    }
+        //                    else
+        //                    {
+        //                        MessageBox.Show("Morphology 설정을 찾을 수 없습니다.");
+        //                        return;
+        //                    }
+        //                    break;
+        //                } 
+        //        }
+        //        SLogger.Write($"필터 적용: {_selectedFilter}", SLogger.LogType.Info);
+        //    }
+        //    else
+        //    {
 
-                SLogger.Write("현재 이미지 유지 (필터 없음)", SLogger.LogType.Info);
-            }
-        }
-
-
-        private void btnUndo_Click(object sender, EventArgs e)
-        {
-            var cameraForm = MainForm.GetDockForm<CameraForm>();
-            cameraForm?.Undo();
-        }
-
-        private void btnRedo_Click(object sender, EventArgs e)
-        {
-            var cameraForm = MainForm.GetDockForm<CameraForm>();
-            cameraForm?.Redo();
-        }
+        //        SLogger.Write("현재 이미지 유지 (필터 없음)", SLogger.LogType.Info);
+        //    }
+        //}
 
         private void btnSrc_Click(object sender, EventArgs e)
         {

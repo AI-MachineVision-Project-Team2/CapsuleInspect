@@ -18,7 +18,7 @@ namespace CapsuleInspect.Teach
     public partial class InspWindow
     {
         public InspWindowType InspWindowType { get; set; }
-
+        
         public string Name { get; set; }
         public string UID { get; set; }
 

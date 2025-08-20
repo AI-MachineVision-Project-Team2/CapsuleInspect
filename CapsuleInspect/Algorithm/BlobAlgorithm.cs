@@ -168,29 +168,46 @@ namespace CapsuleInspect.Algorithm
             else
                 grayImage = targetImage.Clone();
 
-            // 이진화 처리
+            // ROI 영역 안에서 이진화 처리 
             Mat binaryImage = new Mat();
             Cv2.InRange(grayImage, BinThreshold.lower, BinThreshold.upper, binaryImage);
 
             if (BinThreshold.invert)
                 binaryImage = ~binaryImage;
+
+
             // Canny 적용 전에 이진화 결과 등록
             Global.Inst.InspStage.PreView?.SetBinaryResultImage(binaryImage);
-
-            // ✅ Canny 필터 적용 (btnApply 눌렀을 때만)
-            if (Filter == FilterType.CannyEdge && FilterOptions != null)
+            // Canny 필터 적용 (Filter가 CannyEdge이고 Options가 있을 때)
+            // 필터 적용 (Canny 또는 Morphology)
+            if (Filter != FilterType.None && FilterOptions != null)
             {
                 try
                 {
-                    int min = FilterOptions.Min;
-                    int max = FilterOptions.Max;
-                    Mat canny = new Mat();
-                    Cv2.Canny(binaryImage, canny, min, max);
-                    binaryImage = canny.Clone();
+                    if (Filter == FilterType.CannyEdge)
+                    {
+                        int min = FilterOptions.Min;
+                        int max = FilterOptions.Max;
+                        Mat canny = new Mat();
+                        Cv2.Canny(binaryImage, canny, min, max);
+                        binaryImage = canny.Clone();
+                        SLogger.Write($"DoInspect: Canny 적용 (Min={min}, Max={max}) on binaryImage (ROI 내)", SLogger.LogType.Info);
+                    }
+                    else if (Filter == FilterType.Morphology)
+                    {
+                        MorphTypes morphType = FilterOptions.MorphType;
+                        int kernelSize = FilterOptions.KernelSize;
+                        Mat kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(kernelSize, kernelSize));
+                        Mat morph = new Mat();
+                        Cv2.MorphologyEx(binaryImage, morph, morphType, kernel);
+                        binaryImage = morph.Clone();
+                        SLogger.Write($"DoInspect: Morphology 적용 (Type={morphType}, KernelSize={kernelSize}) on binaryImage (ROI 내)", SLogger.LogType.Info);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    SLogger.Write($"Canny 필터 적용 실패: {ex.Message}", SLogger.LogType.Error);
+                    SLogger.Write($"DoInspect: 필터 적용 실패 - {ex.Message}", SLogger.LogType.Error);
+                    return false;
                 }
             }
 

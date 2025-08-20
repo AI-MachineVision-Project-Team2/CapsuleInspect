@@ -175,7 +175,6 @@
     <Compile Include="Inspect\InspResult.cs" />
     <Compile Include="Inspect\InspWorker.cs" />
     <Compile Include="Inspect\SaigeAI.cs" />
-    <Compile Include="Teach\InspWindow.Visibility.cs" />
     <Compile Include="LogForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -208,9 +207,7 @@
       <DependentUpon>PropertiesForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Property2\CannyEdgeProp.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Property2\CannyEdgeProp.cs" />
     <Compile Include="Property2\CannyEdgeProp.Designer.cs">
       <DependentUpon>CannyEdgeProp.cs</DependentUpon>
     </Compile>
@@ -315,6 +312,7 @@
     </Compile>
     <Compile Include="Teach\DiagramEntity.cs" />
     <Compile Include="Teach\InspWindow.cs" />
+    <Compile Include="Teach\InspWindow.Visibility.cs" />
     <Compile Include="Teach\InspWindowFactory.cs" />
     <Compile Include="Teach\Model.cs" />
     <Compile Include="UIControl\ImageViewCtrl.cs">
@@ -491,12 +489,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ㅋㅋㅋ.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

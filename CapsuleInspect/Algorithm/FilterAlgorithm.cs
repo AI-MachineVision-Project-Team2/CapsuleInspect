@@ -76,10 +76,6 @@ namespace CapsuleInspect.Algorithm
 
             switch (filter)
             {
-                case FilterType.Flip:
-                    FlipMode mode = (FlipMode)options.FlipMode;
-                    Cv2.Flip(src, dst, mode);
-                    break;
                 case FilterType.CannyEdge:
                     {
                         Mat gray = new Mat();

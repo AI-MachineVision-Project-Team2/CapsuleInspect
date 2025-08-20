@@ -1,4 +1,7 @@
-﻿using CapsuleInspect.Util;
+﻿using CapsuleInspect.Algorithm;
+using CapsuleInspect.Core;
+using CapsuleInspect.Property;
+using CapsuleInspect.Util;
 using OpenCvSharp;
 using System;
 using System.Collections.Generic;
@@ -45,7 +48,6 @@ namespace CapsuleInspect.Property2
             if (int.TryParse(txtpixelsize.Text, out int newSize))
             {
                 // 커널 크기는 홀수여야 하며, 최소 3 이상이어야 함
-                newSize = Math.Max(3, newSize);
                 if (newSize % 2 == 0) newSize++; // 짝수면 다음 홀수로 조정
                 _kernelSize = newSize;
                 txtpixelsize.Text = _kernelSize.ToString(); // 유효한 값으로 업데이트
@@ -66,7 +68,32 @@ namespace CapsuleInspect.Property2
             get { return _kernelSize; }
         }
 
-      
+        private void btnApply_Click(object sender, EventArgs e)
+        {
+            var preview = Global.Inst.InspStage.PreView;
+            if (preview == null)
+            {
+                SLogger.Write("MorphologyProp: Preview 객체가 없습니다.", SLogger.LogType.Error);
+                return;
+            }
+
+            int kernel = this.KernelSize;
+            MorphTypes morphType = this.SelectedMorphType;
+
+            preview.SetMorphologyPreview(kernel, morphType);
+
+            // 알고리즘 상태 저장 (BlobAlgorithm 필터 정보)
+            var curWindow = preview.CurrentInspWindow;
+            if (curWindow != null)
+            {
+                var blob = curWindow.FindInspAlgorithm(InspectType.InspBinary) as BlobAlgorithm;
+                if (blob != null)
+                {
+                    blob.Filter = FilterType.Morphology;
+                    blob.FilterOptions = new { KernelSize = kernel, MorphType = morphType };
+                }
+            }
+        }
     }
 
 }

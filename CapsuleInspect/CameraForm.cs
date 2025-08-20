@@ -136,50 +136,6 @@ namespace CapsuleInspect
             _useAccumulativeFilter = enableAccumulative;
             _isFirstApply = true; // 새 필터 시작
         }
-        public void RunFilterAlgorithm(FilterType filterType, dynamic options = null)
-        {
-            if (_originalImage == null)
-            {
-                MessageBox.Show("원본 이미지가 없습니다.");
-                return;
-            }
-
-            var filterAlgo = new FilterAlgorithm();
-            Mat src;
-            if (filterType == FilterType.Flip)
-            {
-                src = BitmapConverter.ToMat(GetCurrentBitmap());
-            }
-            else
-            {
-                src = _useAccumulativeFilter
-                    ? BitmapConverter.ToMat(GetCurrentBitmap())
-                    : _originalImage.Clone();
-            }
-            // 필터 적용 전 소스 이미지를 history에 저장
-            _imgHistory.Push(src.Clone());
-            _redoImg.Clear();
-
-            filterAlgo.SetSourceImage(src);
-            filterAlgo.Filter = filterType;
-            filterAlgo.Options = options;
-
-            if (filterAlgo.DoInspect())
-            {
-                // DoInspect 결과로 업데이트된 _srcImage를 표시
-                //imageViewer.LoadBitmap(filterAlgo.ResultImage.ToBitmap(), autoFit);
-                _imgHistory.Push(filterAlgo.ResultImage.Clone());
-                _redoImg.Clear();
-                Global.Inst.InspStage.SetFilteredImage(filterAlgo.ResultImage);
-                Global.Inst.InspStage.UpdateDisplay(filterAlgo.ResultImage.ToBitmap());
-            }
-            else
-            {
-                MessageBox.Show("필터 적용에 실패했습니다.");
-                _imgHistory.Pop(); // 실패 시 소스 이미지 제거
-            }
-        }
-
         public void Undo()
         {
             if (_imgHistory.Count > 1)
@@ -234,19 +190,7 @@ namespace CapsuleInspect
                 MessageBox.Show("원본 이미지가 없습니다.");
             }
         }
-        public void PreviewFilter(FilterType filterType, dynamic options = null)
-        {
-            if (_originalImage == null) return;
-
-            // 원본 기준에서만 미리보기
-            Mat previewBase = _useAccumulativeFilter
-                ? BitmapConverter.ToMat(GetCurrentBitmap())
-                : _originalImage.Clone();
-
-            Mat previewResult = FilterAlgorithm.Apply(previewBase, filterType, options);
-
-            imageViewer.LoadBitmap(previewResult.ToBitmap());
-        }
+      
 
         public void UpdateDisplay(Bitmap bitmap = null)
         {

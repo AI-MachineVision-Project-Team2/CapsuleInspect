@@ -29,7 +29,7 @@ namespace CapsuleInspect.Property
 
 
         //속성창의 값이 변경시 발생하는 이벤트
-        public event EventHandler<EventArgs> PropertyChanged;
+        //public event EventHandler<EventArgs> PropertyChanged;
         //양방향 슬라이더 값 변경시 발생하는 이벤트
         public event EventHandler<RangeChangedEventArgs> RangeChanged;
 

@@ -27,8 +27,10 @@ namespace CapsuleInspect
             tvModelTree.AfterCheck += tvModelTree_AfterCheck;
             //추가한거
 
-            //초기 트리 노트의 기본값은 "Root"
-            tvModelTree.Nodes.Add("Root");
+            //초기 트리 노트의 기본값은 "Root", 체크되지 않은 상태로 초기화
+            TreeNode rootNode = tvModelTree.Nodes.Add("Root");
+            rootNode.Checked = false;
+
 
             // 컨텍스트 메뉴 초기화
             _contextMenu = new ContextMenuStrip();
@@ -87,7 +89,7 @@ namespace CapsuleInspect
             {
                 tvModelTree.Nodes.Clear();
                 TreeNode rootNode = tvModelTree.Nodes.Add("Root");
-
+                rootNode.Checked = false;
                 // 널 가드                                        //추가한거
                 if (Global.Inst == null || Global.Inst.InspStage == null)
                     return;                                     //추가한거
@@ -139,21 +141,45 @@ namespace CapsuleInspect
         private void tvModelTree_AfterCheck(object sender, TreeViewEventArgs e)
         {
             tvModelTree.AfterCheck -= tvModelTree_AfterCheck; // 재귀 방지
-
-            var win = e.Node.Tag as InspWindow;
-            if (win != null)
+            try
             {
-                var viewerForm = MainForm.GetDockForm<CameraForm>();
-                if (viewerForm != null)
+                // Root 노드 체크 시 하위 노드 모두 체크/해제
+                if (e.Node.Text == "Root")
                 {
-                    viewerForm.SetWindowVisible(win, e.Node.Checked); //추가한거
+                    foreach (TreeNode childNode in e.Node.Nodes)
+                    {
+                        childNode.Checked = e.Node.Checked;
+                        var win = childNode.Tag as InspWindow;
+                        if (win != null)
+                        {
+                            var viewerForm = MainForm.GetDockForm<CameraForm>();
+                            if (viewerForm != null)
+                            {
+                                viewerForm.SetWindowVisible(win, childNode.Checked);
+                            }
+                            win.IgnoreInsp = !childNode.Checked;
+                        }
+                    }
                 }
-
-                win.IgnoreInsp = !e.Node.Checked; //추가한거// 체크=보임=검사대상
+                // 하위 노드 체크 시 개별 처리
+                else
+                {
+                    var win = e.Node.Tag as InspWindow;
+                    if (win != null)
+                    {
+                        var viewerForm = MainForm.GetDockForm<CameraForm>();
+                        if (viewerForm != null)
+                        {
+                            viewerForm.SetWindowVisible(win, e.Node.Checked);
+                        }
+                        win.IgnoreInsp = !e.Node.Checked;
+                    }
+                }
             }
-
-            tvModelTree.AfterCheck += tvModelTree_AfterCheck;
-            //추가한거
+            finally
+            {
+                tvModelTree.AfterCheck += tvModelTree_AfterCheck; // 이벤트 재연결
+            }
         }
     }
 }

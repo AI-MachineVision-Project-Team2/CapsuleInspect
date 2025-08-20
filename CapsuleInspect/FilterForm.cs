@@ -20,7 +20,6 @@ namespace CapsuleInspect
         public FilterForm()
         {
             InitializeComponent();
-            LoadOptionControl(FilterType.Flip);
             LoadOptionControl(FilterType.CannyEdge);
             LoadOptionControl(FilterType.Morphology);
           
@@ -77,10 +76,6 @@ namespace CapsuleInspect
             {
                 case FilterType.None:
                     return null; // None은 탭 생성 skip
-                case FilterType.Flip:
-                    curProp = new FlipProp(); 
-                    break;
-
                 case FilterType.CannyEdge:
                     curProp = new CannyEdgeProp();
                     break;
