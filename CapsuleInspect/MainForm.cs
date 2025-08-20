@@ -249,5 +249,6 @@ namespace CapsuleInspect
             var camForm = GetDockForm<CameraForm>();
             return camForm?.GetImageViewControl();
         }
+        //
     }
 }
