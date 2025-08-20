@@ -175,10 +175,7 @@ namespace CapsuleInspect
             ShowBinaryMode showBinMode = e.ShowBinMode;
             Global.Inst.InspStage.PreView?.SetBinary(lowerValue, upperValue, invert, showBinMode);
         }
-        private void FilterApplied(object sender, EventArgs e)
-        {
-            Global.Inst.InspStage.RedrawMainView();
-        }
+       
         //이미지 채널 변경시 프리뷰에 이미지 채널 설정
         private void ImageChannelChanged(object sender, ImageChannelEventArgs e)
         {
