@@ -821,9 +821,10 @@ namespace CapsuleInspect.UIControl
         public void ResetEntity()
         {
             lock(_lock)
-            { 
-            _rectInfos.Clear();
-            Invalidate();
+            {
+                _diagramEntityList.Clear();
+                _rectInfos.Clear();
+                _selEntity = null;
             }
         }
         // ROI 편집을 위한 마우스 이벤트

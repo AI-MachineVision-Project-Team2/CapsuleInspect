@@ -152,7 +152,6 @@ namespace CapsuleInspect.Core
 
         public void SetCannyPreview(int min, int max)
         {
-            // 1. 입력 검증: 원본 이미지 또는 ROI가 없으면 종료
             if (_orinalImage == null || _inspWindow == null)
             {
                 SLogger.Write("SetCannyPreview: 원본 이미지 또는 InspWindow가 null입니다.", SLogger.LogType.Error);
@@ -166,45 +165,30 @@ namespace CapsuleInspect.Core
                 return;
             }
 
-            // 2. ROI 영역 가져오기
             Rect roi = _inspWindow.WindowArea;
-            // baseImage: 현재 프리뷰 유지 (ShowBinaryOnly면 이진화 이미지)
-            Mat baseImage;
-            if (_orinalImage.Channels() == 3)
-            {
-                // 원본이 컬러일 경우 → 흑백 변환
-                baseImage = new Mat();
-                Cv2.CvtColor(_orinalImage, baseImage, ColorConversionCodes.BGR2GRAY);
-            }
-            else
-            {
-                // 원본이 이미 흑백이면 그대로 복사
-                baseImage = _orinalImage.Clone();
-            }
+            Mat baseImage = _orinalImage.Channels() == 3 ? _orinalImage.CvtColor(ColorConversionCodes.BGR2GRAY) : _orinalImage.Clone();
 
-            Mat gray;
-            if (_binaryResultImage != null && !_binaryResultImage.Empty())
-            {
-                gray = _binaryResultImage[roi].Clone(); // 🔧 ROI 크기로 잘라낸 마스크
-            }
-            else
-            {
-                Mat roiImage = baseImage[roi];
-                gray = (roiImage.Channels() == 3) ? 
-                    roiImage.CvtColor(ColorConversionCodes.BGR2GRAY) : roiImage.Clone();
-            }
-           
-            // Canny 적용 (binary 마스크 기반, sharp 엣지 검출, ROI 내)
+            // 입력 이미지를 항상 원본 ROI로 고정 (이진화 마스크는 BlobAlgorithm에서 처리)
+            Mat roiImage = baseImage[roi];
+            Mat gray = roiImage.Channels() == 3 ? roiImage.CvtColor(ColorConversionCodes.BGR2GRAY) : roiImage.Clone();
+
+
+            // Canny 적용
             Mat canny = new Mat();
             Cv2.Canny(gray, canny, min, max);
-            
-            // Canny 결과를 컬러로 변환 (baseImage는 CV_8UC3이므로)
 
-            // baseImage의 ROI 영역을 Canny 이미지로 교체 (오버레이 대신)
-            canny.CopyTo(new Mat(baseImage, roi));
-           
-            _previewImage=baseImage.Clone(); // 프리뷰 이미지 업데이트
+
+            // ROI에 Canny 결과 적용
+            canny.CopyTo(baseImage[roi]);
+
+            // 프리뷰 이미지 업데이트
+            _previewImage = baseImage.Clone();
             cameraForm.UpdateDisplay(_previewImage.ToBitmap());
+
+            // _binaryResultImage를 Canny 결과로 업데이트 (8UC1 유지)
+            Mat fullCanny = Mat.Zeros(_orinalImage.Size(), MatType.CV_8UC1);
+            canny.CopyTo(fullCanny[roi]);
+            _binaryResultImage = fullCanny;
         }
 
         public void SetMorphologyPreview(int kernelSize, MorphTypes morphType)
@@ -220,6 +204,18 @@ namespace CapsuleInspect.Core
             if (cameraForm == null)
             {
                 SLogger.Write("SetMorphologyPreview: CameraForm을 찾을 수 없습니다.", SLogger.LogType.Error);
+                return;
+            }
+
+            // ⚠️ 이진화 마스크가 없으면 경고 메시지 출력
+            if (_binaryResultImage == null || _binaryResultImage.Empty())
+            {
+                System.Windows.Forms.MessageBox.Show(
+                    "이진화 처리를 먼저 해주세요.\nMorphology는 이진화된 ROI에서만 작동합니다.",
+                    "Morphology 적용 실패",
+                    System.Windows.Forms.MessageBoxButtons.OK,
+                    System.Windows.Forms.MessageBoxIcon.Warning
+                );
                 return;
             }
 
@@ -261,6 +257,8 @@ namespace CapsuleInspect.Core
 
             _previewImage = baseImage.Clone();
             cameraForm.UpdateDisplay(_previewImage.ToBitmap());
+           
+          
             //_binaryResultImage = _previewImage.Clone(); // 이진화 결과 이미지 업데이트
             SLogger.Write("SetMorphologyPreview: Morphology 결과 적용 및 표시 완료", SLogger.LogType.Info);
         }
