@@ -839,7 +839,8 @@ namespace CapsuleInspect.Core
             else // 수동 단일 검사
             {
                 SLogger.Write("[InspStage] 수동 단일 검사 모드 실행");
-                if (!OneCycle())
+                bool result = OneCycle();
+                if (!result)
                 {
                     SLogger.Write("[InspStage] 단일 검사 실패 또는 이미지 없음");
                 }
