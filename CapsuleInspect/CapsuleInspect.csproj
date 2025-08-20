@@ -308,6 +308,7 @@
     </Compile>
     <Compile Include="Teach\DiagramEntity.cs" />
     <Compile Include="Teach\InspWindow.cs" />
+    <Compile Include="Teach\InspWindow.Visibility.cs" />
     <Compile Include="Teach\InspWindowFactory.cs" />
     <Compile Include="Teach\Model.cs" />
     <Compile Include="UIControl\ImageViewCtrl.cs">
