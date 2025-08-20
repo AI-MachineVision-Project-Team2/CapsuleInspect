@@ -371,19 +371,17 @@ namespace CapsuleInspect.Core
 
         public void DelTeachingImage(int index)
         {
-            if (_selectedInspWindow == null) return;
+            if (_selectedInspWindow is null)
+                return;
 
-            var matchAlgo = (MatchAlgorithm)_selectedInspWindow.FindInspAlgorithm(InspectType.InspMatch);
-            if (matchAlgo == null) return;
+            InspWindow inspWindow = _selectedInspWindow;
 
-            matchAlgo.DelTemplateImage(index); // MatchAlgorithm 템플릿 삭제
-            _selectedInspWindow.DelWindowImage(index); // InspWindow 동기화
+            inspWindow.DelWindowImage(index);
 
-            // UI 갱신
-            var propForm = MainForm.GetDockForm<PropertiesForm>();
-            if (propForm != null)
+            MatchAlgorithm matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
+            if (matchAlgo != null)
             {
-                propForm.ShowProperty(_selectedInspWindow);
+                UpdateProperty(inspWindow);
             }
         }
         public void SetTeachingImage(InspWindow inspWindow, int index = -1)
@@ -411,42 +409,23 @@ namespace CapsuleInspect.Core
 
             // 기존 코드: Clone 사용, 새로운 코드에서는 Clone 제거
             // 두 가지 옵션을 유지하기 위해 Clone 유지 (필요 시 주석 처리 가능)
-            Mat windowImage = curImage[inspWindow.WindowArea].Clone();
+            Mat windowImage = curImage[inspWindow.WindowArea];
 
-            // MatchAlgorithm 처리
-            var matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
+            if (index < 0)
+                inspWindow.AddWindowImage(windowImage);
+            else
+                inspWindow.SetWindowImage(windowImage, index);
+
+            inspWindow.IsPatternLearn = false;
+
+            MatchAlgorithm matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
             if (matchAlgo != null)
             {
-                // 새로운 코드: ImageChannel 설정 및 컬러를 그레이로 변환
+                //패턴매칭 이미지 채널 설정, 칼라인 경우 그레이로 변경
                 matchAlgo.ImageChannel = SelImageChannel;
                 if (matchAlgo.ImageChannel == eImageChannel.Color)
                     matchAlgo.ImageChannel = eImageChannel.Gray;
 
-                // 기존 코드: 템플릿 이미지 설정
-                if (index < 0)
-                {
-                    matchAlgo.AddTemplateImage(windowImage);
-                    inspWindow.AddWindowImage(windowImage); // 동기화 유지
-                }
-                else
-                {
-                    matchAlgo.SetTemplateImage(windowImage, index); // Set 메서드 필요
-                    inspWindow.SetWindowImage(windowImage, index); // 동기화 유지
-                }
-            }
-
-            inspWindow.IsPatternLearn = false;
-
-            // 기존 및 새로운 코드: UI 갱신
-            var propForm = MainForm.GetDockForm<PropertiesForm>();
-            if (propForm != null)
-            {
-                propForm.ShowProperty(inspWindow); // 탭 갱신
-            }
-
-            // 새로운 코드: UpdateProperty 호출
-            if (matchAlgo != null)
-            {
                 UpdateProperty(inspWindow);
             }
         }
