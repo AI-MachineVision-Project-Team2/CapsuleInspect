@@ -135,8 +135,9 @@ namespace CapsuleInspect.UIControl
                     _multiSelectedEntities.RemoveAt(i);
             }
         }
+     
 
-        //추가 한거
+        
         //추가한거
         public void SetWindowVisible(InspWindow window, bool visible)
         {
@@ -172,6 +173,7 @@ namespace CapsuleInspect.UIControl
             _contextMenu.Items.Add("Unlock", null, OnUnlockClicked);
 
             MouseWheel += new MouseEventHandler(ImageViewCCtrl_MouseWheel);
+            
         }
         public Bitmap GetCurBitmap()
         {
@@ -382,6 +384,12 @@ namespace CapsuleInspect.UIControl
                     g.DrawImage(_bitmapImage, ImageRect);
                     // _rectInfos 그리기
                     DrawDiagram(g);
+
+                    //  DrawOverlay 호출
+                    if (Global.Inst.InspStage.PreView != null)
+                    {
+                        Global.Inst.InspStage.PreView.DrawOverlay(g);
+                    }
 
                     // 캔버스를 UserControl 화면에 표시
                     e.Graphics.DrawImage(Canvas, 0, 0);
@@ -1307,7 +1315,13 @@ namespace CapsuleInspect.UIControl
             }
         }
 
-
+        private void ImageViewCtrl_Paint(object sender, PaintEventArgs e)
+        {
+            if (Global.Inst.InspStage.PreView != null)
+            {
+                Global.Inst.InspStage.PreView.DrawOverlay(e.Graphics);
+            }
+        }
     }
 
     //#10_INSPWINDOW#22 ImageViewCtrl에서 사용하는 이벤트 타입 정의

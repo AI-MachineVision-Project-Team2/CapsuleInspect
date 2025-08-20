@@ -1,4 +1,6 @@
-﻿namespace CapsuleInspect.UIControl
+﻿using System.Windows.Forms;
+
+namespace CapsuleInspect.UIControl
 {
     partial class ImageViewCtrl
     {
@@ -32,13 +34,14 @@
             // 
             // ImageViewCtrl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 26F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Font = new System.Drawing.Font("Noto Sans KR", 9F);
             this.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             this.Name = "ImageViewCtrl";
             this.Size = new System.Drawing.Size(215, 325);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.ImageViewCtrl_Paint);
             this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ImageViewCtrl_MouseDoubleClick);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ImageViewCtrl_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ImageViewCtrl_MouseMove);

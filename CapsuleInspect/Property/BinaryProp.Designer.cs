@@ -35,13 +35,14 @@
             this.grpBinary = new System.Windows.Forms.GroupBox();
             this.cbChannel = new System.Windows.Forms.ComboBox();
             this.lbChannel = new System.Windows.Forms.Label();
+            this.binRangeTrackbar = new CapsuleInspect.UIControl.RangeTrackbar();
             this.cbHighlight = new System.Windows.Forms.ComboBox();
             this.lbHighlight = new System.Windows.Forms.Label();
             this.cbBinMethod = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.dataGridViewFilter = new System.Windows.Forms.DataGridView();
             this.chkRotatedRect = new System.Windows.Forms.CheckBox();
-            this.binRangeTrackbar = new CapsuleInspect.UIControl.RangeTrackbar();
+            this.chkMeasure = new System.Windows.Forms.CheckBox();
             this.grpBinary.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewFilter)).BeginInit();
             this.SuspendLayout();
@@ -93,6 +94,16 @@
             this.lbChannel.Size = new System.Drawing.Size(66, 17);
             this.lbChannel.TabIndex = 10;
             this.lbChannel.Text = "이미지 채널";
+            // 
+            // binRangeTrackbar
+            // 
+            this.binRangeTrackbar.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.binRangeTrackbar.Location = new System.Drawing.Point(8, 20);
+            this.binRangeTrackbar.Name = "binRangeTrackbar";
+            this.binRangeTrackbar.Size = new System.Drawing.Size(281, 53);
+            this.binRangeTrackbar.TabIndex = 8;
+            this.binRangeTrackbar.ValueLeft = 80;
+            this.binRangeTrackbar.ValueRight = 200;
             // 
             // cbHighlight
             // 
@@ -160,20 +171,23 @@
             this.chkRotatedRect.UseVisualStyleBackColor = true;
             this.chkRotatedRect.CheckedChanged += new System.EventHandler(this.chkRotatedRect_CheckedChanged);
             // 
-            // binRangeTrackbar
+            // chkMeasure
             // 
-            this.binRangeTrackbar.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.binRangeTrackbar.Location = new System.Drawing.Point(8, 20);
-            this.binRangeTrackbar.Name = "binRangeTrackbar";
-            this.binRangeTrackbar.Size = new System.Drawing.Size(281, 53);
-            this.binRangeTrackbar.TabIndex = 8;
-            this.binRangeTrackbar.ValueLeft = 80;
-            this.binRangeTrackbar.ValueRight = 200;
+            this.chkMeasure.AutoSize = true;
+            this.chkMeasure.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.chkMeasure.Location = new System.Drawing.Point(119, 320);
+            this.chkMeasure.Name = "chkMeasure";
+            this.chkMeasure.Size = new System.Drawing.Size(49, 21);
+            this.chkMeasure.TabIndex = 18;
+            this.chkMeasure.Text = "측정";
+            this.chkMeasure.UseVisualStyleBackColor = true;
+            this.chkMeasure.CheckedChanged += new System.EventHandler(this.chkMeasure_CheckedChanged);
             // 
             // BinaryProp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkMeasure);
             this.Controls.Add(this.chkRotatedRect);
             this.Controls.Add(this.cbBinMethod);
             this.Controls.Add(this.label1);
@@ -204,5 +218,6 @@
         private System.Windows.Forms.CheckBox chkRotatedRect;
         private System.Windows.Forms.ComboBox cbChannel;
         private System.Windows.Forms.Label lbChannel;
+        private System.Windows.Forms.CheckBox chkMeasure;
     }
 }

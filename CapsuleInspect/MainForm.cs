@@ -244,5 +244,10 @@ namespace CapsuleInspect
                 SettingXml.Inst.CycleMode = false;
             }
         }
+        public static ImageViewCtrl GetImageViewCtrl()
+        {
+            var camForm = GetDockForm<CameraForm>();
+            return camForm?.GetImageViewControl();
+        }
     }
 }

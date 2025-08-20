@@ -2,6 +2,7 @@
 using CapsuleInspect.Core;
 using CapsuleInspect.Teach;
 using CapsuleInspect.Util;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -370,6 +371,38 @@ namespace CapsuleInspect.Property
             ImageChannelChanged?.Invoke(this, new ImageChannelEventArgs(_blobAlgo.ImageChannel));
         }
 
+        private void chkMeasure_CheckedChanged(object sender, EventArgs e)
+        {
+
+            var cameraForm = MainForm.GetDockForm<CameraForm>();
+            if (cameraForm == null) return;
+
+            var preview = Global.Inst.InspStage.PreView;
+            if (preview == null) return;
+
+            var currentWindow = preview.CurrentInspWindow;
+            if (currentWindow == null) return;
+
+            foreach (var algo in currentWindow.AlgorithmList)
+            {
+                if (algo is BlobAlgorithm blobAlgo)
+                {
+                    if (!chkMeasure.Checked)
+                    {
+                        preview.SetMeasureLines(null); // 측정선 제거
+                        MainForm.GetImageViewCtrl()?.Invalidate(); // 다시 그리기
+                        return;
+                    }
+
+                    Mat binary = preview.GetBinaryResultImage();
+                    if (binary == null || binary.Empty()) return;
+
+                    var result = blobAlgo.MeasureCapsuleSize(binary, algo.InspRect);
+                    preview.SetMeasureLines(result);
+                    MainForm.GetImageViewCtrl()?.Invalidate(); // 이미지 다시 그리기
+                }
+            }
+        }
     }
     public class ImageChannelEventArgs : EventArgs
     {
