@@ -144,15 +144,20 @@ namespace CapsuleInspect.Inspect
 
                     ngCnt++;
 
-                    // 💡 ROI 이름 기준으로 세분화된 NG 카운트 분기
-                    if (inspWindow.Name.Contains("Crack"))
-                        ngCrack++;
-                    else if (inspWindow.Name.Contains("Scratch"))
-                        ngScratch++;
-                    else if (inspWindow.Name.Contains("Squeeze"))
-                        ngSqueeze++;
-                    else if (inspWindow.Name.Contains("PrintDefect"))
-                        ngPrintDefect++;
+                    var kind = GetInspWindowKind(inspWindow); // ← 아래 헬퍼 추가
+
+                    switch (kind)
+                    {
+                        case InspWindowType.Crack: ngCrack = 1; break;
+                        case InspWindowType.Scratch: ngScratch = 1; break;
+                        case InspWindowType.Squeeze: ngSqueeze = 1; break;
+                        case InspWindowType.PrintDefect: ngPrintDefect = 1; break;
+                        // 필요 시 다른 종류도 추가
+                        default:
+                            // 이름으로도 못 찾으면 로그 한번 남겨 원인 파악
+                            // SLogger.Write($"[InspWorker] Unknown kind ROI: {inspWindow?.Name}", SLogger.LogType.Info);
+                            break;
+                    }
                 }
                 else
                 {
@@ -161,6 +166,11 @@ namespace CapsuleInspect.Inspect
 
                 DisplayResult(inspWindow, InspectType.InspNone);
             }
+            int distinctByKind = (ngCrack > 0 ? 1 : 0)
+                   + (ngScratch > 0 ? 1 : 0)
+                   + (ngSqueeze > 0 ? 1 : 0)
+                   + (ngPrintDefect > 0 ? 1 : 0);
+            Global.Inst.InspStage.SetDistinctNgCount(distinctByKind);
 
             var cameraForm = MainForm.GetDockForm<CameraForm>();
             if (cameraForm != null)
@@ -194,7 +204,35 @@ namespace CapsuleInspect.Inspect
 
             return true;
         }
+        private InspWindowType GetInspWindowKind(InspWindow w)
+        {
+            // 1) 속성으로 직접 갖고 있으면 그걸 최우선 사용 (프로퍼티명 케이스 대응)
+            var t = w.GetType();
+            var p1 = t.GetProperty("InspWindowType"); // 보통 이 이름일 가능성 높음
+            if (p1 != null && p1.PropertyType == typeof(InspWindowType))
+                return (InspWindowType)p1.GetValue(w, null);
 
+            var p2 = t.GetProperty("WindowType");     // 혹시 다른 이름으로 있을 수도 있음
+            if (p2 != null && p2.PropertyType == typeof(InspWindowType))
+                return (InspWindowType)p2.GetValue(w, null);
+
+            // 2) 없으면 이름으로 후순위 판정 (대/소문자·한글 키워드 모두 처리)
+            var name = (w?.Name ?? w?.UID ?? string.Empty).ToLowerInvariant();
+
+            if (name.Contains("crack") || name.Contains("크랙") || name.Contains("균열"))
+                return InspWindowType.Crack;
+
+            if (name.Contains("scratch") || name.Contains("스크래치"))
+                return InspWindowType.Scratch;
+
+            if (name.Contains("squeeze") || name.Contains("찌그러") || name.Contains("변형"))
+                return InspWindowType.Squeeze;
+
+            if (name.Contains("printdefect") || name.Contains("인쇄") || name.Contains("프린트"))
+                return InspWindowType.PrintDefect;
+
+            return InspWindowType.None;
+        }
         //특정 InspWindow에 대한 검사 진행
         //inspType이 있다면 그것만을 검사하고, 없다면 InpsWindow내의 모든 알고리즘 검사
         public bool TryInspect(InspWindow inspObj, InspectType inspType)

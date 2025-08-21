@@ -17,6 +17,9 @@ namespace CapsuleInspect
 {
     public partial class ResultForm : DockContent
     {
+        private StatusStrip _status;                 // ← 추가
+        private ToolStripStatusLabel _tsslDistinct;  // ← 추가
+
         //검사 결과를 보여주기 위한 컨트롤 추가
         private SplitContainer _splitContainer;
         private TreeListView _treeListView;
@@ -27,6 +30,23 @@ namespace CapsuleInspect
             InitializeComponent();
             //컨트롤 초기화, 아래 함수 구현할것
             InitTreeListView();
+            // (A) 상태바(하단) 만들기
+            _status = new StatusStrip() { SizingGrip = false };
+            _tsslDistinct = new ToolStripStatusLabel("NG (종류별 1): 0");
+            _status.Items.Add(_tsslDistinct);
+
+            // 상태바는 Panel1(트리 영역) 아래에 붙임
+            _splitContainer.Panel1.Controls.Add(_status);
+            _status.Dock = DockStyle.Bottom;
+
+            // (B) 이벤트 구독 (검사 사이클 끝에 값이 올라옴)
+            Global.Inst.InspStage.DistinctNgCountUpdated += OnDistinctNgUpdated;
+
+            // 폼 닫힐 때 구독 해제 (메모리 누수 방지)
+            this.FormClosed += (s, e) =>
+            {
+                Global.Inst.InspStage.DistinctNgCountUpdated -= OnDistinctNgUpdated;
+            };
         }
         private void InitTreeListView()
         {
@@ -238,6 +258,11 @@ namespace CapsuleInspect
             {
                 cameraForm.AddRect(result.ResultRectList); // Defect 및 Count 필터 Defect 표시
             }
+        }
+        private void OnDistinctNgUpdated(int count)
+        {
+            if (InvokeRequired) { BeginInvoke(new Action(() => OnDistinctNgUpdated(count))); return; }
+            _tsslDistinct.Text = $"NG (종류별 1): {count}";
         }
     }
 }

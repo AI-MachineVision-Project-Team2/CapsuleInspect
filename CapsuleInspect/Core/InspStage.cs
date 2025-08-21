@@ -125,6 +125,18 @@ namespace CapsuleInspect.Core
         public AccumCounter Accum { get; } = new AccumCounter();
         public event Action<AccumCounter> AccumChanged;
 
+        //지피티 추가
+        public int LastDistinctNgCount { get; private set; }
+        public event Action<int> DistinctNgCountUpdated;
+
+
+        private void OnUi(Action a)
+        {
+            var main = Application.OpenForms.OfType<MainForm>().FirstOrDefault();
+            if (main != null && main.InvokeRequired) main.BeginInvoke(a);
+            else a();
+        }
+
         public void ResetAccum()
         {
             Accum.Reset();
@@ -999,6 +1011,17 @@ namespace CapsuleInspect.Core
             {
                 cameraForm.SetWorkingState(workingState);
             }
+        }
+        // 마지막 검사 결과를 기반으로, 불량 개수 계산 및 UI 업데이트
+        private void PublishDistinctNg()
+        {
+            // Distinct-by-kind 값은 InspWorker에서 계산해 SetDistinctNgCount로 전달됨.
+            OnUi(() => DistinctNgCountUpdated?.Invoke(LastDistinctNgCount));
+        }
+        public void SetDistinctNgCount(int count)
+        {
+            LastDistinctNgCount = count;
+            OnUi(() => DistinctNgCountUpdated?.Invoke(count));
         }
 
         public void RunAISegAndShow()
