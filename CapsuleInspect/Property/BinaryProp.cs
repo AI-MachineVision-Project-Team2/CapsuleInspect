@@ -397,9 +397,25 @@ namespace CapsuleInspect.Property
                     Mat binary = preview.GetBinaryResultImage();
                     if (binary == null || binary.Empty()) return;
 
-                    //var result = blobAlgo.MeasureCapsuleSize(binary, algo.InspRect);
-                    //preview.SetMeasureLines(result);
-                    //MainForm.GetImageViewCtrl()?.Invalidate(); // 이미지 다시 그리기
+                    // 주석 해제: 실제 측정 호출
+                    var result = blobAlgo.MeasureCapsuleSize(binary, algo.InspRect);
+                    preview.SetMeasureLines(result);
+
+                    // 화면 갱신
+                    MainForm.GetImageViewCtrl()?.Invalidate(); // ImageViewCtrl 갱신 (Paint 이벤트 트리거)
+
+                    // 추가: CameraForm의 UpdateDisplay 호출로 전체 뷰 갱신 (필요 시)
+                    cameraForm.UpdateDisplay();
+
+                    // 결과 로그 (디버깅용)
+                    if (result.Count > 0)
+                    {
+                        SLogger.Write($"측정 완료: Width/Height 선 {result.Count}개 생성.", SLogger.LogType.Info);
+                    }
+                    else
+                    {
+                        SLogger.Write("측정 결과가 없습니다. 윤곽선이 없거나 ROI 문제.", SLogger.LogType.Error);
+                    }
                 }
             }
         }
