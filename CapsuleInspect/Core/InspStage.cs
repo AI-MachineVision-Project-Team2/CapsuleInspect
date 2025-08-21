@@ -1009,8 +1009,20 @@ namespace CapsuleInspect.Core
                 var ai = AIModule;                   // SaigeAI 인스턴스 (지연 생성 프로퍼티)
                 ai?.Inspect(bmp);                    // 세그먼트/검사 실행
                 var result = ai?.GetResultImage();   // 그려진 결과 비트맵
+                                                     // ★ 추가: DrawResult에서 반환된 defectInfos 가져오기 (DrawResult 호출 전에 resultImage 생성 필요)
+                                                     // GetResultImage() 내부 DrawResult 호출로, defectInfos를 반환하도록 GetResultImage() 수정 or 별도 호출
+                                                     // 간단히: ai.DrawResult(result); 대신 직접 호출
+                List<DrawInspectInfo> defectInfos = ai.DrawResult(result); // 수정된 DrawResult 반환 사용
+
                 if (result != null)
-                    UpdateDisplay(result);           // CameraForm 화면 갱신
+                    UpdateDisplay(result);
+
+                // 불량 객체 그리기
+                var cameraForm = MainForm.GetDockForm<CameraForm>();
+                if (cameraForm != null && defectInfos != null && defectInfos.Count > 0)
+                {
+                    cameraForm.AddRect(defectInfos);
+                }
             }
             catch (Exception ex)
             {

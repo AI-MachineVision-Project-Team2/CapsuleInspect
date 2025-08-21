@@ -1,4 +1,5 @@
 ﻿using BrightIdeasSoftware;
+using CapsuleInspect.Core;
 using CapsuleInspect.Inspect;
 using CapsuleInspect.Teach;
 using System;
@@ -171,7 +172,7 @@ namespace CapsuleInspect
             if (inspWindow.InspResultList.Count > 0)
             {
                 InspResult inspResult = inspWindow.InspResultList[0];
-                ShowDedtail(inspResult);
+                ShowDetail(inspResult);
             }
         }
 
@@ -207,7 +208,7 @@ namespace CapsuleInspect
 
             if (_treeListView.SelectedObject is InspResult result)
             {
-                ShowDedtail(result);
+                ShowDetail(result);
             }
             else if (_treeListView.SelectedObject is InspWindow window)
             {
@@ -217,20 +218,25 @@ namespace CapsuleInspect
             }
         }
 
-        private void ShowDedtail(InspResult result)
+        private void ShowDetail(InspResult result)
         {
             if (result is null)
                 return;
 
-            _txtDetails.Text = result.ResultInfos.ToString();
-
+            StringBuilder sb = new StringBuilder();
             if (result.ResultRectList != null)
             {
-                CameraForm cameraForm = MainForm.GetDockForm<CameraForm>();
-                if (cameraForm != null)
+                foreach (var info in result.ResultRectList)
                 {
-                    cameraForm.AddRect(result.ResultRectList);
+                    sb.AppendLine($"{info.inspectType}: {info.info} (Defect)");
                 }
+            }
+            _txtDetails.Text = sb.ToString();
+
+            var cameraForm = MainForm.GetDockForm<CameraForm>();
+            if (cameraForm != null && result.ResultRectList != null)
+            {
+                cameraForm.AddRect(result.ResultRectList); // Defect 및 Count 필터 Defect 표시
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using CapsuleInspect.Algorithm;
 using CapsuleInspect.Core;
+using CapsuleInspect.Util;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using SaigeVision.Net.V2;
@@ -53,19 +54,6 @@ namespace CapsuleInspect.Inspect
 
             switch (_engineType)
             {
-                case EngineType.IAD:
-                    _iADEngine = new IADEngine(modelPath, 0);
-                    var iadOption = _iADEngine.GetInferenceOption();
-                    iadOption.CalcScoremap = false;
-                    iadOption.CalcHeatmap = false;
-                    iadOption.CalcMask = false;
-                    iadOption.CalcObject = true;
-                    iadOption.CalcObjectAreaAndApplyThreshold = true;
-                    iadOption.CalcObjectScoreAndApplyThreshold = true;
-                    iadOption.CalcTime = true;
-                    _iADEngine.SetInferenceOption(iadOption);
-                    break;
-
                 case EngineType.SEG:
                     _sEGEngine = new SegmentationEngine(modelPath, 0);
                     var segOption = _sEGEngine.GetInferenceOption();
@@ -77,12 +65,7 @@ namespace CapsuleInspect.Inspect
                     segOption.CalcObjectScoreAndApplyThreshold = true;
                     _sEGEngine.SetInferenceOption(segOption);
                     break;
-
-                case EngineType.DET:
-                    _dETEngine = new DetectionEngine(modelPath, 0);
-                    var detOption = _dETEngine.GetInferenceOption();
-                    detOption.CalcTime = true;
-                    _dETEngine.SetInferenceOption(detOption);
+                default:
                     break;
             }
         }
@@ -103,14 +86,6 @@ namespace CapsuleInspect.Inspect
 
             switch (_engineType)
             {
-                case EngineType.IAD:
-                    if (_iADEngine == null)
-                    {
-                        MessageBox.Show("IAD 엔진이 초기화되지 않았습니다.");
-                        return false;
-                    }
-                    _iADresult = _iADEngine.Inspection(srImage);
-                    break;
                 case EngineType.SEG:
                     if (_sEGEngine == null)
                     {
@@ -119,15 +94,6 @@ namespace CapsuleInspect.Inspect
                     }
                     _sEGResult = _sEGEngine.Inspection(srImage);
                     break;
-                case EngineType.DET:
-                    if (_dETEngine == null)
-                    {
-                        MessageBox.Show("DET 엔진이 초기화되지 않았습니다.");
-                        return false;
-                    }
-                    _dETResult = _dETEngine.Inspection(srImage);
-                    break;
-
                 default:
                     MessageBox.Show("지원하지 않는 엔진 타입입니다.");
                     return false;
@@ -136,15 +102,16 @@ namespace CapsuleInspect.Inspect
             sw.Stop();
             return true;
         }
-        public void DrawResult(Bitmap bmp)
+        public List<DrawInspectInfo> DrawResult(Bitmap bmp)
         {
             if (bmp == null)
-                return;
+                return null;
 
             Graphics g = Graphics.FromImage(bmp);
             int step = 10;
 
-            List<object> filteredObjects = new List<object>(); // SEG/IAD/DET 객체 저장 (object로 다형성)
+            List<object> filteredObjects = new List<object>(); // 통과 객체
+            List<DrawInspectInfo> inspectInfos = new List<DrawInspectInfo>(); // Defect 정보 (Good은 화면 표시 안 함)
 
             switch (_engineType)
             {
@@ -173,49 +140,69 @@ namespace CapsuleInspect.Inspect
                             int width = boundingRect.Width;
                             int height = boundingRect.Height;
 
-                            // 필터 적용 (BlobAlgorithm.RunBinary() 참고)
+                            // 필터 적용 (필터 통과 = Defect)
                             bool passFilter = true;
+                            string failReason = string.Empty;
                             foreach (var filter in Filters)
                             {
                                 if (!filter.isUse) continue;
-
                                 if (filter.name == "Area" && ((filter.min > 0 && area < filter.min) || (filter.max > 0 && area > filter.max)))
                                 {
                                     passFilter = false;
+                                    failReason = $"Area: {area}, Range=[{filter.min},{filter.max}]";
                                     break;
                                 }
                                 else if (filter.name == "Width" && ((filter.min > 0 && width < filter.min) || (filter.max > 0 && width > filter.max)))
                                 {
                                     passFilter = false;
+                                    failReason = $"Width: {width}, Range=[{filter.min},{filter.max}]";
                                     break;
                                 }
                                 else if (filter.name == "Height" && ((filter.min > 0 && height < filter.min) || (filter.max > 0 && height > filter.max)))
                                 {
                                     passFilter = false;
+                                    failReason = $"Height: {height}, Range=[{filter.min},{filter.max}]";
                                     break;
                                 }
                             }
 
                             if (passFilter)
+                            {
+                                // 필터 통과 객체: Defect로 처리, DrawInspectInfo 생성, 화면 표시
+                                string inspectInfo = $"Defect A:{(int)area}";
+                                DrawInspectInfo drawInfo = new DrawInspectInfo(boundingRect, inspectInfo, InspectType.InspBinary, DecisionType.Defect);
+
+                                // RotatedRect 계산 및 설정 (빨간색으로 표시)
+                                RotatedRect rotatedRect = Cv2.MinAreaRect(contourPoints);
+                                Point2f[] rotatedPoints = rotatedRect.Points();
+                                drawInfo.SetRotatedRectPoints(rotatedPoints);
+
+                                inspectInfos.Add(drawInfo);
                                 filteredObjects.Add(prediction);
+                            }
+                            // 필터 미통과 객체 (Good): 화면 표시 및 로그 기록 안 함
                         }
 
-                        // Count 필터 적용 (전체 객체 수, Blob처럼)
+                        // Count 필터
                         var countFilter = Filters.FirstOrDefault(f => f.name == "Count" && f.isUse);
                         if (countFilter != null)
                         {
                             int findCount = filteredObjects.Count;
                             if ((countFilter.min > 0 && findCount < countFilter.min) || (countFilter.max > 0 && findCount > countFilter.max))
                             {
-                                filteredObjects.Clear(); // NG: 객체 비우기 (또는 NG 표시 로직 추가)
+                                filteredObjects.Clear();
+                                // 전체 Defect: DrawInspectInfo 추가 (화면 표시)
+                                string countInfo = $"Defect Count:{findCount}";
+                                DrawInspectInfo countDraw = new DrawInspectInfo(new Rect(0, 0, bmp.Width, bmp.Height), countInfo, InspectType.InspBinary, DecisionType.Defect);
+                                inspectInfos.Add(countDraw); // Count 필터 Defect는 화면 표시
                             }
                         }
 
-                        // 필터링된 객체 그리기
+                        // 필터링된 객체 그리기 (Defect는 빨간색)
                         foreach (var obj in filteredObjects)
                         {
-                            var prediction = (/* 적절한 타입 캐스트, 예: SegmentedObject */ obj as SegmentedObject);
-                            using (var brush = new SolidBrush(Color.FromArgb(127, prediction.ClassInfo.Color)))
+                            var prediction = obj as dynamic; // 실제 타입: SegmentedObject
+                            using (var brush = new SolidBrush(Color.FromArgb(127, 255, 0, 0))) // 빨간색 계열
                             using (var gp = new GraphicsPath())
                             {
                                 gp.AddPolygon(prediction.Contour.Value.ToArray());
@@ -234,6 +221,8 @@ namespace CapsuleInspect.Inspect
                     MessageBox.Show("DrawResult: 지원하지 않는 엔진 타입입니다.");
                     break;
             }
+            return inspectInfos; // InspStage에서 CameraForm.AddRect(defectInfos) 호출
+
         }
 
         public Bitmap GetResultImage()
