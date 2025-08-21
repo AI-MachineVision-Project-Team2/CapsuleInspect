@@ -397,9 +397,9 @@ namespace CapsuleInspect.Property
                     Mat binary = preview.GetBinaryResultImage();
                     if (binary == null || binary.Empty()) return;
 
-                    var result = blobAlgo.MeasureCapsuleSize(binary, algo.InspRect);
-                    preview.SetMeasureLines(result);
-                    MainForm.GetImageViewCtrl()?.Invalidate(); // 이미지 다시 그리기
+                    //var result = blobAlgo.MeasureCapsuleSize(binary, algo.InspRect);
+                    //preview.SetMeasureLines(result);
+                    //MainForm.GetImageViewCtrl()?.Invalidate(); // 이미지 다시 그리기
                 }
             }
         }

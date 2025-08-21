@@ -1,4 +1,5 @@
-﻿using CapsuleInspect.Core;
+﻿using CapsuleInspect.Algorithm;
+using CapsuleInspect.Core;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using SaigeVision.Net.V2;
@@ -30,7 +31,7 @@ namespace CapsuleInspect.Inspect
     public class SaigeAI : IDisposable
     {
         public EngineType _engineType;
-
+        public List<BlobFilter> Filters { get; set; } = new List<BlobFilter>();
         IADEngine _iADEngine = null;
         IADResult _iADresult = null;
         SegmentationEngine _sEGEngine = null;
@@ -143,6 +144,8 @@ namespace CapsuleInspect.Inspect
             Graphics g = Graphics.FromImage(bmp);
             int step = 10;
 
+            List<object> filteredObjects = new List<object>(); // SEG/IAD/DET 객체 저장 (object로 다형성)
+
             switch (_engineType)
             {
                 case EngineType.SEG:
@@ -153,18 +156,68 @@ namespace CapsuleInspect.Inspect
                             : _iADresult?.SegmentedObjects;
 
                         if (segmentedObjects == null)
-                            break; // return 대신 break
-
-                        int minContourCount = _engineType == EngineType.SEG ? 4 : 3;
+                            break;
 
                         foreach (var prediction in segmentedObjects)
                         {
+                            if (prediction.Contour.Value.Count < 4) // 최소 contour 조건 (Blob 참고)
+                                continue;
+
+                            // List<PointF>를 OpenCvSharp.Point[]로 변환
+                            var contourPoints = prediction.Contour.Value.Select(p => new OpenCvSharp.Point((int)p.X, (int)p.Y)).ToArray();
+                            // Area 계산
+                            double area = Cv2.ContourArea(contourPoints);
+
+                            // Width/Height 계산
+                            Rect boundingRect = Cv2.BoundingRect(contourPoints);
+                            int width = boundingRect.Width;
+                            int height = boundingRect.Height;
+
+                            // 필터 적용 (BlobAlgorithm.RunBinary() 참고)
+                            bool passFilter = true;
+                            foreach (var filter in Filters)
+                            {
+                                if (!filter.isUse) continue;
+
+                                if (filter.name == "Area" && ((filter.min > 0 && area < filter.min) || (filter.max > 0 && area > filter.max)))
+                                {
+                                    passFilter = false;
+                                    break;
+                                }
+                                else if (filter.name == "Width" && ((filter.min > 0 && width < filter.min) || (filter.max > 0 && width > filter.max)))
+                                {
+                                    passFilter = false;
+                                    break;
+                                }
+                                else if (filter.name == "Height" && ((filter.min > 0 && height < filter.min) || (filter.max > 0 && height > filter.max)))
+                                {
+                                    passFilter = false;
+                                    break;
+                                }
+                            }
+
+                            if (passFilter)
+                                filteredObjects.Add(prediction);
+                        }
+
+                        // Count 필터 적용 (전체 객체 수, Blob처럼)
+                        var countFilter = Filters.FirstOrDefault(f => f.name == "Count" && f.isUse);
+                        if (countFilter != null)
+                        {
+                            int findCount = filteredObjects.Count;
+                            if ((countFilter.min > 0 && findCount < countFilter.min) || (countFilter.max > 0 && findCount > countFilter.max))
+                            {
+                                filteredObjects.Clear(); // NG: 객체 비우기 (또는 NG 표시 로직 추가)
+                            }
+                        }
+
+                        // 필터링된 객체 그리기
+                        foreach (var obj in filteredObjects)
+                        {
+                            var prediction = (/* 적절한 타입 캐스트, 예: SegmentedObject */ obj as SegmentedObject);
                             using (var brush = new SolidBrush(Color.FromArgb(127, prediction.ClassInfo.Color)))
                             using (var gp = new GraphicsPath())
                             {
-                                if (prediction.Contour.Value.Count < minContourCount)
-                                    continue;
-
                                 gp.AddPolygon(prediction.Contour.Value.ToArray());
                                 foreach (var innerValue in prediction.Contour.InnerValue)
                                 {
@@ -174,25 +227,6 @@ namespace CapsuleInspect.Inspect
                             }
                             step += 50;
                         }
-                    }
-                    break;
-
-                case EngineType.DET:
-                    if (_dETResult == null) return;
-
-                    foreach (var prediction in _dETResult.DetectedObjects)
-                    {
-                        SolidBrush brush = new SolidBrush(Color.FromArgb(127, prediction.ClassInfo.Color));
-                        using (GraphicsPath gp = new GraphicsPath())
-                        {
-                            float x = (float)prediction.BoundingBox.X;
-                            float y = (float)prediction.BoundingBox.Y;
-                            float width = (float)prediction.BoundingBox.Width;
-                            float height = (float)prediction.BoundingBox.Height;
-                            gp.AddRectangle(new RectangleF(x, y, width, height));
-                            g.DrawPath(new Pen(brush, 10), gp);
-                        }
-                        step += 50;
                     }
                     break;
 

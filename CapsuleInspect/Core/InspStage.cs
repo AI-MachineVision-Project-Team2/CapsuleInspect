@@ -857,7 +857,10 @@ namespace CapsuleInspect.Core
             { 
                 if (!VirtualGrab()) return false; 
             } 
-            ResetDisplay(); 
+            ResetDisplay();
+
+            RunAISegAndShow();
+
             bool isDefect; 
             if (!_inspWorker.RunInspect(out isDefect)) 
                 return false; 
@@ -920,6 +923,7 @@ namespace CapsuleInspect.Core
                                 SLogger.Write(errMsg, SLogger.LogType.Error);
                             }
                         }
+                        RunAISegAndShow();
 
                         bool isDefect = false;
                         if (!_inspWorker.RunInspect(out isDefect))
@@ -994,8 +998,25 @@ namespace CapsuleInspect.Core
                 cameraForm.SetWorkingState(workingState);
             }
         }
-       
 
+        public void RunAISegAndShow()
+        {
+            try
+            {
+                var bmp = GetBitmap();               // 현재 표시용 비트맵 (ImageSpace에서 꺼냄)
+                if (bmp == null) return;
+
+                var ai = AIModule;                   // SaigeAI 인스턴스 (지연 생성 프로퍼티)
+                ai?.Inspect(bmp);                    // 세그먼트/검사 실행
+                var result = ai?.GetResultImage();   // 그려진 결과 비트맵
+                if (result != null)
+                    UpdateDisplay(result);           // CameraForm 화면 갱신
+            }
+            catch (Exception ex)
+            {
+                SLogger.Write($"AI Inspect 실패: {ex.Message}", SLogger.LogType.Error);
+            }
+        }
 
         #region Disposable
 

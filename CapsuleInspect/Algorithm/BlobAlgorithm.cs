@@ -143,6 +143,9 @@ namespace CapsuleInspect.Algorithm
         //InspAlgorithm을 상속받아, 구현하고, 인자로 입력받던 것을 부모의 _srcImage 이미지 사용
         //검사 시작전 IsInspected = false로 초기화하고, 검사가 정상적으로 완료되면,IsInspected = true로 설정
         //이진화 검사 알고리즘
+
+        //측정 검사 알고리즘
+        /*
         public List<DrawInspectInfo> MeasureCapsuleSize(Mat binaryImage, Rect roi)
         {
             List<DrawInspectInfo> drawInfos = new List<DrawInspectInfo>();
@@ -190,7 +193,7 @@ namespace CapsuleInspect.Algorithm
 
             return drawInfos;
         }
-
+        */
         public override bool DoInspect()
         {
             ResetResult();
@@ -271,8 +274,9 @@ namespace CapsuleInspect.Algorithm
                         return false;
                 }
             // 캡슐 width/height 측정선 그리기용 정보 생성
-            List<DrawInspectInfo> lines = MeasureCapsuleSize(binaryImage, InspRect);
-            Global.Inst.InspStage.PreView?.SetMeasureLines(lines);
+            //측정 검사
+            //List<DrawInspectInfo> lines = MeasureCapsuleSize(binaryImage, InspRect);
+            //Global.Inst.InspStage.PreView?.SetMeasureLines(lines);
 
             // 화면에 갱신 요청
             MainForm.GetImageViewCtrl()?.Invalidate();
