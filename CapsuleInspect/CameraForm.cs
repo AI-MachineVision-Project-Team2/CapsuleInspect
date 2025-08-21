@@ -300,11 +300,24 @@ namespace CapsuleInspect
             switch (e.Button)
             {
                 case ToolbarButton.ShowROI:
-                    if (e.IsChecked)
-                        UpdateDiagramEntity();
-                    else
-                        imageViewer.ResetEntity();
-                    break;
+                    {
+                        bool show = e.IsChecked;
+
+                        // (기존) 화면 오버레이 갱신
+                        if (show) UpdateDiagramEntity();
+                        else imageViewer.ResetEntity();
+
+                        // (추가) 모든 ROI 검사 포함/제외 일괄 반영
+                        var model = Global.Inst.InspStage.CurModel;
+                        if (model != null)
+                            foreach (var w in model.InspWindowList)
+                                w.IgnoreInsp = !show;
+
+                        // (선택) ROI 트리 UI도 동기화 필요 시
+                        var tree = MainForm.GetDockForm<ModelTreeForm>();
+                        tree?.UpdateDiagramEntity();
+                        break;
+                    }
                 case ToolbarButton.ChannelColor:
                     _currentImageChannel = eImageChannel.Color;
                     UpdateDisplay();

@@ -138,47 +138,75 @@ namespace CapsuleInspect
                 tvModelTree.EndUpdate();                          //추가한거
             }
         }
+        //추가 버전
+        private bool _updatingTree = false;
+
         private void tvModelTree_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            tvModelTree.AfterCheck -= tvModelTree_AfterCheck; // 재귀 방지
+            if (_updatingTree) return;        // 재진입 방지
+            _updatingTree = true;
+            tvModelTree.BeginUpdate();        // 깜빡임/성능 개선
+
             try
             {
-                // Root 노드 체크 시 하위 노드 모두 체크/해제
-                if (e.Node.Text == "Root")
+                // 뷰어(오버레이 표시 폼) 캐시
+                var viewerForm = MainForm.GetDockForm<CameraForm>();
+
+                // 해당 노드에 연결된 ROI에 "표시/검사" 동기화
+                void ApplyToNode(TreeNode n, bool isChecked)
                 {
-                    foreach (TreeNode childNode in e.Node.Nodes)
+                    if (n?.Tag is InspWindow w)
                     {
-                        childNode.Checked = e.Node.Checked;
-                        var win = childNode.Tag as InspWindow;
-                        if (win != null)
-                        {
-                            var viewerForm = MainForm.GetDockForm<CameraForm>();
-                            if (viewerForm != null)
-                            {
-                                viewerForm.SetWindowVisible(win, childNode.Checked);
-                            }
-                            win.IgnoreInsp = !childNode.Checked;
-                        }
+                        viewerForm?.SetWindowVisible(w, isChecked); // 화면 표시/숨김
+                        w.IgnoreInsp = !isChecked;                  // 검사 포함/제외 (체크=검사포함)
                     }
                 }
-                // 하위 노드 체크 시 개별 처리
+
+                // 하위 전체에 체크/해제 및 "표시/검사" 동기화 (재귀)
+                void SetCheckedRecursive(TreeNode n, bool isChecked)
+                {
+                    n.Checked = isChecked;      // 프로그램적으로도 체크 상태 반영
+                    ApplyToNode(n, isChecked);  // 화면/검사 동기화
+
+                    foreach (TreeNode c in n.Nodes)
+                        SetCheckedRecursive(c, isChecked);
+                }
+
+                // 상위(부모) 체크 상태 갱신: 모든 자식이 체크일 때만 체크
+                void UpdateAncestorsChecked(TreeNode n)
+                {
+                    var p = n?.Parent;
+                    while (p != null)
+                    {
+                        bool allChecked = p.Nodes.Cast<TreeNode>().All(c => c.Checked);
+                        p.Checked = allChecked;      // 트리 상태 일치
+                        p = p.Parent;
+                    }
+                }
+
+                // ─────────────────────────────────────────────
+                // 분기: 루트(그룹) 노드 vs 개별 ROI 노드
+                // 텍스트 "Root" 하드코딩 대신, 최상위(Level==0) 기준으로 처리
+                // ─────────────────────────────────────────────
+                if (e.Node.Level == 0)
+                {
+                    // 루트(그룹) 노드: 하위 전부 동기화
+                    SetCheckedRecursive(e.Node, e.Node.Checked);
+                }
                 else
                 {
-                    var win = e.Node.Tag as InspWindow;
-                    if (win != null)
-                    {
-                        var viewerForm = MainForm.GetDockForm<CameraForm>();
-                        if (viewerForm != null)
-                        {
-                            viewerForm.SetWindowVisible(win, e.Node.Checked);
-                        }
-                        win.IgnoreInsp = !e.Node.Checked;
-                    }
+                    // 개별 ROI 노드: 자신만 반영, 부모 체크상태 갱신
+                    ApplyToNode(e.Node, e.Node.Checked);
+                    UpdateAncestorsChecked(e.Node);
                 }
+
+                // (선택) 화면 전체 리프레시가 필요하면 호출
+                Global.Inst.InspStage.RedrawMainView();
             }
             finally
             {
-                tvModelTree.AfterCheck += tvModelTree_AfterCheck; // 이벤트 재연결
+                tvModelTree.EndUpdate();
+                _updatingTree = false;
             }
         }
     }
