@@ -855,6 +855,15 @@ namespace CapsuleInspect.UIControl
                     if (!_isCtrlPressed && _multiSelectedEntities.Count > 1 && _screenSelectedRect.Contains(e.Location))
                     {
                         _selEntity = _multiSelectedEntities[0];
+
+                        // ★ 추가: 그룹 이동 시작 전에, 선택된 것 모두 자동 Unlock (모델+뷰)
+                        foreach (var ent in _multiSelectedEntities)
+                        {
+                            var w = ent.LinkedWindow;
+                            if (w != null) w.IsTeach = false;
+                            ent.IsHold = false;
+                        }
+
                         _isMovingRoi = true;
                         _moveStart = e.Location;
                         _roiRect = _selEntity.EntityROI;
@@ -1049,9 +1058,12 @@ namespace CapsuleInspect.UIControl
                     _selEntity = new DiagramEntity(_roiRect, _selColor);
 
                     //모델에 InspWindow 추가하는 이벤트 발생
-                    DiagramEntityEvent?.Invoke(this, new DiagramEntityEventArgs(EntityActionType.Add, null, _newRoiType, _roiRect, new Point()));
-
-
+                    DiagramEntityEvent?.Invoke(
+                        this,
+                        new DiagramEntityEventArgs(
+                            EntityActionType.Add, null, _newRoiType, _roiRect, new Point()
+                        )
+                    );
                 }
                 else if (_isResizingRoi)
                 {
@@ -1059,10 +1071,48 @@ namespace CapsuleInspect.UIControl
                     _isResizingRoi = false;
 
                     //모델에 InspWindow 크기 변경 이벤트 발생
-                    DiagramEntityEvent?.Invoke(this, new DiagramEntityEventArgs(EntityActionType.Resize, _selEntity.LinkedWindow, _newRoiType, _roiRect, new Point()));
+                    DiagramEntityEvent?.Invoke(
+                        this,
+                        new DiagramEntityEventArgs(
+                            EntityActionType.Resize, _selEntity.LinkedWindow, _newRoiType, _roiRect, new Point()
+                        )
+                    );
                 }
                 else if (_isMovingRoi)
                 {
+                    // ★ 추가: 멀티 선택 이동은 '전부' 커밋(모델 반영)
+                    if (_multiSelectedEntities.Count > 1)
+                    {
+                        foreach (var ent in _multiSelectedEntities)
+                        {
+                            if (ent is null || ent.LinkedWindow is null)
+                                continue;
+
+                            var linkedWindow = ent.LinkedWindow;
+                            var newRect = ent.EntityROI;
+
+                            var offset = new Point(
+                                newRect.X - linkedWindow.WindowArea.X,
+                                newRect.Y - linkedWindow.WindowArea.Y
+                            );
+
+                            if (offset.X != 0 || offset.Y != 0)
+                            {
+                                DiagramEntityEvent?.Invoke(
+                                    this,
+                                    new DiagramEntityEventArgs(
+                                        EntityActionType.Move, linkedWindow, _newRoiType, newRect, offset
+                                    )
+                                );
+                            }
+                        }
+
+                        _isMovingRoi = false;
+                        Invalidate();
+                        return; // 멀티 이동은 여기서 종료
+                    }
+
+                    // (단일 이동 커밋은 기존 그대로)
                     _isMovingRoi = false;
 
                     if (_selEntity != null)
@@ -1078,14 +1128,22 @@ namespace CapsuleInspect.UIControl
 
                         //모델에 InspWindow 이동 이벤트 발생
                         if (offsetMove.X != 0 || offsetMove.Y != 0)
-                            DiagramEntityEvent?.Invoke(this, new DiagramEntityEventArgs(EntityActionType.Move, linkedWindow, _newRoiType, _roiRect, offsetMove));
+                            DiagramEntityEvent?.Invoke(
+                                this,
+                                new DiagramEntityEventArgs(
+                                    EntityActionType.Move, linkedWindow, _newRoiType, _roiRect, offsetMove
+                                )
+                            );
                         else
                             //모델에 InspWindow 선택 변경 이벤트 발생
-                            DiagramEntityEvent?.Invoke(this, new DiagramEntityEventArgs(EntityActionType.Select, _selEntity.LinkedWindow));
-
+                            DiagramEntityEvent?.Invoke(
+                                this,
+                                new DiagramEntityEventArgs(EntityActionType.Select, _selEntity.LinkedWindow)
+                            );
                     }
                 }
-                // ROI 선택 완료
+
+                // ROI 선택 완료 (기존 그대로)
                 if (_isBoxSelecting)
                 {
                     _isBoxSelecting = false;
@@ -1095,9 +1153,10 @@ namespace CapsuleInspect.UIControl
 
                     foreach (DiagramEntity entity in _diagramEntityList)
                     {
-                        // 숨김 ROI는 건너뜀 (루프 안에서 체크해야 함)
+                        // 숨김 ROI는 건너뜀
                         if (entity.LinkedWindow != null && _hiddenWindows.Contains(entity.LinkedWindow))
-                            continue; //추가한거
+                            continue;
+
                         if (selectionVirtual.IntersectsWith(entity.EntityROI))
                         {
                             _multiSelectedEntities.Add(entity);
@@ -1113,7 +1172,6 @@ namespace CapsuleInspect.UIControl
                     DiagramEntityEvent?.Invoke(this, new DiagramEntityEventArgs(EntityActionType.Select, null));
 
                     Invalidate();
-
                     return;
                 }
             }
@@ -1121,15 +1179,13 @@ namespace CapsuleInspect.UIControl
             // 마우스를 떼면 마지막 오프셋 값을 저장하여 이후 이동을 연속적으로 처리
             if (e.Button == MouseButtons.Right)
             {
+                //컨텍스트 메뉴 동작 처리
                 if (_newRoiType != InspWindowType.None)
                 {
-                    //같은 타입의 ROI추가가 더이상 없다면 초기화하여, ROI가 추가되지 않도록 함
                     _newRoiType = InspWindowType.None;
                 }
                 else if (_selEntity != null)
-
                 {
-                    //팝업메뉴 표시
                     _contextMenu.Show(this, e.Location);
                 }
 
@@ -1286,11 +1342,14 @@ namespace CapsuleInspect.UIControl
                 return;
 
             InspWindow window = _selEntity.LinkedWindow;
-
             if (window is null)
                 return;
 
+            // 화면 + 모델 모두 해제해야 UpdateDiagramEntity()에서 다시 안 잠김
             _selEntity.IsHold = false;
+            window.IsTeach = false;   // ★ 추가: 모델 잠금도 해제 (핵심)
+
+            Invalidate();
         }
 
         private void DeleteSelEntity()
