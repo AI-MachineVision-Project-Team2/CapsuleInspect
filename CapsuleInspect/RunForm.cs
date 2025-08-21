@@ -62,7 +62,44 @@ namespace CapsuleInspect
         {
             SLogger.Write($"[RunForm] 검사 클릭됨");
             string serialID = $"{DateTime.Now:MM-dd HH:mm:ss}";
-            Global.Inst.InspStage.InspectReady("LOT_NUMBER", serialID);
+            var stage = Global.Inst.InspStage;
+            stage.InspectReady("LOT_NUMBER", serialID);
+
+            // AI 검사 추가
+            string modelPath = stage.CurModel.ModelPath;
+            if (!string.IsNullOrEmpty(modelPath))
+            {
+                var saigeAI = stage.AIModule;
+                saigeAI.LoadEngine(modelPath);
+
+                Bitmap bitmap = stage.GetBitmap();
+                if (bitmap != null)
+                {
+                    if (saigeAI.Inspect(bitmap))
+                    {
+                        Bitmap resultImage = saigeAI.GetResultImage();
+                        if (resultImage != null)
+                        {
+                            stage.UpdateDisplay(resultImage);
+                        }
+                        else
+                        {
+                            SLogger.Write("[RunForm] 결과 이미지를 가져오지 못했습니다.", SLogger.LogType.Error);
+                            MessageBox.Show("결과 이미지를 가져오지 못했습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    else
+                    {
+                        SLogger.Write("[RunForm] AI 검사 실패", SLogger.LogType.Error);
+                        MessageBox.Show("AI 검사에 실패했습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                {
+                    SLogger.Write("[RunForm] 현재 이미지가 없습니다.", SLogger.LogType.Error);
+                    MessageBox.Show("현재 이미지가 없습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
 
             if (SettingXml.Inst.CamType == Grab.CameraType.None ||
                 SettingXml.Inst.CommType == Sequence.CommunicatorType.None)

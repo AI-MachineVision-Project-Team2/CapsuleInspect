@@ -27,17 +27,25 @@ namespace CapsuleInspect.Core
         private Mat _binaryResultImage = null;
         private bool _usePreview = true;
         public InspWindow CurrentInspWindow => _inspWindow;
+        private List<DrawInspectInfo> _measureLines = null;
         public void SetImage(Mat image)
         {
             _orinalImage = image;
             _previewImage = new Mat();
             _binaryResultImage = null;
         }
+        public void SetMeasureLines(List<DrawInspectInfo> lines)
+        {
+            _measureLines = lines;
+        }
         public void SetBinaryResultImage(Mat binary)
         {
             _binaryResultImage = binary.Clone();
         }
-
+        public Mat GetBinaryResultImage()
+        {
+            return _binaryResultImage;
+        }
         // 프리뷰를 위한 InspWindow 설정
         public void SetInspWindow(InspWindow inspwindow)
         {
@@ -265,6 +273,18 @@ namespace CapsuleInspect.Core
           
             //_binaryResultImage = _previewImage.Clone(); // 이진화 결과 이미지 업데이트
             SLogger.Write("SetMorphologyPreview: Morphology 결과 적용 및 표시 완료", SLogger.LogType.Info);
+        }
+        public void DrawOverlay(Graphics g)
+        {
+            if (_measureLines != null)
+            {
+                foreach (var line in _measureLines)
+                {
+                    Rectangle r = new Rectangle(line.rect.X, line.rect.Y, line.rect.Width, line.rect.Height);
+                    g.DrawRectangle(Pens.Orange, r);
+                    g.DrawString(line.info, SystemFonts.DefaultFont, Brushes.Green, r.Location);
+                }
+            }
         }
     }
 }

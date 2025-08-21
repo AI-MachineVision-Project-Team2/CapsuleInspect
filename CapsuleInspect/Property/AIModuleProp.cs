@@ -1,4 +1,6 @@
-﻿using CapsuleInspect.Inspect;
+﻿using CapsuleInspect.Algorithm;
+using CapsuleInspect.Core;
+using CapsuleInspect.Inspect;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,7 +12,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
-using CapsuleInspect.Core;
 namespace CapsuleInspect.Property
 {
     public partial class AIModuleProp : UserControl
@@ -18,13 +19,20 @@ namespace CapsuleInspect.Property
         SaigeAI _saigeAI; // SaigeAI 인스턴스
         string _modelPath = string.Empty;
         //EngineType _engineType;
-
+        public List<BlobFilter> BlobFilters { get; set; } = new List<BlobFilter>();
         public AIModuleProp()
         {
             InitializeComponent();
             InitializeFilterDataGridView();
+            SetDefault(); // 생성자에서 초기화
         }
-
+        public void SetDefault()
+        {
+            BlobFilters.Add(new BlobFilter { name = "Area", isUse = false, min = 200, max = 500 });
+            BlobFilters.Add(new BlobFilter { name = "Width", isUse = false, min = 0, max = 0 });
+            BlobFilters.Add(new BlobFilter { name = "Height", isUse = false, min = 0, max = 0 });
+            BlobFilters.Add(new BlobFilter { name = "Count", isUse = false, min = 0, max = 0 });
+        }
         private void InitializeFilterDataGridView()
         {
             // 스타일 설정
@@ -84,10 +92,10 @@ namespace CapsuleInspect.Property
             });
 
             // 항목 추가
-            AddFilterRow("Area");
-            AddFilterRow("Length");
-            AddFilterRow("Width");
-            AddFilterRow("Count");
+            AddFilterRow("Area", false, 200, 500);
+            AddFilterRow("Width", false, 0, 0);
+            AddFilterRow("Height", false, 0, 0);
+            AddFilterRow("Count", false, 0, 0);
 
             dataGridViewFilter.AllowUserToAddRows = false;
             dataGridViewFilter.RowHeadersVisible = false;
@@ -98,13 +106,27 @@ namespace CapsuleInspect.Property
 
             // 이벤트 핸들러 추가
             dataGridViewFilter.CurrentCellDirtyStateChanged += dataGridViewFilter_CurrentCellDirtyStateChanged;
+            dataGridViewFilter.CellValueChanged += dataGridViewFilter_CellValueChanged;
         }
 
-        private void AddFilterRow(string itemName)
+        // GridView 행 추가 메서드 수정 (초기값 반영)
+        private void AddFilterRow(string itemName, bool isUse, int min, int max)
         {
-            dataGridViewFilter.Rows.Add(itemName, false, "", "");
+            dataGridViewFilter.Rows.Add(itemName, isUse, min.ToString(), max.ToString());
         }
-
+        // BinaryProp처럼 GridView 값을 BlobFilters에 반영
+        private void GetProperty()
+        {
+            for (int i = 0; i < dataGridViewFilter.Rows.Count; i++)
+            {
+                var row = dataGridViewFilter.Rows[i];
+                var filter = BlobFilters[i];
+                filter.isUse = (bool)row.Cells[1].Value;// 사용 여부
+                // min/max 파싱 (빈 값 처리: 0으로 fallback)
+                filter.min = string.IsNullOrEmpty(row.Cells[2].Value?.ToString()) ? 0 : int.Parse(row.Cells[2].Value.ToString());
+                filter.max = string.IsNullOrEmpty(row.Cells[3].Value?.ToString()) ? 0 : int.Parse(row.Cells[3].Value.ToString());
+            }
+        }
         private void dataGridViewFilter_CurrentCellDirtyStateChanged(object sender, EventArgs e)
         {
             if (dataGridViewFilter.CurrentCell is DataGridViewCheckBoxCell)
@@ -112,7 +134,21 @@ namespace CapsuleInspect.Property
                 dataGridViewFilter.CommitEdit(DataGridViewDataErrorContexts.Commit);
             }
         }
-
+        private void dataGridViewFilter_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            GetProperty(); // 값 변경 시 즉시 반영
+            // SaigeAI에 필터 즉시 적용
+            if (_saigeAI != null)
+            {
+                _saigeAI.Filters = new List<BlobFilter>(BlobFilters.Select(f => new BlobFilter
+                {
+                    name = f.name,
+                    isUse = f.isUse,
+                    min = f.min,
+                    max = f.max
+                })); // 깊은 복사
+            }
+        }
         private void btnSelAIModel_Click(object sender, EventArgs e)
         {
             string filter = "Segmentation Files|*.saigeseg;";
@@ -155,30 +191,15 @@ namespace CapsuleInspect.Property
             }
 
             _saigeAI.LoadEngine(_modelPath);
+            _saigeAI.Filters = new List<BlobFilter>(BlobFilters.Select(f => new BlobFilter
+            {
+                name = f.name,
+                isUse = f.isUse,
+                min = f.min,
+                max = f.max
+            })); // 깊은 복사
             MessageBox.Show("모델이 성공적으로 로드되었습니다.", "정보", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void btnInspAI_Click(object sender, EventArgs e)
-        {
-            if (_saigeAI == null)
-            {
-                MessageBox.Show("AI 모듈이 초기화되지 않았습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            Bitmap bitmap = Global.Inst.InspStage.GetBitmap();
-
-            if (bitmap is null)
-            {
-                MessageBox.Show("현재 이미지가 없습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            _saigeAI.Inspect(bitmap);
-
-            Bitmap resultImage = _saigeAI.GetResultImage();
-
-            Global.Inst.InspStage.UpdateDisplay(resultImage);
-        }
     }
 }

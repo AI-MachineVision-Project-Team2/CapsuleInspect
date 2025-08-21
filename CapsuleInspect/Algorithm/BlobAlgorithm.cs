@@ -143,6 +143,57 @@ namespace CapsuleInspect.Algorithm
         //InspAlgorithm을 상속받아, 구현하고, 인자로 입력받던 것을 부모의 _srcImage 이미지 사용
         //검사 시작전 IsInspected = false로 초기화하고, 검사가 정상적으로 완료되면,IsInspected = true로 설정
         //이진화 검사 알고리즘
+
+        //측정 검사 알고리즘
+        /*
+        public List<DrawInspectInfo> MeasureCapsuleSize(Mat binaryImage, Rect roi)
+        {
+            List<DrawInspectInfo> drawInfos = new List<DrawInspectInfo>();
+
+            // 1. ROI 영역 추출
+            Mat roiImage = new Mat(binaryImage, roi);
+
+            // 2. 외곽선 추출
+            Cv2.FindContours(roiImage, out OpenCvSharp.Point[][] contours, out _, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
+            if (contours.Length == 0) return drawInfos;
+
+            // 3. 가장 큰 contour 사용
+            var maxContour = contours.OrderByDescending(c => Cv2.ContourArea(c)).First();
+            var rect = Cv2.BoundingRect(maxContour);
+
+            // 4. Width 측정 (세로 중간 위치 기준 좌우)
+            for (int i = 0; i < 3; i++)
+            {
+                int y = rect.Top + (i + 1) * rect.Height / 4;
+                OpenCvSharp.Point p1 = new OpenCvSharp.Point(rect.Left, y);
+                OpenCvSharp.Point p2 = new OpenCvSharp.Point(rect.Right, y);
+                drawInfos.Add(new DrawInspectInfo
+                {
+                    rect = new Rect(p1.X, p1.Y, p2.X - p1.X, 1),
+                    decision = DecisionType.Info,
+                    info = $"W: {p2.X - p1.X}",
+                    inspectType = InspectType.InspBinary
+                });
+            }
+
+            // 5. Height 측정 (가로 중간 위치 기준 상하)
+            for (int i = 0; i < 5; i++)
+            {
+                int x = rect.Left + (i + 1) * rect.Width / 6;
+                OpenCvSharp.Point p1 = new OpenCvSharp.Point(x, rect.Top);
+                OpenCvSharp.Point p2 = new OpenCvSharp.Point(x, rect.Bottom);
+                drawInfos.Add(new DrawInspectInfo
+                {
+                    rect = new Rect(p1.X, p1.Y, 1, p2.Y - p1.Y),
+                    decision = DecisionType.Info,
+                    info = $"H: {p2.Y - p1.Y}",
+                    inspectType = InspectType.InspBinary
+                });
+            }
+
+            return drawInfos;
+        }
+        */
         public override bool DoInspect()
         {
             ResetResult();
@@ -222,10 +273,17 @@ namespace CapsuleInspect.Algorithm
                     if (!InspBlobFilter(binaryImage))
                         return false;
                 }
+            // 캡슐 width/height 측정선 그리기용 정보 생성
+            //측정 검사
+            //List<DrawInspectInfo> lines = MeasureCapsuleSize(binaryImage, InspRect);
+            //Global.Inst.InspStage.PreView?.SetMeasureLines(lines);
 
-                IsInspected = true;
+            // 화면에 갱신 요청
+            MainForm.GetImageViewCtrl()?.Invalidate();
 
-                return true;
+            IsInspected = true;
+
+            return true;
             }
         
         //검사 결과 초기화
