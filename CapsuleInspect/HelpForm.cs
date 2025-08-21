@@ -14,7 +14,7 @@ namespace CapsuleInspect
         private PdfDocument _document;
 
         // 임시폴더에 풀어서 보여줄 파일명 (원하는 이름으로 변경 가능)
-        private const string ExtractedPdfFileName = "Capsule-Inspection-MANUAL.pdf";
+        private const string ExtractedPdfFileName = "Capsule_Inspection_MANUAL.pdf";
 
         public HelpForm()
         {
@@ -50,7 +50,7 @@ namespace CapsuleInspect
                 // 리소스 이름 예: "CapsuleInspect.Docs.CapsuleInspection_Manual.pdf"
                 var resName = asm
                     .GetManifestResourceNames()
-                    .FirstOrDefault(n => n.EndsWith("Capsule-Inspection-MANUAL.pdf",
+                    .FirstOrDefault(n => n.EndsWith("Capsule_Inspection_MANUAL.pdf",
                                         StringComparison.OrdinalIgnoreCase));
 
                 if (string.IsNullOrEmpty(resName))

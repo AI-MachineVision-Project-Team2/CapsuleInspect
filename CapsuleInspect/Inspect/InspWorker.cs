@@ -21,6 +21,9 @@ namespace CapsuleInspect.Inspect
 
         public bool IsRunning { get; set; } = false;
 
+        // 마지막 판정의 세부 NG 타입(또는 "OK")
+        public string LastDefectType { get; private set; } = "OK";
+
         public InspWorker()
         {
         }
@@ -35,6 +38,7 @@ namespace CapsuleInspect.Inspect
             _cts = new CancellationTokenSource();
             Task.Run(() => InspectionLoop(this, _cts.Token));
         }
+
         // 단일 사이클 루프 시작
         public void StartSingleCycleLoop()
         {
@@ -53,7 +57,7 @@ namespace CapsuleInspect.Inspect
                 string inspImageDir = System.IO.Path.GetDirectoryName(inspImagePath);
                 if (!System.IO.Directory.Exists(inspImageDir))
                 {
-                    SLogger.Write($"[InspWorker] 이미지 폴더가 존재하지 않음: {inspImageDir}", SLogger.LogType.Error);
+                    SLogger.Write(string.Format("[InspWorker] 이미지 폴더가 존재하지 않음: {0}", inspImageDir), SLogger.LogType.Error);
                     return;
                 }
 
@@ -66,6 +70,7 @@ namespace CapsuleInspect.Inspect
             _cts = new CancellationTokenSource();
             Task.Run(() => SingleCycleLoop(this, _cts.Token));
         }
+
         private void InspectionLoop(InspWorker inspWorker, CancellationToken token)
         {
             Global.Inst.InspStage.SetWorkingState(WorkingState.INSPECT);
@@ -108,10 +113,13 @@ namespace CapsuleInspect.Inspect
             IsRunning = false;
             SLogger.Write("[InspWorker] 단일 사이클 검사 완료");
         }
+
         //InspStage내의 모든 InspWindow들을 검사하는 함수
         public bool RunInspect(out bool isDefect)
         {
             isDefect = false;
+            LastDefectType = "OK"; // 기본값
+
             Model curMode = Global.Inst.InspStage.CurModel;
             List<InspWindow> inspWindowList = curMode.InspWindowList;
             foreach (var inspWindow in inspWindowList)
@@ -144,15 +152,18 @@ namespace CapsuleInspect.Inspect
 
                     ngCnt++;
 
-                    // 💡 ROI 이름 기준으로 세분화된 NG 카운트 분기
-                    if (inspWindow.Name.Contains("Crack"))
-                        ngCrack++;
-                    else if (inspWindow.Name.Contains("Scratch"))
-                        ngScratch++;
-                    else if (inspWindow.Name.Contains("Squeeze"))
-                        ngSqueeze++;
-                    else if (inspWindow.Name.Contains("PrintDefect"))
-                        ngPrintDefect++;
+                    // ROI 이름 기준으로 세분화된 NG 카운트 분기
+                    if (inspWindow.Name != null)
+                    {
+                        if (inspWindow.Name.Contains("Crack"))
+                            ngCrack++;
+                        else if (inspWindow.Name.Contains("Scratch"))
+                            ngScratch++;
+                        else if (inspWindow.Name.Contains("Squeeze"))
+                            ngSqueeze++;
+                        else if (inspWindow.Name.Contains("PrintDefect"))
+                            ngPrintDefect++;
+                    }
                 }
                 else
                 {
@@ -169,28 +180,32 @@ namespace CapsuleInspect.Inspect
                 cameraForm.SetInspResultCount(totalCnt, okCnt, ngCnt);
             }
 
-            // ★ 누적 카운트 갱신 (이미지 1장 단위로)
+            // 누적 카운트 갱신 (이미지 1장 단위로)
             Global.Inst.InspStage.AddAccumCount(1, isDefect ? 0 : 1, isDefect ? 1 : 0);
-            // 🎯 세분화된 NG 카운트 반영
+            // 세분화된 NG 카운트 반영
             Global.Inst.InspStage.AddNgDetailCount(ngCrack, ngScratch, ngSqueeze, ngPrintDefect);
-            //if (totalCnt > 0)
-            //{
-            //    //찾은 위치를 이미지상에서 표시
-            //    var cameraForm = MainForm.GetDockForm<CameraForm>();
-            //    if (cameraForm != null)
-            //    {
-            //        cameraForm.SetInspResultCount(totalCnt, okCnt, ngCnt);
-            //    }
-            //    var resultForm = MainForm.GetDockForm<ResultForm>();
-            //    if (resultForm != null)
-            //    {
-            //        if (resultForm.InvokeRequired)
-            //            resultForm.BeginInvoke(new Action(() => resultForm.AddModelResult(curMode)));
-            //        else
-            //            resultForm.AddModelResult(curMode);
-            //    }
-            //}
 
+            // 최종 세부 타입 결정 로직
+            if (!isDefect)
+            {
+                LastDefectType = "OK";
+            }
+            else
+            {
+                // 가장 많이 검출된 타입을 선택 (동률이면 우선순위: Crack > Squeeze > Scratch > PrintDefect)
+                int maxCnt = ngCrack;
+                string type = "Crack";
+
+                if (ngSqueeze > maxCnt) { maxCnt = ngSqueeze; type = "Squeeze"; }
+                if (ngScratch > maxCnt) { maxCnt = ngScratch; type = "Scratch"; }
+                if (ngPrintDefect > maxCnt) { maxCnt = ngPrintDefect; type = "PrintDefect"; }
+
+                // 모든 세부 카운트가 0인데 isDefect만 true인 특이 케이스 대비
+                if (maxCnt <= 0)
+                    type = "Scratch";
+
+                LastDefectType = type;
+            }
 
             return true;
         }
