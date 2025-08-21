@@ -834,6 +834,7 @@ namespace CapsuleInspect.UIControl
                 _rectInfos.Clear();
                 _selEntity = null;
             }
+            Invalidate();
         }
         // ROI 편집을 위한 마우스 이벤트
         private void ImageViewCtrl_MouseDown(object sender, MouseEventArgs e)

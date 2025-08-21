@@ -112,51 +112,68 @@ namespace CapsuleInspect.Inspect
         public bool RunInspect(out bool isDefect)
         {
             isDefect = false;
-            Model curMode = Global.Inst.InspStage.CurModel;
-            List<InspWindow> inspWindowList = curMode.InspWindowList;
-            foreach (var inspWindow in inspWindowList)
-            {
-                if (inspWindow is null)
-                    continue;
 
-                UpdateInspData(inspWindow);
+            var curMode = Global.Inst.InspStage.CurModel;
+            if (curMode == null || curMode.InspWindowList == null)
+            {
+                // 모델이 없으면 UI만 정리하고 종료
+                var cam = MainForm.GetDockForm<CameraForm>();
+                cam?.SetInspResultCount(0, 0, 0);
+                Global.Inst.InspStage.SetDistinctNgCount(0);
+                return true;
             }
 
-            _inspectBoard.InspectWindowList(inspWindowList);
+            var inspWindowList = curMode.InspWindowList;
 
-            int totalCnt = 0;
-            int okCnt = 0;
-            int ngCnt = 0;
+            // ★ 검사 대상 ROI만 추출 (체크 해제된 ROI는 제외)
+            var activeWindows = inspWindowList
+                .Where(w => w != null && !w.IgnoreInsp)
+                .ToList();
 
-            var allRects = new List<DrawInspectInfo>();
+            // 활성 ROI가 하나도 없으면: 검사 스킵 + UI 정리
+            if (activeWindows.Count == 0)
+            {
+                var cam = MainForm.GetDockForm<CameraForm>();
+                cam?.SetInspResultCount(0, 0, 0);
+                Global.Inst.InspStage.SetDistinctNgCount(0);
 
-            // 누적 변수 선언
+                // 이미지 1장 단위 누적 카운트를 OK로 증가시킬지 여부는 정책에 따라 조정
+                Global.Inst.InspStage.AddAccumCount(1, 1, 0); // (원하면 주석 처리 가능)
+                return true;
+            }
+
+            // 검사 데이터 준비 (활성 ROI만)
+            foreach (var w in activeWindows)
+            {
+                if (w == null) continue;
+                UpdateInspData(w);
+            }
+
+            // 실제 검사 실행 (활성 ROI만)
+            _inspectBoard.InspectWindowList(activeWindows);
+
+            int totalCnt = 0, okCnt = 0, ngCnt = 0;
+
+            // 종류별 1회 카운트 플래그
             int ngCrack = 0, ngScratch = 0, ngSqueeze = 0, ngPrintDefect = 0;
 
-            foreach (var inspWindow in inspWindowList)
+            // 결과 집계 (활성 ROI만)
+            foreach (var w in activeWindows)
             {
                 totalCnt++;
 
-                if (inspWindow.IsDefect())
+                if (w.IsDefect())
                 {
-                    if (!isDefect)
-                        isDefect = true;
-
+                    isDefect = true;
                     ngCnt++;
 
-                    var kind = GetInspWindowKind(inspWindow); // ← 아래 헬퍼 추가
-
-                    switch (kind)
+                    switch (GetInspWindowKind(w))
                     {
                         case InspWindowType.Crack: ngCrack = 1; break;
                         case InspWindowType.Scratch: ngScratch = 1; break;
                         case InspWindowType.Squeeze: ngSqueeze = 1; break;
                         case InspWindowType.PrintDefect: ngPrintDefect = 1; break;
-                        // 필요 시 다른 종류도 추가
-                        default:
-                            // 이름으로도 못 찾으면 로그 한번 남겨 원인 파악
-                            // SLogger.Write($"[InspWorker] Unknown kind ROI: {inspWindow?.Name}", SLogger.LogType.Info);
-                            break;
+                        default: break;
                     }
                 }
                 else
@@ -164,43 +181,30 @@ namespace CapsuleInspect.Inspect
                     okCnt++;
                 }
 
-                DisplayResult(inspWindow, InspectType.InspNone);
+                // ROI별 결과 표시(도형/박스) — 내부에서 CameraForm에 그려줌
+                DisplayResult(w, InspectType.InspNone);
             }
-            int distinctByKind = (ngCrack > 0 ? 1 : 0)
-                   + (ngScratch > 0 ? 1 : 0)
-                   + (ngSqueeze > 0 ? 1 : 0)
-                   + (ngPrintDefect > 0 ? 1 : 0);
+
+            // 종류별 distinct 카운트
+            int distinctByKind =
+                (ngCrack > 0 ? 1 : 0) +
+                (ngScratch > 0 ? 1 : 0) +
+                (ngSqueeze > 0 ? 1 : 0) +
+                (ngPrintDefect > 0 ? 1 : 0);
             Global.Inst.InspStage.SetDistinctNgCount(distinctByKind);
 
+            // 상단 카운터 갱신
             var cameraForm = MainForm.GetDockForm<CameraForm>();
             if (cameraForm != null)
             {
-                cameraForm.AddRect(allRects);                        // (있다면)
                 cameraForm.SetInspResultCount(totalCnt, okCnt, ngCnt);
+                // 주: DisplayResult가 도형을 직접 그리므로 여기서 AddRect 별도 호출 불필요
+                // (필요하면 도메인 정책에 맞게 allRects를 모아 한 번에 그리도록 변경 가능)
             }
 
-            // ★ 누적 카운트 갱신 (이미지 1장 단위로)
+            // 누적 카운트 & 종류별 NG 누적
             Global.Inst.InspStage.AddAccumCount(1, isDefect ? 0 : 1, isDefect ? 1 : 0);
-            // 🎯 세분화된 NG 카운트 반영
             Global.Inst.InspStage.AddNgDetailCount(ngCrack, ngScratch, ngSqueeze, ngPrintDefect);
-            //if (totalCnt > 0)
-            //{
-            //    //찾은 위치를 이미지상에서 표시
-            //    var cameraForm = MainForm.GetDockForm<CameraForm>();
-            //    if (cameraForm != null)
-            //    {
-            //        cameraForm.SetInspResultCount(totalCnt, okCnt, ngCnt);
-            //    }
-            //    var resultForm = MainForm.GetDockForm<ResultForm>();
-            //    if (resultForm != null)
-            //    {
-            //        if (resultForm.InvokeRequired)
-            //            resultForm.BeginInvoke(new Action(() => resultForm.AddModelResult(curMode)));
-            //        else
-            //            resultForm.AddModelResult(curMode);
-            //    }
-            //}
-
 
             return true;
         }
