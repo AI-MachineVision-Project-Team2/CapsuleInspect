@@ -118,21 +118,14 @@ namespace CapsuleInspect.Inspect
         //InspStage내의 모든 InspWindow들을 검사하는 함수
         public bool RunInspect(out bool isDefect, out int ngCrack, out int ngScratch, out int ngSqueeze, out int ngPrintDefect)
         {
+            // out 매개변수 초기화 (모든 경로에서 값이 할당되도록 보장)
             isDefect = false;
-
+            ngCrack = ngScratch = ngSqueeze = ngPrintDefect = 0;
             LastDefectType = "OK"; // 기본값
 
-            Model curMode = Global.Inst.InspStage.CurModel;
-            List<InspWindow> inspWindowList = curMode.InspWindowList;
-            foreach (var inspWindow in inspWindowList)
-            {
-                if (inspWindow is null)
-                    continue;
-
-            ngCrack = ngScratch = ngSqueeze = ngPrintDefect = 0;
-
-            var curMode = Global.Inst.InspStage.CurModel;
-            if (curMode == null || curMode.InspWindowList == null)
+            // 기존 curMode와 inspWindowList를 재사용 (중복 선언 제거)
+            Model currentModel = Global.Inst.InspStage.CurModel;
+            if (currentModel == null || currentModel.InspWindowList == null)
             {
                 var cam = MainForm.GetDockForm<CameraForm>();
                 cam?.SetInspResultCount(0, 0, 0);
@@ -140,10 +133,8 @@ namespace CapsuleInspect.Inspect
                 return true;
             }
 
-            var inspWindowList = curMode.InspWindowList;
-
             // 검사 대상 ROI만 추출 (체크 해제된 ROI는 제외)
-            var activeWindows = inspWindowList
+            var activeWindows = currentModel.InspWindowList
                 .Where(w => w != null && !w.IgnoreInsp)
                 .ToList();
 
@@ -169,34 +160,38 @@ namespace CapsuleInspect.Inspect
             int totalCnt = 0, okCnt = 0, ngCnt = 0;
 
             // 결과 집계 (활성 ROI만)
-            foreach (var w in activeWindows)
+            foreach (var inspWindow in activeWindows)
             {
                 totalCnt++;
-                if (w.IsDefect())
+                if (inspWindow.IsDefect())
                 {
                     isDefect = true;
                     ngCnt++;
-
-
                     // ROI 이름 기준으로 세분화된 NG 카운트 분기
                     if (inspWindow.Name != null)
                     {
-                        if (inspWindow.Name.Contains("Crack"))
-                            ngCrack++;
-                        else if (inspWindow.Name.Contains("Scratch"))
-                            ngScratch++;
-                        else if (inspWindow.Name.Contains("Squeeze"))
-                            ngSqueeze++;
-                        else if (inspWindow.Name.Contains("PrintDefect"))
-                            ngPrintDefect++;
+                        if (inspWindow.Name.Contains("Crack")) ngCrack++;
+                        else if (inspWindow.Name.Contains("Scratch")) ngScratch++;
+                        else if (inspWindow.Name.Contains("Squeeze")) ngSqueeze++;
+                        else if (inspWindow.Name.Contains("PrintDefect")) ngPrintDefect++;
 
-                    switch (GetInspWindowKind(w))
-                    {
-                        case InspWindowType.Crack: ngCrack = 1; break;
-                        case InspWindowType.Scratch: ngScratch = 1; break;
-                        case InspWindowType.Squeeze: ngSqueeze = 1; break;
-                        case InspWindowType.PrintDefect: ngPrintDefect = 1; break;
-                        default: break;
+                        switch (GetInspWindowKind(inspWindow))
+                        {
+                            case InspWindowType.Crack:
+                                ngCrack = 1;
+                                break;
+                            case InspWindowType.Scratch:
+                                ngScratch = 1;
+                                break;
+                            case InspWindowType.Squeeze:
+                                ngSqueeze = 1;
+                                break;
+                            case InspWindowType.PrintDefect:
+                                ngPrintDefect = 1;
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
                 else
@@ -205,15 +200,11 @@ namespace CapsuleInspect.Inspect
                 }
 
                 // ROI별 결과 표시(도형/박스) — 내부에서 CameraForm에 그려줌
-                DisplayResult(w, InspectType.InspNone);
+                DisplayResult(inspWindow, InspectType.InspNone);
             }
 
             // 종류별 distinct 카운트
-            int distinctByKind =
-                (ngCrack > 0 ? 1 : 0) +
-                (ngScratch > 0 ? 1 : 0) +
-                (ngSqueeze > 0 ? 1 : 0) +
-                (ngPrintDefect > 0 ? 1 : 0);
+            int distinctByKind = (ngCrack > 0 ? 1 : 0) + (ngScratch > 0 ? 1 : 0) + (ngSqueeze > 0 ? 1 : 0) + (ngPrintDefect > 0 ? 1 : 0);
             Global.Inst.InspStage.SetDistinctNgCount(distinctByKind);
 
             // 상단 카운터 갱신
@@ -225,6 +216,7 @@ namespace CapsuleInspect.Inspect
 
             // 누적 카운트 갱신 (이미지 1장 단위로)
             Global.Inst.InspStage.AddAccumCount(1, isDefect ? 0 : 1, isDefect ? 1 : 0);
+
             // 세분화된 NG 카운트 반영
             Global.Inst.InspStage.AddNgDetailCount(ngCrack, ngScratch, ngSqueeze, ngPrintDefect);
 
@@ -238,19 +230,29 @@ namespace CapsuleInspect.Inspect
                 // 가장 많이 검출된 타입을 선택 (동률이면 우선순위: Crack > Squeeze > Scratch > PrintDefect)
                 int maxCnt = ngCrack;
                 string type = "Crack";
-
-                if (ngSqueeze > maxCnt) { maxCnt = ngSqueeze; type = "Squeeze"; }
-                if (ngScratch > maxCnt) { maxCnt = ngScratch; type = "Scratch"; }
-                if (ngPrintDefect > maxCnt) { maxCnt = ngPrintDefect; type = "PrintDefect"; }
-
-                // 모든 세부 카운트가 0인데 isDefect만 true인 특이 케이스 대비
-                if (maxCnt <= 0)
+                if (ngSqueeze > maxCnt)
+                {
+                    maxCnt = ngSqueeze;
+                    type = "Squeeze";
+                }
+                if (ngScratch > maxCnt)
+                {
+                    maxCnt = ngScratch;
                     type = "Scratch";
-
+                }
+                if (ngPrintDefect > maxCnt)
+                {
+                    maxCnt = ngPrintDefect;
+                    type = "PrintDefect";
+                }
+                // 모든 세부 카운트가 0인데 isDefect만 true인 특이 케이스 대비
+                if (maxCnt <= 0) type = "Scratch";
                 LastDefectType = type;
             }
+
             return true;
         }
+
         private InspWindowType GetInspWindowKind(InspWindow w)
         {
             var t = w.GetType();
