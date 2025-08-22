@@ -35,6 +35,9 @@
             this.btnSelModelDir = new System.Windows.Forms.Button();
             this.txtModelDir = new System.Windows.Forms.TextBox();
             this.lbModelDir = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.txtAIModelPath = new System.Windows.Forms.TextBox();
+            this.AIModelPath = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnSelImageDir
@@ -72,7 +75,7 @@
             // btnApply
             // 
             this.btnApply.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.btnApply.Location = new System.Drawing.Point(388, 137);
+            this.btnApply.Location = new System.Drawing.Point(386, 209);
             this.btnApply.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(85, 56);
@@ -113,10 +116,45 @@
             this.lbModelDir.TabIndex = 14;
             this.lbModelDir.Text = "모델 경로";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.label1.Location = new System.Drawing.Point(15, 146);
+            this.label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(105, 26);
+            this.label1.TabIndex = 21;
+            this.label1.Text = "AI 모델 경로";
+            // 
+            // txtAIModelPath
+            // 
+            this.txtAIModelPath.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.txtAIModelPath.Location = new System.Drawing.Point(124, 138);
+            this.txtAIModelPath.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
+            this.txtAIModelPath.Name = "txtAIModelPath";
+            this.txtAIModelPath.Size = new System.Drawing.Size(261, 34);
+            this.txtAIModelPath.TabIndex = 22;
+            // 
+            // AIModelPath
+            // 
+            this.AIModelPath.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.AIModelPath.Location = new System.Drawing.Point(416, 136);
+            this.AIModelPath.Margin = new System.Windows.Forms.Padding(5, 6, 5, 6);
+            this.AIModelPath.Name = "AIModelPath";
+            this.AIModelPath.Size = new System.Drawing.Size(55, 46);
+            this.AIModelPath.TabIndex = 23;
+            this.AIModelPath.Text = "...";
+            this.AIModelPath.UseVisualStyleBackColor = true;
+            this.AIModelPath.Click += new System.EventHandler(this.AIModelPath_Click);
+            // 
             // PathSetting
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 26F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.AIModelPath);
+            this.Controls.Add(this.txtAIModelPath);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.btnSelImageDir);
             this.Controls.Add(this.txtImageDir);
             this.Controls.Add(this.lbImageDir);
@@ -128,7 +166,7 @@
             this.Font = new System.Drawing.Font("Noto Sans KR", 9F);
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "PathSetting";
-            this.Size = new System.Drawing.Size(488, 231);
+            this.Size = new System.Drawing.Size(488, 301);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -143,5 +181,8 @@
         private System.Windows.Forms.Button btnSelModelDir;
         private System.Windows.Forms.TextBox txtModelDir;
         private System.Windows.Forms.Label lbModelDir;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox txtAIModelPath;
+        private System.Windows.Forms.Button AIModelPath;
     }
 }

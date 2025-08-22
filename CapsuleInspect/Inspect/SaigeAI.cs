@@ -20,7 +20,7 @@ using System.Windows.Forms;
 
 namespace CapsuleInspect.Inspect
 {
-    public enum EngineType 
+    public enum EngineType
     {
         [Description("Anomaly Detection")]
         IAD,
@@ -39,10 +39,11 @@ namespace CapsuleInspect.Inspect
         SegmentationResult _sEGResult = null;
         DetectionEngine _dETEngine = null;
         DetectionResult _dETResult = null;
-        
+
         private bool _isDefect; // 불량 여부 저장
         public bool IsDefect => _isDefect; // 불량 여부 반환 프로퍼티
         Bitmap _inspImage = null;
+        private bool _isLoadedEngine = false;
 
         public SaigeAI()
         {
@@ -51,6 +52,8 @@ namespace CapsuleInspect.Inspect
 
         public void LoadEngine(string modelPath)
         {
+            if (_isLoadedEngine == true)
+                return;
 
             DisposeMode();
 
@@ -66,6 +69,7 @@ namespace CapsuleInspect.Inspect
                     segOption.CalcObjectAreaAndApplyThreshold = true;
                     segOption.CalcObjectScoreAndApplyThreshold = true;
                     _sEGEngine.SetInferenceOption(segOption);
+                    _isLoadedEngine = true;
                     break;
                 default:
                     break;
@@ -107,6 +111,37 @@ namespace CapsuleInspect.Inspect
             sw.Stop();
             return true;
         }
+
+
+        public bool GetContours(ref OpenCvSharp.Point[][] contours)
+        {
+            switch (_engineType)
+            {
+                case EngineType.SEG:
+                case EngineType.IAD:
+                    {
+                        var segmentedObjects = _engineType == EngineType.SEG
+                            ? _sEGResult?.SegmentedObjects
+                            : _iADresult?.SegmentedObjects;
+
+                        if (segmentedObjects == null)
+                            break;
+
+                        contours = new OpenCvSharp.Point[segmentedObjects.Length][];
+
+                        int i = 0;
+                        foreach (var prediction in segmentedObjects)
+                        {
+                            contours[i++] = prediction.Contour.Value.Select(p => new OpenCvSharp.Point((int)p.X, (int)p.Y)).ToArray();
+                        }
+                    }
+                    break;
+            }
+
+            return true;
+        }
+
+
         public List<DrawInspectInfo> DrawResult(Bitmap bmp)
         {
             if (bmp == null)

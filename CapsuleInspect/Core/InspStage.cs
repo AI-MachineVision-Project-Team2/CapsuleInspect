@@ -873,7 +873,7 @@ namespace CapsuleInspect.Core
             } 
             ResetDisplay();
 
-            RunAISegAndShow();
+            //RunAISegAndShow();
 
             bool isDefect;
             int ngCrack, ngScratch, ngSqueeze, ngPrintDefect;
@@ -1031,6 +1031,16 @@ namespace CapsuleInspect.Core
         {
             LastDistinctNgCount = count;
             OnUi(() => DistinctNgCountUpdated?.Invoke(count));
+        }
+
+        public void ShowSaigeResult()
+        {
+            if (_saigeAI is null)
+                return;
+
+            var result = _saigeAI.GetResultImage();
+            if (result != null)
+                UpdateDisplay(result);
         }
 
         public void RunAISegAndShow()

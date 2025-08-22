@@ -1,5 +1,6 @@
 ﻿using CapsuleInspect.Algorithm;
 using CapsuleInspect.Core;
+using CapsuleInspect.Setting;
 using CapsuleInspect.Teach;
 using CapsuleInspect.Util;
 using OpenCvSharp;
@@ -269,6 +270,13 @@ namespace CapsuleInspect.Inspect
                 Mat srcImage = Global.Inst.InspStage.GetFilteredImage() ??
                   Global.Inst.InspStage.GetMat(0, inspAlgo.ImageChannel);
                 inspAlgo.SetInspData(srcImage);
+
+                if (inspAlgo.InspectType == InspectType.InspAI)
+                {
+                    Global.Inst.InspStage.AIModule.LoadEngine(SettingXml.Inst.AIModelPath);
+                    AIAlgorithm aiAlgo = inspAlgo as AIAlgorithm;
+                    aiAlgo.SetSaigeAI(Global.Inst.InspStage.AIModule);
+                }
             }
 
             return true;

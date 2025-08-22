@@ -55,6 +55,7 @@ namespace CapsuleInspect.Inspect
                         inspResult.ResultValue = $"{matchAlgo.OutScore}";
                         break;
                     case InspectType.InspBinary:
+                    case InspectType.InspAI:
                         BlobAlgorithm blobAlgo = algo as BlobAlgorithm;
                         int min = blobAlgo.BlobFilters[blobAlgo.FILTER_COUNT].min;
                         int max = blobAlgo.BlobFilters[blobAlgo.FILTER_COUNT].max;

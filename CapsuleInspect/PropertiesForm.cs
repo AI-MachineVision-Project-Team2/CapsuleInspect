@@ -150,7 +150,6 @@ namespace CapsuleInspect
 
                         binaryProp.SetAlgorithm(blobAlgo);
                     }
-                   
                     else if (uc is MatchInspProp matchProp)
                     {
                         MatchAlgorithm matchAlgo = (MatchAlgorithm)window.FindInspAlgorithm(InspectType.InspMatch);
@@ -160,6 +159,15 @@ namespace CapsuleInspect
                         window.PatternLearn();
 
                         matchProp.SetAlgorithm(matchAlgo);
+                    }
+
+                    else if (uc is AIModuleProp aiModuleProp)
+                    {
+                        AIAlgorithm aiAlgo = (AIAlgorithm)window.FindInspAlgorithm(InspectType.InspAI);
+                        if (aiAlgo is null)
+                            continue;
+
+                        aiModuleProp.SetAlgorithm(aiAlgo);
                     }
                 }
             }

@@ -1,10 +1,14 @@
 ﻿using CapsuleInspect.Core;
+using CapsuleInspect.Inspect;
 using CapsuleInspect.Property;
 using CapsuleInspect.Util;
 using OpenCvSharp;
+using OpenCvSharp.Extensions;
+using SaigeVision.Net.V2;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,82 +18,22 @@ using System.Xml.Serialization;
 namespace CapsuleInspect.Algorithm
 {
     //이진화 임계값 설정을 구조체로 만들기
-    public struct BinaryThreshold
+    
+    public class AIAlgorithm : BlobAlgorithm
     {
-        public int lower { get; set; }
-        public int upper { get; set; }
-        public bool invert { get; set; }
-        public BinaryThreshold(int _lower, int _upper, bool _invert)
+        private SaigeAI _saigeAI = null;
+        
+     
+        public AIAlgorithm()
         {
-            lower = _lower;
-            upper = _upper;
-            invert = _invert;
-        }
-    }
+            InspectType = InspectType.InspAI;
 
-    //이진화 검사 방법과 Blob Features 정보 정의
-    //이진화 검사 방법 정의
-    public enum BinaryMethod : int
-    {
-        [Description("필터")]
-        Feature,
-        [Description("픽셀갯수")]
-        PixelCount
-    }
-
-    //Blob Features 정보 정의
-    public class BlobFilter
-    {
-        public string name { get; set; }
-        public bool isUse { get; set; }
-        public int min { get; set; }
-        public int max { get; set; }
-
-        // 기본 생성자가 필요
-        public BlobFilter() { }
-    }
-
-    public class BlobAlgorithm : InspAlgorithm
-    {
-        public BinaryThreshold BinThreshold { get; set; } = new BinaryThreshold();
-        //Blob Features 검사를 위한 변수 추가
-        //Blob Features 필터 인덱스 정의
-        public readonly int FILTER_AREA = 0;
-        public readonly int FILTER_WIDTH = 1;
-        public readonly int FILTER_HEIGHT = 2;
-        public readonly int FILTER_COUNT = 3;
-
-        //이진화 필터로 찾은 영역
-        [XmlIgnore]
-        protected List<DrawInspectInfo> _findArea;
-        public BinaryMethod BinMethod { get; set; } = BinaryMethod.Feature;
-        //검사로 찾은 영역을 최외곽박스로 표시할 지 여부
-        public bool UseRotatedRect { get; set; } = false;
-
-        // Canny 옵션 필드 추가
-        public FilterType Filter = FilterType.None;
-        public dynamic FilterOptions = null;
-
-        List<BlobFilter> _filterBlobs = new List<BlobFilter>();
-        public List<BlobFilter> BlobFilters
-        {
-            get { return _filterBlobs; }
-            set { _filterBlobs = value; }
-        }
-
-        //검사로 찾은 Blob의 개수
-        public int OutBlobCount { get; set; } = 0;
-
-        public BlobAlgorithm()
-        {
-            InspectType = InspectType.InspBinary;
-            BinThreshold = new BinaryThreshold(100, 200, false);
         }
 
         //InspWindow 복사를 위한 BlobAlgorithm 복사 함수
         public override InspAlgorithm Clone()
         {
-            var cloneAlgo = new BlobAlgorithm();
+            var cloneAlgo = new AIAlgorithm();
 
             // 공통 필드 복사
             this.CopyBaseTo(cloneAlgo);
@@ -119,26 +63,13 @@ namespace CapsuleInspect.Algorithm
 
             return true;
         }
-        //BlobAlgorithm 생성시, 기본 필터 설정
-        public void SetDefault()
+
+        public void SetSaigeAI(SaigeAI saigeAI)
         {
-            //픽셀 영역으로 이진화 필터
-            BlobFilter areaFilter = new BlobFilter()
-            { name = "Area", isUse = false, min = 200, max = 500 };
-            _filterBlobs.Add(areaFilter);
-
-            BlobFilter widthFilter = new BlobFilter()
-            { name = "width", isUse = false, min = 0, max = 0 };
-            _filterBlobs.Add(widthFilter);
-
-            BlobFilter heightFilter = new BlobFilter()
-            { name = "Height", isUse = false, min = 0, max = 0 };
-            _filterBlobs.Add(heightFilter);
-
-            BlobFilter countFilter = new BlobFilter()
-            { name = "Count", isUse = false, min = 0, max = 0 };
-            _filterBlobs.Add(countFilter);
+            _saigeAI = saigeAI;
         }
+
+        //BlobAlgorithm 생성시, 기본 필터 설정
 
         //InspAlgorithm을 상속받아, 구현하고, 인자로 입력받던 것을 부모의 _srcImage 이미지 사용
         //검사 시작전 IsInspected = false로 초기화하고, 검사가 정상적으로 완료되면,IsInspected = true로 설정
@@ -146,65 +77,6 @@ namespace CapsuleInspect.Algorithm
 
         //측정 검사 알고리즘
 
-        public List<DrawInspectInfo> MeasureCapsuleSize(Mat binaryImage, Rect roi)
-        {
-            List<DrawInspectInfo> drawInfos = new List<DrawInspectInfo>();
-
-            // 입력 유효성 검사
-            if (binaryImage == null || binaryImage.Empty() || binaryImage.Type() != MatType.CV_8UC1)
-            {
-                SLogger.Write("MeasureCapsuleSize: 입력 이미지가 유효하지 않음 (null, 빈 이미지, 또는 CV_8UC1 아님).", SLogger.LogType.Error);
-                return drawInfos;
-            }
-
-            // 1. ROI 영역 추출
-            Mat roiImage = new Mat(binaryImage, roi);
-
-            // 2. 외곽선 추출
-            Cv2.FindContours(roiImage, out OpenCvSharp.Point[][] contours, out _, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
-            if (contours.Length == 0)
-            {
-                SLogger.Write("MeasureCapsuleSize: 윤곽선이 발견되지 않음.", SLogger.LogType.Error);
-                return drawInfos;
-            }
-
-            // 3. 가장 큰 contour 사용
-            var maxContour = contours.OrderByDescending(c => Cv2.ContourArea(c)).First();
-            var rect = Cv2.BoundingRect(maxContour);
-
-            // 4. Width 측정 (세로 중간 위치 기준 좌우)
-            for (int i = 0; i < 3; i++)
-            {
-                int y = rect.Top + (i + 1) * rect.Height / 4;
-                OpenCvSharp.Point p1 = new OpenCvSharp.Point(rect.Left + roi.X, y + roi.Y); // 전체 좌표로 변환
-                OpenCvSharp.Point p2 = new OpenCvSharp.Point(rect.Right + roi.X, y + roi.Y);
-                drawInfos.Add(new DrawInspectInfo
-                {
-                    rect = new Rect(p1.X, p1.Y, p2.X - p1.X, 1),
-                    decision = DecisionType.Info,
-                    info = $"W: {p2.X - p1.X}",
-                    inspectType = InspectType.InspBinary
-                });
-            }
-
-            // 5. Height 측정 (가로 중간 위치 기준 상하)
-            for (int i = 0; i < 5; i++)
-            {
-                int x = rect.Left + (i + 1) * rect.Width / 6;
-                OpenCvSharp.Point p1 = new OpenCvSharp.Point(x + roi.X, rect.Top + roi.Y); // 전체 좌표로 변환
-                OpenCvSharp.Point p2 = new OpenCvSharp.Point(x + roi.X, rect.Bottom + roi.Y);
-                drawInfos.Add(new DrawInspectInfo
-                {
-                    rect = new Rect(p1.X, p1.Y, 1, p2.Y - p1.Y),
-                    decision = DecisionType.Info,
-                    info = $"H: {p2.Y - p1.Y}",
-                    inspectType = InspectType.InspBinary
-                });
-            }
-
-            SLogger.Write($"MeasureCapsuleSize: 측정 완료. Width/Height 선 {drawInfos.Count}개 생성.", SLogger.LogType.Info);
-            return drawInfos;
-        }
 
         public override bool DoInspect()
         {
@@ -224,80 +96,170 @@ namespace CapsuleInspect.Algorithm
                 return false;
 
             Mat targetImage = _srcImage[InspRect];
-
-            Mat grayImage = new Mat();
-            if (targetImage.Type() == MatType.CV_8UC3)
-                Cv2.CvtColor(targetImage, grayImage, ColorConversionCodes.BGR2GRAY);
-            else
-                grayImage = targetImage.Clone();
-
-            // ROI 영역 안에서 이진화 처리 
-            Mat binaryImage = new Mat();
-            Cv2.InRange(grayImage, BinThreshold.lower, BinThreshold.upper, binaryImage);
-
-            if (BinThreshold.invert)
-                binaryImage = ~binaryImage;
+            // --- 변경: RunForm의 AI 검사 로직을 여기로 옮김 ---
+            bool isAIDefect = false;
 
 
-            // Canny 적용 전에 이진화 결과 등록
-            Global.Inst.InspStage.PreView?.SetBinaryResultImage(binaryImage);
-            // Canny 필터 적용 (Filter가 CannyEdge이고 Options가 있을 때)
-            // 필터 적용 (Canny 또는 Morphology)
-            if (Filter != FilterType.None && FilterOptions != null)
+            // 이미지 변환 (Mat -> Bitmap)
+            using (Bitmap bitmap = targetImage.ToBitmap())  // ROI 영역만 사용
             {
-                try
+                if (bitmap == null)
                 {
-                    if (Filter == FilterType.CannyEdge)
-                    {
-                        int min = FilterOptions.Min;
-                        int max = FilterOptions.Max;
-                        Mat canny = new Mat();
-                        Cv2.Canny(binaryImage, canny, min, max);
-                        binaryImage = canny.Clone();
-                        SLogger.Write($"DoInspect: Canny 적용 (Min={min}, Max={max}) on binaryImage (ROI 내)", SLogger.LogType.Info);
-                    }
-                    else if (Filter == FilterType.Morphology)
-                    {
-                        MorphTypes morphType = FilterOptions.MorphType;
-                        int kernelSize = FilterOptions.KernelSize;
-                        Mat kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(kernelSize, kernelSize));
-                        Mat morph = new Mat();
-                        Cv2.MorphologyEx(binaryImage, morph, morphType, kernel);
-                        binaryImage = morph.Clone();
-                        SLogger.Write($"DoInspect: Morphology 적용 (Type={morphType}, KernelSize={kernelSize}) on binaryImage (ROI 내)", SLogger.LogType.Info);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    SLogger.Write($"DoInspect: 필터 적용 실패 - {ex.Message}", SLogger.LogType.Error);
+                    MessageBox.Show("이미지 변환 실패.");
                     return false;
                 }
+
+                // AI 검사 수행
+                if (_saigeAI.Inspect(bitmap))
+                {
+                    OpenCvSharp.Point[][] contours = new OpenCvSharp.Point[0][];
+                    if (_saigeAI.GetContours(ref contours))
+                    {
+                        if (_findArea is null)
+                            _findArea = new List<DrawInspectInfo>();
+
+                        _findArea.Clear();
+
+                        int findBlobCount = 0;
+
+                        foreach (var contour in contours)
+                        {
+                            double area = Cv2.ContourArea(contour);
+                            if (area <= 0)
+                                continue;
+
+                            int showArea = 0;
+                            int showWidth = 0;
+                            int showHeight = 0;
+
+                            BlobFilter areaFilter = BlobFilters[FILTER_AREA];
+
+                            if (areaFilter.isUse)
+                            {
+                                if (areaFilter.min > 0 && area < areaFilter.min)
+                                    continue;
+
+                                if (areaFilter.max > 0 && area > areaFilter.max)
+                                    continue;
+
+                                showArea = (int)(area + 0.5f);
+                            }
+
+                            Rect boundingRect = Cv2.BoundingRect(contour);
+                            RotatedRect rotatedRect = Cv2.MinAreaRect(contour);
+                            Size2d blobSize = new Size2d(boundingRect.Width, boundingRect.Height);
+
+                            // RotatedRect 정보 계산
+                            if (UseRotatedRect)
+                            {
+                                // 너비와 높이 가져오기
+                                float width = rotatedRect.Size.Width;
+                                float height = rotatedRect.Size.Height;
+
+                                // 장축과 단축 구분
+                                blobSize.Width = Math.Max(width, height);
+                                blobSize.Height = Math.Min(width, height);
+                            }
+
+                            BlobFilter widthFilter = BlobFilters[FILTER_WIDTH];
+                            if (widthFilter.isUse)
+                            {
+                                if (widthFilter.min > 0 && blobSize.Width < widthFilter.min)
+                                    continue;
+
+                                if (widthFilter.max > 0 && blobSize.Width > widthFilter.max)
+                                    continue;
+
+                                showWidth = (int)(blobSize.Width + 0.5f);
+                            }
+
+                            BlobFilter heightFilter = BlobFilters[FILTER_HEIGHT];
+                            if (heightFilter.isUse)
+                            {
+                                if (heightFilter.min > 0 && blobSize.Height < heightFilter.min)
+                                    continue;
+
+                                if (heightFilter.max > 0 && blobSize.Height > heightFilter.max)
+                                    continue;
+
+                                showHeight = (int)(blobSize.Height + 0.5f);
+                            }
+
+
+                            findBlobCount++;
+                            Rect blobRect = boundingRect + InspRect.TopLeft;
+
+                            string featureInfo = "";
+                            if (showArea > 0)
+                                featureInfo += $"A:{showArea}";
+
+                            if (showWidth > 0)
+                            {
+                                if (featureInfo != "")
+                                    featureInfo += "\r\n";
+
+                                featureInfo += $"W:{showWidth}";
+                            }
+
+                            if (showHeight > 0)
+                            {
+                                if (featureInfo != "")
+                                    featureInfo += "\r\n";
+
+                                featureInfo += $"H:{showHeight}";
+                            }
+
+                            //검사된 정보를 문자열로 저장
+                            string blobInfo;
+                            blobInfo = $"Blob X:{blobRect.X}, Y:{blobRect.Y}, Size({blobRect.Width},{blobRect.Height})";
+                            ResultString.Add(blobInfo);
+
+                            //검사된 영역 정보를 DrawInspectInfo로 저장
+                            DrawInspectInfo rectInfo = new DrawInspectInfo(blobRect, featureInfo, InspectType.InspAI, DecisionType.Info);
+
+                            if (UseRotatedRect)
+                            {
+                                Point2f[] points = rotatedRect.Points().Select(p => p + InspRect.TopLeft).ToArray();
+                                rectInfo.SetRotatedRectPoints(points);
+                            }
+
+                            _findArea.Add(rectInfo);
+                        }
+
+                        OutBlobCount = findBlobCount;
+
+                        IsDefect = false;
+                        string result = "OK";
+                        BlobFilter countFilter = BlobFilters[FILTER_COUNT];
+
+                        if (countFilter.isUse)
+                        {
+                            if (countFilter.min > 0 && findBlobCount < countFilter.min)
+                                IsDefect = true;
+
+                            if (IsDefect == false && countFilter.max > 0 && findBlobCount > countFilter.max)
+                                IsDefect = true;
+                        }
+
+                        if (IsDefect)
+                        {
+                            string rectInfo = $"Count:{findBlobCount}";
+                            _findArea.Add(new DrawInspectInfo(InspRect, rectInfo, InspectType.InspBinary, DecisionType.Defect));
+
+                            result = "NG";
+
+                            string resultInfo = "";
+                            resultInfo = $"[{result}] Blob count [in : {countFilter.min},{countFilter.max},out : {findBlobCount}]";
+                            ResultString.Add(resultInfo);
+                        }
+                    }
+                }
             }
-
-            //이진화 검사 타입에 따른 검사 함수 분기
-            if (BinaryMethod.PixelCount == BinMethod)
-                {
-                    if (!InspPixelCount(binaryImage))
-                        return false;
-                }
-                else if (BinaryMethod.Feature == BinMethod)
-                {
-                    if (!InspBlobFilter(binaryImage))
-                        return false;
-                }
-            // 캡슐 width/height 측정선 그리기용 정보 생성
-            //측정 검사
-            //List<DrawInspectInfo> lines = MeasureCapsuleSize(binaryImage, InspRect);
-            //Global.Inst.InspStage.PreView?.SetMeasureLines(lines);
-
-            // 화면에 갱신 요청
-            MainForm.GetImageViewCtrl()?.Invalidate();
 
             IsInspected = true;
 
             return true;
-            }
-        
+        }
         //검사 결과 초기화
         public override void ResetResult()
         {
@@ -365,7 +327,7 @@ namespace CapsuleInspect.Algorithm
         private bool InspBlobFilter(Mat binImage)
         {
             // 컨투어 찾기
-            Point[][] contours;
+            OpenCvSharp.Point[][] contours;
             HierarchyIndex[] hierarchy;
             Cv2.FindContours(binImage, out contours, out hierarchy, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
 
@@ -528,5 +490,6 @@ namespace CapsuleInspect.Algorithm
             resultArea = _findArea;
             return resultArea.Count;
         }
+
     }
 }
