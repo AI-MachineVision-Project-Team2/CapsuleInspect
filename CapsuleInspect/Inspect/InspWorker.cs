@@ -109,14 +109,14 @@ namespace CapsuleInspect.Inspect
             SLogger.Write("[InspWorker] 단일 사이클 검사 완료");
         }
         //InspStage내의 모든 InspWindow들을 검사하는 함수
-        public bool RunInspect(out bool isDefect)
+        public bool RunInspect(out bool isDefect, out int ngCrack, out int ngScratch, out int ngSqueeze, out int ngPrintDefect)
         {
             isDefect = false;
+            ngCrack = ngScratch = ngSqueeze = ngPrintDefect = 0;
 
             var curMode = Global.Inst.InspStage.CurModel;
             if (curMode == null || curMode.InspWindowList == null)
             {
-                // 모델이 없으면 UI만 정리하고 종료
                 var cam = MainForm.GetDockForm<CameraForm>();
                 cam?.SetInspResultCount(0, 0, 0);
                 Global.Inst.InspStage.SetDistinctNgCount(0);
@@ -125,7 +125,7 @@ namespace CapsuleInspect.Inspect
 
             var inspWindowList = curMode.InspWindowList;
 
-            // ★ 검사 대상 ROI만 추출 (체크 해제된 ROI는 제외)
+            // 검사 대상 ROI만 추출 (체크 해제된 ROI는 제외)
             var activeWindows = inspWindowList
                 .Where(w => w != null && !w.IgnoreInsp)
                 .ToList();
@@ -136,9 +136,6 @@ namespace CapsuleInspect.Inspect
                 var cam = MainForm.GetDockForm<CameraForm>();
                 cam?.SetInspResultCount(0, 0, 0);
                 Global.Inst.InspStage.SetDistinctNgCount(0);
-
-                // 이미지 1장 단위 누적 카운트를 OK로 증가시킬지 여부는 정책에 따라 조정
-                Global.Inst.InspStage.AddAccumCount(1, 1, 0); // (원하면 주석 처리 가능)
                 return true;
             }
 
@@ -154,19 +151,14 @@ namespace CapsuleInspect.Inspect
 
             int totalCnt = 0, okCnt = 0, ngCnt = 0;
 
-            // 종류별 1회 카운트 플래그
-            int ngCrack = 0, ngScratch = 0, ngSqueeze = 0, ngPrintDefect = 0;
-
             // 결과 집계 (활성 ROI만)
             foreach (var w in activeWindows)
             {
                 totalCnt++;
-
                 if (w.IsDefect())
                 {
                     isDefect = true;
                     ngCnt++;
-
                     switch (GetInspWindowKind(w))
                     {
                         case InspWindowType.Crack: ngCrack = 1; break;
@@ -198,43 +190,30 @@ namespace CapsuleInspect.Inspect
             if (cameraForm != null)
             {
                 cameraForm.SetInspResultCount(totalCnt, okCnt, ngCnt);
-                // 주: DisplayResult가 도형을 직접 그리므로 여기서 AddRect 별도 호출 불필요
-                // (필요하면 도메인 정책에 맞게 allRects를 모아 한 번에 그리도록 변경 가능)
             }
-
-            // 누적 카운트 & 종류별 NG 누적
-            Global.Inst.InspStage.AddAccumCount(1, isDefect ? 0 : 1, isDefect ? 1 : 0);
-            Global.Inst.InspStage.AddNgDetailCount(ngCrack, ngScratch, ngSqueeze, ngPrintDefect);
 
             return true;
         }
         private InspWindowType GetInspWindowKind(InspWindow w)
         {
-            // 1) 속성으로 직접 갖고 있으면 그걸 최우선 사용 (프로퍼티명 케이스 대응)
             var t = w.GetType();
-            var p1 = t.GetProperty("InspWindowType"); // 보통 이 이름일 가능성 높음
+            var p1 = t.GetProperty("InspWindowType");
             if (p1 != null && p1.PropertyType == typeof(InspWindowType))
                 return (InspWindowType)p1.GetValue(w, null);
 
-            var p2 = t.GetProperty("WindowType");     // 혹시 다른 이름으로 있을 수도 있음
+            var p2 = t.GetProperty("WindowType");
             if (p2 != null && p2.PropertyType == typeof(InspWindowType))
                 return (InspWindowType)p2.GetValue(w, null);
 
-            // 2) 없으면 이름으로 후순위 판정 (대/소문자·한글 키워드 모두 처리)
             var name = (w?.Name ?? w?.UID ?? string.Empty).ToLowerInvariant();
-
             if (name.Contains("crack") || name.Contains("크랙") || name.Contains("균열"))
                 return InspWindowType.Crack;
-
             if (name.Contains("scratch") || name.Contains("스크래치"))
                 return InspWindowType.Scratch;
-
             if (name.Contains("squeeze") || name.Contains("찌그러") || name.Contains("변형"))
                 return InspWindowType.Squeeze;
-
             if (name.Contains("printdefect") || name.Contains("인쇄") || name.Contains("프린트"))
                 return InspWindowType.PrintDefect;
-
             return InspWindowType.None;
         }
         //특정 InspWindow에 대한 검사 진행
@@ -247,13 +226,13 @@ namespace CapsuleInspect.Inspect
                     return false;
 
                 _inspectBoard.Inspect(inspObj);
-
                 DisplayResult(inspObj, inspType);
             }
             else
             {
                 bool isDefect = false;
-                RunInspect(out isDefect);
+                int ngCrack, ngScratch, ngSqueeze, ngPrintDefect;
+                RunInspect(out isDefect, out ngCrack, out ngScratch, out ngSqueeze, out ngPrintDefect);
             }
 
             ResultForm resultForm = MainForm.GetDockForm<ResultForm>();

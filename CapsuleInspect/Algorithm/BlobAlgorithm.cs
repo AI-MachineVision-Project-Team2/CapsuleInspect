@@ -145,17 +145,28 @@ namespace CapsuleInspect.Algorithm
         //이진화 검사 알고리즘
 
         //측정 검사 알고리즘
-        /*
+
         public List<DrawInspectInfo> MeasureCapsuleSize(Mat binaryImage, Rect roi)
         {
             List<DrawInspectInfo> drawInfos = new List<DrawInspectInfo>();
+
+            // 입력 유효성 검사
+            if (binaryImage == null || binaryImage.Empty() || binaryImage.Type() != MatType.CV_8UC1)
+            {
+                SLogger.Write("MeasureCapsuleSize: 입력 이미지가 유효하지 않음 (null, 빈 이미지, 또는 CV_8UC1 아님).", SLogger.LogType.Error);
+                return drawInfos;
+            }
 
             // 1. ROI 영역 추출
             Mat roiImage = new Mat(binaryImage, roi);
 
             // 2. 외곽선 추출
             Cv2.FindContours(roiImage, out OpenCvSharp.Point[][] contours, out _, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
-            if (contours.Length == 0) return drawInfos;
+            if (contours.Length == 0)
+            {
+                SLogger.Write("MeasureCapsuleSize: 윤곽선이 발견되지 않음.", SLogger.LogType.Error);
+                return drawInfos;
+            }
 
             // 3. 가장 큰 contour 사용
             var maxContour = contours.OrderByDescending(c => Cv2.ContourArea(c)).First();
@@ -165,8 +176,8 @@ namespace CapsuleInspect.Algorithm
             for (int i = 0; i < 3; i++)
             {
                 int y = rect.Top + (i + 1) * rect.Height / 4;
-                OpenCvSharp.Point p1 = new OpenCvSharp.Point(rect.Left, y);
-                OpenCvSharp.Point p2 = new OpenCvSharp.Point(rect.Right, y);
+                OpenCvSharp.Point p1 = new OpenCvSharp.Point(rect.Left + roi.X, y + roi.Y); // 전체 좌표로 변환
+                OpenCvSharp.Point p2 = new OpenCvSharp.Point(rect.Right + roi.X, y + roi.Y);
                 drawInfos.Add(new DrawInspectInfo
                 {
                     rect = new Rect(p1.X, p1.Y, p2.X - p1.X, 1),
@@ -180,8 +191,8 @@ namespace CapsuleInspect.Algorithm
             for (int i = 0; i < 5; i++)
             {
                 int x = rect.Left + (i + 1) * rect.Width / 6;
-                OpenCvSharp.Point p1 = new OpenCvSharp.Point(x, rect.Top);
-                OpenCvSharp.Point p2 = new OpenCvSharp.Point(x, rect.Bottom);
+                OpenCvSharp.Point p1 = new OpenCvSharp.Point(x + roi.X, rect.Top + roi.Y); // 전체 좌표로 변환
+                OpenCvSharp.Point p2 = new OpenCvSharp.Point(x + roi.X, rect.Bottom + roi.Y);
                 drawInfos.Add(new DrawInspectInfo
                 {
                     rect = new Rect(p1.X, p1.Y, 1, p2.Y - p1.Y),
@@ -191,9 +202,10 @@ namespace CapsuleInspect.Algorithm
                 });
             }
 
+            SLogger.Write($"MeasureCapsuleSize: 측정 완료. Width/Height 선 {drawInfos.Count}개 생성.", SLogger.LogType.Info);
             return drawInfos;
         }
-        */
+
         public override bool DoInspect()
         {
             ResetResult();

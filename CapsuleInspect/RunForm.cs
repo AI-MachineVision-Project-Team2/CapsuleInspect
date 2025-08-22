@@ -1,5 +1,6 @@
 ﻿using CapsuleInspect.Core;
 using CapsuleInspect.Grab;
+using CapsuleInspect.Inspect;
 using CapsuleInspect.Setting;
 using CapsuleInspect.Util;
 using System;
@@ -65,22 +66,28 @@ namespace CapsuleInspect
             var stage = Global.Inst.InspStage;
             stage.InspectReady("LOT_NUMBER", serialID);
 
-            // AI 검사 추가
+            bool isAIDefect = false;
+            bool isTeachingDefect = false;
+            int ngScratchFromAI = 0; // AI에서 Scratch 불량 여부 (1 or 0)
+            List<string> defectTypes = new List<string>();
+
+            // AI 검사
             string modelPath = stage.CurModel.ModelPath;
             if (!string.IsNullOrEmpty(modelPath))
             {
                 var saigeAI = stage.AIModule;
                 saigeAI.LoadEngine(modelPath);
-
                 Bitmap bitmap = stage.GetBitmap();
                 if (bitmap != null)
                 {
-                    if (saigeAI.Inspect(bitmap))
+                    if (saigeAI.Inspect(bitmap)) // Inspect에서 _isDefect 설정
                     {
-                        Bitmap resultImage = saigeAI.GetResultImage();
+                        Bitmap resultImage = saigeAI.GetResultImage(); // 내부 DrawResult 호출, _isDefect 확인
                         if (resultImage != null)
                         {
                             stage.UpdateDisplay(resultImage);
+                            isAIDefect = saigeAI.IsDefect; // _isDefect 사용
+                            if (isAIDefect) ngScratchFromAI = 1; // AI defect 시 Scratch 1 증가 (개수 무관)
                         }
                         else
                         {
@@ -101,17 +108,39 @@ namespace CapsuleInspect
                 }
             }
 
+            // Teaching 검사
+            int ngCrack, ngScratchFromTeaching, ngSqueeze, ngPrintDefect;
+            stage.InspWorker.RunInspect(out isTeachingDefect, out ngCrack, out ngScratchFromTeaching, out ngSqueeze, out ngPrintDefect);
+
+            // 전체 불량 여부
+            bool isOverallDefect = isAIDefect || isTeachingDefect;
+
+            // 통계 업데이트
+            var accum = stage.Accum;
+            stage.AddAccumCount(1, isOverallDefect ? 0 : 1, isOverallDefect ? 1 : 0); // 이미지당 Total/OK/NG 1씩
+
+            // 불량 유형: AI + Teaching
+            int ngScratch = (ngScratchFromAI > 0 || ngScratchFromTeaching > 0) ? 1 : 0; // 중복 방지, 이미지당 1
+            stage.AddNgDetailCount(ngCrack, ngScratch, ngSqueeze, ngPrintDefect);
+
+            // 결과 표시
+            var resultForm = MainForm.GetDockForm<ResultForm>();
+            if (resultForm != null)
+            {
+                resultForm.AddModelResult(stage.CurModel);
+            }
+
+            // 단일 사이클 실행
             if (SettingXml.Inst.CamType == Grab.CameraType.None ||
                 SettingXml.Inst.CommType == Sequence.CommunicatorType.None)
             {
-
-                Global.Inst.InspStage.CycleInspect(true); // 무한 루프 검사
-
+                stage.InspWorker.StartSingleCycleLoop();
             }
             else
             {
-                Global.Inst.InspStage.StartAutoRun();
+                stage.StartAutoRun();
             }
+        
         }
 
         private void btnStop_Click(object sender, EventArgs e)

@@ -875,9 +875,10 @@ namespace CapsuleInspect.Core
 
             RunAISegAndShow();
 
-            bool isDefect; 
-            if (!_inspWorker.RunInspect(out isDefect)) 
-                return false; 
+            bool isDefect;
+            int ngCrack, ngScratch, ngSqueeze, ngPrintDefect;
+            if (!_inspWorker.RunInspect(out isDefect, out ngCrack, out ngScratch, out ngSqueeze, out ngPrintDefect))
+                return false;
             return true; 
         }
 
@@ -939,13 +940,21 @@ namespace CapsuleInspect.Core
                         }
                         RunAISegAndShow();
 
-                        bool isDefect = false;
-                        if (!_inspWorker.RunInspect(out isDefect))
+                        bool isDefect;
+                        int ngCrack, ngScratch, ngSqueeze, ngPrintDefect;
+                        if (!_inspWorker.RunInspect(out isDefect, out ngCrack, out ngScratch, out ngSqueeze, out ngPrintDefect))
                         {
                             errMsg = string.Format("검사 실패");
                             SLogger.Write(errMsg, SLogger.LogType.Error);
                         }
-
+                        else
+                        {
+                            // Teaching 검사 결과로 불량 카운트 업데이트
+                            if (isDefect)
+                            {
+                                AddNgDetailCount(ngCrack, ngScratch, ngSqueeze, ngPrintDefect);
+                            }
+                        }
                         //#WCF_FSM#6 비젼 -> 제어에 검사 완료 및 결과 전송
                         VisionSequence.Inst.VisionCommand(Vision2Mmi.InspDone, isDefect);
                     }
