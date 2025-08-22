@@ -26,20 +26,20 @@ namespace CapsuleInspect.Core
     //누적 카운트 증가 
     public class AccumCounter
     {
-        public long Total { get;  set; }
-        public long OK { get;  set; }
+        public long Total { get; set; }
+        public long OK { get; set; }
         public long NG { get; set; }
-        public long NG_Scratch { get;  set; }
-        public long NG_Squeeze { get;  set; }
-        public long NG_PrintDefect { get;  set; }
-        public long NG_Crack { get;  set; }
+        public long NG_Scratch { get; set; }
+        public long NG_Squeeze { get; set; }
+        public long NG_PrintDefect { get; set; }
+        public long NG_Crack { get; set; }
 
-        public void Reset() { Total = OK= NG = NG_Scratch = NG_Squeeze = NG_PrintDefect = NG_Crack = 0; }
+        public void Reset() { Total = OK = NG = NG_Scratch = NG_Squeeze = NG_PrintDefect = NG_Crack = 0; }
         public void Add(int total, int ok, int ng)
         { Total += total; OK += ok; NG += ng; }
-    
+
     }
-   
+
 
     //추가 
     //검사와 관련된 클래스를 관리하는 클래스
@@ -83,6 +83,11 @@ namespace CapsuleInspect.Core
         private string _serialID;
         [XmlIgnore]
         private Mat _filteredImage;
+
+        // 검사 완료를 알리는 이벤트 (true=NG, false=OK)
+        public event Action<string> InspectionCompleted;
+
+
         public InspStage() { }
         public ImageSpace ImageSpace
         {
@@ -101,8 +106,6 @@ namespace CapsuleInspect.Core
                 return _saigeAI;
             }
         }
-
-
 
         public PreviewImage PreView
         {
@@ -206,9 +209,9 @@ namespace CapsuleInspect.Core
                 _grabManager.TransferCompleted += _multiGrab_TransferCompleted;
                 InitModelGrab(MAX_GRAB_BUF);
             }
-           
+
         }
-       
+
 
         public bool Initialize()
         {
@@ -443,49 +446,7 @@ namespace CapsuleInspect.Core
                 UpdateProperty(inspWindow);
             }
         }
-        /*
-        public void SetTeachingImage(InspWindow inspWindow, int index = -1)
-        {
-            if (inspWindow is null)
-                return;
 
-            // 필터링된 이미지 우선, 없으면 원본
-            Mat curImage = GetFilteredImage() ?? GetMat();
-            if (curImage == null) return;
-
-            if (inspWindow.WindowArea.Right >= curImage.Width ||
-                inspWindow.WindowArea.Bottom >= curImage.Height)
-            {
-                SLogger.Write("ROI 영역이 잘못되었습니다!");
-                return;
-            }
-
-            Mat windowImage = curImage[inspWindow.WindowArea].Clone();
-            // MatchAlgorithm에 템플릿 설정
-            var matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
-            if (matchAlgo != null)
-            {
-                if (index < 0)
-                {
-                    matchAlgo.AddTemplateImage(windowImage);
-                    inspWindow.AddWindowImage(windowImage); // 동기화 유지
-                }
-                else
-                {
-                    matchAlgo.SetTemplateImage(windowImage, index); // Set 메서드 필요
-                    inspWindow.SetWindowImage(windowImage, index); // 동기화 유지
-                }
-            }
-
-            inspWindow.IsPatternLearn = false;
-
-            // UI 갱신
-            var propForm = MainForm.GetDockForm<PropertiesForm>();
-            if (propForm != null)
-            {
-                propForm.ShowProperty(inspWindow); // 탭 갱신
-            }
-        }*/
         //InitImageSpace를 먼저 실행하도록 수정
         public void SetBuffer(int bufferCount)
         {
@@ -860,6 +821,7 @@ namespace CapsuleInspect.Core
                 }
             }
         }
+
       
         public bool OneCycle() 
         { 
@@ -877,9 +839,22 @@ namespace CapsuleInspect.Core
 
             bool isDefect;
             int ngCrack, ngScratch, ngSqueeze, ngPrintDefect;
-            if (!_inspWorker.RunInspect(out isDefect, out ngCrack, out ngScratch, out ngSqueeze, out ngPrintDefect))
+              if (!_inspWorker.RunInspect(out isDefect, out ngCrack, out ngScratch, out ngSqueeze, out ngPrintDefect))
                 return false;
+            // 여기서도 항상 검사 완료 이벤트를 올림
+            try
+            {
+                string defectType = (_inspWorker != null && !string.IsNullOrEmpty(_inspWorker.LastDefectType))
+                    ? _inspWorker.LastDefectType
+                    : (isDefect ? "Scratch" : "OK");
+                var h = InspectionCompleted;
+                if (h != null) h(defectType);
+            }
+            catch { }
+            
+          
             return true; 
+
         }
 
         public void StopCycle()
@@ -916,17 +891,15 @@ namespace CapsuleInspect.Core
             {
                 case SeqCmd.InspStart:
                     {
-                        //카메라 촬상 후, 검사 진행
                         SLogger.Write("MMI : 검사 진행", SLogger.LogType.Info);
 
-                        //검사 시작
                         string errMsg;
 
                         if (UseCamera)
                         {
                             if (!Grab(0))
                             {
-                                errMsg = string.Format("이미지 촬영 실패");
+                                errMsg = "이미지 촬영 실패";
                                 SLogger.Write(errMsg, SLogger.LogType.Error);
                             }
                         }
@@ -934,7 +907,7 @@ namespace CapsuleInspect.Core
                         {
                             if (!VirtualGrab())
                             {
-                                errMsg = string.Format("가상 촬영 실패");
+                                errMsg = "가상 촬영 실패";
                                 SLogger.Write(errMsg, SLogger.LogType.Error);
                             }
                         }
@@ -944,21 +917,26 @@ namespace CapsuleInspect.Core
                         int ngCrack, ngScratch, ngSqueeze, ngPrintDefect;
                         if (!_inspWorker.RunInspect(out isDefect, out ngCrack, out ngScratch, out ngSqueeze, out ngPrintDefect))
                         {
-                            errMsg = string.Format("검사 실패");
+                            errMsg = "검사 실패";
                             SLogger.Write(errMsg, SLogger.LogType.Error);
                         }
-                        else
-                        {
-                            // Teaching 검사 결과로 불량 카운트 업데이트
-                            if (isDefect)
-                            {
-                                AddNgDetailCount(ngCrack, ngScratch, ngSqueeze, ngPrintDefect);
-                            }
-                        }
-                        //#WCF_FSM#6 비젼 -> 제어에 검사 완료 및 결과 전송
+
                         VisionSequence.Inst.VisionCommand(Vision2Mmi.InspDone, isDefect);
+
+                        // 세부 타입 문자열 가져와서 UI로 통지
+                        string defectType = _inspWorker != null && !string.IsNullOrEmpty(_inspWorker.LastDefectType)
+                                            ? _inspWorker.LastDefectType
+                                            : (isDefect ? "Scratch" : "OK");
+
+                        try
+                        {
+                            var handler = InspectionCompleted;
+                            if (handler != null) handler(defectType);
+                        }
+                        catch { }
                     }
                     break;
+
                 case SeqCmd.InspEnd:
                     {
                         SLogger.Write("MMI : 검사 종료", SLogger.LogType.Info);
@@ -1004,7 +982,7 @@ namespace CapsuleInspect.Core
 
             LiveMode = false;
             UseCamera = SettingXml.Inst.CamType != CameraType.None ? true : false;
-            
+
             SetWorkingState(WorkingState.INSPECT);
             // 자동검사 시작
             string modelName = Path.GetFileNameWithoutExtension(modelPath);
@@ -1021,6 +999,7 @@ namespace CapsuleInspect.Core
                 cameraForm.SetWorkingState(workingState);
             }
         }
+
         // 마지막 검사 결과를 기반으로, 불량 개수 계산 및 UI 업데이트
         private void PublishDistinctNg()
         {
@@ -1084,7 +1063,6 @@ namespace CapsuleInspect.Core
             {
                 if (disposing)
                 {
-                    // Dispose managed resources.
                     //시퀀스 이벤트 해제
                     VisionSequence.Inst.SeqCommand -= SeqCommand;
 
@@ -1100,8 +1078,6 @@ namespace CapsuleInspect.Core
                     }
                     _regKey.Close();
                 }
-
-                // Dispose unmanaged managed resources.
 
                 disposed = true;
             }

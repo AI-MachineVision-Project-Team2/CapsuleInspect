@@ -4,33 +4,80 @@ using CapsuleInspect.Inspect;
 using CapsuleInspect.Setting;
 using CapsuleInspect.Util;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq; // OfType<T>()
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace CapsuleInspect
 {
-
     public partial class RunForm : DockContent
     {
-
         public RunForm()
         {
             InitializeComponent();
+            // 생성자에서는 구독하지 않음 (초기화 타이밍 이슈 방지)
+        }
+
+        // 폼이 화면에 나타난 뒤에 안전하게 구독한다
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            BindStage();
+        }
+
+        // 언제든 호출 가능: 최신 InspStage에 재구독
+        public void BindStage()
+        {
+            var stage = Global.Inst.InspStage;
+            if (stage == null) return;
+
+            try { stage.InspectionCompleted -= OnInspectionCompleted; } catch { }
+            stage.InspectionCompleted += OnInspectionCompleted;
+
+            SLogger.Write("[RunForm] InspectionCompleted 구독 완료");
+        }
+
+        // DockContent 자원이 내려갈 때 구독 해제 (메모리 누수/중복 방지)
+        protected override void OnHandleDestroyed(EventArgs e)
+        {
+            var stage = Global.Inst.InspStage;
+            if (stage != null)
+            {
+                try { stage.InspectionCompleted -= OnInspectionCompleted; } catch { }
+            }
+            base.OnHandleDestroyed(e);
+        }
+
+        // 검사 완료 콜백: 세부 타입 문자열을 받는다 ("OK", "Scratch", "Crack", "Squeeze", "PrintDefect")
+        private void OnInspectionCompleted(string defectType)
+        {
+            if (this.InvokeRequired)
+            {
+                try { this.BeginInvoke(new Action<string>(OnInspectionCompleted), defectType); } catch { }
+                return;
+            }
+
+            var stage = Global.Inst.InspStage;
+            if (stage == null) return;
+
+            Bitmap bmp = stage.GetBitmap(); // 최신 버퍼/채널 기준
+            if (bmp == null) return;
+
+            // MainForm은 Form이므로 OpenForms로 찾는다
+            var main = Application.OpenForms.OfType<MainForm>().FirstOrDefault();
+            if (main != null)
+            {
+                // prefix는 필요에 맞게 변경 가능("Capsule")
+                main.SaveFromInspection(bmp, defectType, "Capsule");
+                SLogger.Write("[RunForm] SaveFromInspection 호출: " + defectType);
+            }
         }
 
         private void btnGrab_Click(object sender, EventArgs e)
         {
-            // 그랩시 이미지 버퍼를 먼저 설정하도록 변경
-
             var stage = Global.Inst.InspStage;
-            SLogger.Write($"[RunForm] 촬상 클릭됨 CameraType: {stage.GetCurrentCameraType()}");
+            SLogger.Write(string.Format("[RunForm] 촬상 클릭됨 CameraType: {0}", stage.GetCurrentCameraType()));
 
             if (stage.GetCurrentCameraType() == CameraType.None)
             {
@@ -47,90 +94,27 @@ namespace CapsuleInspect
             stage.ToggleLiveMode();
             if (stage.LiveMode)
             {
-                SLogger.Write($"[RunForm] 동영상 모드 클릭됨 CameraType:{stage.GetCurrentCameraType()}");
+                SLogger.Write(string.Format("[RunForm] 동영상 모드 클릭됨 CameraType:{0}", stage.GetCurrentCameraType()));
                 stage.SetWorkingState(WorkingState.LIVE);
                 stage.CheckImageBuffer();
                 stage.Grab(0); // 최초 시작
             }
             else
             {
-                SLogger.Write($"[RunForm] 동영상 모드 중지됨 CameraType:{stage.GetCurrentCameraType()}");
+                SLogger.Write(string.Format("[RunForm] 동영상 모드 중지됨 CameraType:{0}", stage.GetCurrentCameraType()));
                 stage.SetWorkingState(WorkingState.NONE);
             }
         }
 
         private void btnInsp_Click(object sender, EventArgs e)
         {
+
             SLogger.Write($"[RunForm] 검사 클릭됨");
             string serialID = $"{DateTime.Now:MM-dd HH:mm:ss}";
             var stage = Global.Inst.InspStage;
             stage.InspectReady("LOT_NUMBER", serialID);
-            //string modelPath = SettingXml.Inst.AIModelPath;
-            //bool isAIDefect = false;
-            //bool isTeachingDefect = false;
-            //int ngScratchFromAI = 0; // AI에서 Scratch 불량 여부 (1 or 0)
-            //List<string> defectTypes = new List<string>();
-
-            //// AI 검사
-            //string modelPath = stage.CurModel.ModelPath;
-            //if (!string.IsNullOrEmpty(modelPath))
-            //{
-            //    var saigeAI = stage.AIModule;
-            //    saigeAI.LoadEngine(modelPath);
-            //    Bitmap bitmap = stage.GetBitmap();
-            //    if (bitmap != null)
-            //    {
-            //        if (saigeAI.Inspect(bitmap)) // Inspect에서 _isDefect 설정
-            //        {
-            //            Bitmap resultImage = saigeAI.GetResultImage(); // 내부 DrawResult 호출, _isDefect 확인
-            //            if (resultImage != null)
-            //            {
-            //                stage.UpdateDisplay(resultImage);
-            //                isAIDefect = saigeAI.IsDefect; // _isDefect 사용
-            //                if (isAIDefect) ngScratchFromAI = 1; // AI defect 시 Scratch 1 증가 (개수 무관)
-            //            }
-            //            else
-            //            {
-            //                SLogger.Write("[RunForm] 결과 이미지를 가져오지 못했습니다.", SLogger.LogType.Error);
-            //                MessageBox.Show("결과 이미지를 가져오지 못했습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //            }
-            //        }
-            //        else
-            //        {
-            //            SLogger.Write("[RunForm] AI 검사 실패", SLogger.LogType.Error);
-            //            MessageBox.Show("AI 검사에 실패했습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //        }
-            //    }
-            //    else
-            //    {
-            //        SLogger.Write("[RunForm] 현재 이미지가 없습니다.", SLogger.LogType.Error);
-            //        MessageBox.Show("현재 이미지가 없습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //    }
-            //}
-
-            //// Teaching 검사
-            //int ngCrack, ngScratchFromTeaching, ngSqueeze, ngPrintDefect;
-            //stage.InspWorker.RunInspect(out isTeachingDefect, out ngCrack, out ngScratchFromTeaching, out ngSqueeze, out ngPrintDefect);
-
-            //// 전체 불량 여부
-            //bool isOverallDefect = isAIDefect || isTeachingDefect;
-
-            //// 통계 업데이트
-            //var accum = stage.Accum;
-            //stage.AddAccumCount(1, isOverallDefect ? 0 : 1, isOverallDefect ? 1 : 0); // 이미지당 Total/OK/NG 1씩
-
-            //// 불량 유형: AI + Teaching
-            //int ngScratch = (ngScratchFromAI > 0 || ngScratchFromTeaching > 0) ? 1 : 0; // 중복 방지, 이미지당 1
-            //stage.AddNgDetailCount(ngCrack, ngScratch, ngSqueeze, ngPrintDefect);
-
-            //// 결과 표시
-            //var resultForm = MainForm.GetDockForm<ResultForm>();
-            //if (resultForm != null)
-            //{
-            //    resultForm.AddModelResult(stage.CurModel);
-            //}
-
-            // 단일 사이클 실행
+            // 초기화 뒤 재구독 보장 (안전망)
+            BindStage();
             if (SettingXml.Inst.CamType == Grab.CameraType.None ||
                 SettingXml.Inst.CommType == Sequence.CommunicatorType.None)
             {

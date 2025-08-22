@@ -8,19 +8,25 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
+using System.Linq; 
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
+using static CapsuleInspect.ImageSaveHelper; // ★ Category enum 사용
 
 namespace CapsuleInspect
 {
-
     public partial class MainForm : Form
     {
         private static DockPanel _dockPanel;
         public static FilterForm SharedFilterForm;
+
+        // RunForm 참조를 필드로 보관 (BindStage 호출용)
+        private RunForm _runWindow;
+
+        //  실시간 저장기
+        private readonly RealtimeImageSaver _realtimeSaver = new RealtimeImageSaver(boundedCapacity: 500, useDateFolder: true);
 
         public MainForm()
         {
@@ -33,14 +39,14 @@ namespace CapsuleInspect
             {
                 Height = 5,
                 Dock = DockStyle.Top,
-                BackColor = Color.FromArgb(243, 244, 246) // 상단 메뉴와 도킹 패널 사이의 간격을 위한 패널
+                BackColor = Color.FromArgb(243, 244, 246)
             };
             var toolboxCtrl = new ToolboxCtrl
             {
                 Dock = DockStyle.Top,
-                Height = 20 // 필요에 따라 높이 조정
+                Height = 20
             };
-            // DockPanel 생성 및 추가
+
             _dockPanel = new DockPanel
             {
                 Dock = DockStyle.Fill
@@ -50,54 +56,65 @@ namespace CapsuleInspect
             Controls.Add(mainMenu);
             //Controls.Add(spacerPanel);
 
-
             //Controls.SetChildIndex(spacerPanel, 0); // MenuStrip 아래
-            Controls.SetChildIndex(_dockPanel, 1);  // spacer 아래
+            Controls.SetChildIndex(_dockPanel, 1);
             _dockPanel.Theme = new VS2015LightTheme();
-            // 도킹 윈도우 로드 메서드 호출
+
+            // 도킹 윈도우 생성/표시
             LoadDockingWindows();
-            // Global 인스턴스 초기화
+
+            // InspStage 초기화
             Global.Inst.Initialize();
+
+            // 환경설정 반영
             LoadSetting();
+
+            // Initialize 직후 RunForm가 InspStage 이벤트를 구독하도록 보장
+            _runWindow?.BindStage();
+
+            // 저장 완료 시 경로 UI 갱신
+            _realtimeSaver.OnSaved += path => { try { UpdateFilePathTextBox(path); } catch { } };
         }
-        //도킹 윈도우를 로드하는 메서드
+
         private void LoadDockingWindows()
         {
-            //도킹해제 금지 설정
             _dockPanel.AllowEndUserDocking = false;
 
-            //메인폼 설정
             var cameraWindow = new CameraForm();
             cameraWindow.Show(_dockPanel, DockState.Document);
-            var runWindow = new RunForm();
-            runWindow.Show(cameraWindow.Pane, DockAlignment.Bottom, 0.3);
+
+            // 필드에 보관
+            _runWindow = new RunForm();
+            _runWindow.Show(cameraWindow.Pane, DockAlignment.Bottom, 0.3);
+
             var resultWindow = new ResultForm();
             resultWindow.Show(_dockPanel, DockState.DockRight);
+
             var statisicsWindow = new StatisticsForm();
             statisicsWindow.Show(_dockPanel, DockState.DockRight);
+
             var helpWindow = new HelpForm();
             helpWindow.Show(_dockPanel, DockState.DockRight);
+
             var propWindow = new PropertiesForm();
             propWindow.Show(_dockPanel, DockState.DockLeft);
 
             var logWindow = new LogForm();
             logWindow.Show(resultWindow.Pane, DockAlignment.Bottom, 0.3);
+
             SharedFilterForm = new FilterForm();
             SharedFilterForm.Show(propWindow.Pane, DockAlignment.Bottom, 0.3);
 
-            //#11_MODEL_TREE#1 검사 결과창 우측에 40% 비율로 모델트리 추가
             var modelTreeWindow = new ModelTreeForm();
-            modelTreeWindow.Show(runWindow.Pane, DockAlignment.Bottom, 0.6);
-            
+            modelTreeWindow.Show(_runWindow.Pane, DockAlignment.Bottom, 0.6);
         }
+
         private void LoadSetting()
         {
             cycleModeMenuItem.Checked = SettingXml.Inst.CycleMode;
             cycleModeMenuItem2.Checked = SettingXml.Inst.CycleMode2;
         }
 
-        //쉽게 도킹패널에 접근하기 위한 정적 함수
-        //제네릭 함수 사용를 이용해 입력된 타입의 폼 객체 얻기
         public static T GetDockForm<T>() where T : DockContent
         {
             var findForm = _dockPanel.Contents.OfType<T>().FirstOrDefault();
@@ -125,18 +142,22 @@ namespace CapsuleInspect
                 }
             }
         }
+
         private void SetupMenuItem_Click(object sender, EventArgs e)
         {
-            SLogger.Write($"환경설정창 열기");
+            SLogger.Write("환경설정창 열기");
             SetupForm setupForm = new SetupForm();
             setupForm.ShowDialog();
         }
+
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             Global.Inst.Dispose();
+
+            // 백그라운드 저장기 정리
+            _realtimeSaver.Dispose();
         }
 
-        // 모델 파일 열기,저장, 다른 이름으로 저장 기능 구현
         private string GetMdoelTitle(Model curModel)
         {
             if (curModel is null)
@@ -148,7 +169,6 @@ namespace CapsuleInspect
 
         private void modelNewMenuItem_Click(object sender, EventArgs e)
         {
-            //신규 모델 추가를 위한 모델 정보를 받기 위한 창 띄우기
             NewModel newModel = new NewModel();
             newModel.ShowDialog();
 
@@ -161,7 +181,6 @@ namespace CapsuleInspect
 
         private void modelOpenMenuItem_Click(object sender, EventArgs e)
         {
-            //모델 파일 열기
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Title = "모델 파일 선택";
@@ -188,16 +207,13 @@ namespace CapsuleInspect
             modelOpenMenuItem_Click(this, EventArgs.Empty);
         }
 
-
         private void modelSaveMenuItem_Click(object sender, EventArgs e)
         {
-            //모델 파일 저장
             Global.Inst.InspStage.SaveModel("");
         }
 
         private void modelSaveAsMenuItem_Click(object sender, EventArgs e)
         {
-            //다른이름으로 모델 파일 저장
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
                 saveFileDialog.InitialDirectory = SettingXml.Inst.ModelDir;
@@ -218,11 +234,9 @@ namespace CapsuleInspect
             modelSaveMenuItem_Click(this, EventArgs.Empty);
         }
 
-        //Cycle 모드 설정
         private void cycleModeMenuItem_Click(object sender, EventArgs e)
         {
-            SLogger.Write($"자동 반복 검사 클릭됨");
-            // 현재 체크 상태 확인
+            SLogger.Write("자동 반복 검사 클릭됨");
             bool isChecked = cycleModeMenuItem.Checked;
             SettingXml.Inst.CycleMode = isChecked;
             if (isChecked)
@@ -234,8 +248,7 @@ namespace CapsuleInspect
 
         private void cycleModeMenuItem2_Click(object sender, EventArgs e)
         {
-            SLogger.Write($"자동 반복 검사(한 번) 클릭됨");
-            // 현재 체크 상태 확인
+            SLogger.Write("자동 반복 검사(한 번) 클릭됨");
             bool isChecked = cycleModeMenuItem2.Checked;
             SettingXml.Inst.CycleMode2 = isChecked;
             if (isChecked)
@@ -244,12 +257,13 @@ namespace CapsuleInspect
                 SettingXml.Inst.CycleMode = false;
             }
         }
+
         public static ImageViewCtrl GetImageViewCtrl()
         {
             var camForm = GetDockForm<CameraForm>();
             return camForm?.GetImageViewControl();
         }
-        //
+
         public void UpdateFilePathTextBox(string path)
         {
             if (txtFilePath.InvokeRequired)
@@ -260,6 +274,22 @@ namespace CapsuleInspect
             {
                 txtFilePath.Text = path;
             }
+        }
+
+        // 검사 결과가 나올 때 호출해서 저장
+        public void SaveFromInspection(Bitmap resultBitmap, string defectType, string prefix = "Capsule")
+        {
+            if (resultBitmap == null) return;
+
+            Category cat;
+            if (defectType == "OK") cat = Category.OK;
+            else if (defectType == "Scratch") cat = Category.NG_Scratch;
+            else if (defectType == "PrintDefect") cat = Category.NG_PrintDefect;
+            else if (defectType == "Crack") cat = Category.NG_Crack;
+            else if (defectType == "Squeeze") cat = Category.NG_Squeeze;
+            else cat = Category.OK;
+
+            _realtimeSaver.Enqueue(resultBitmap, cat, prefix);
         }
     }
 }
