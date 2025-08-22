@@ -66,7 +66,7 @@ namespace CapsuleInspect
             stage.InspectReady("LOT_NUMBER", serialID);
 
             // AI 검사 추가
-            string modelPath = stage.CurModel.ModelPath;
+            string modelPath = SettingXml.Inst.AIModelPath;
             if (!string.IsNullOrEmpty(modelPath))
             {
                 var saigeAI = stage.AIModule;

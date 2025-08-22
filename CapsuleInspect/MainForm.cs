@@ -19,6 +19,7 @@ namespace CapsuleInspect
 
     public partial class MainForm : Form
     {
+
         private static DockPanel _dockPanel;
         public static FilterForm SharedFilterForm;
 

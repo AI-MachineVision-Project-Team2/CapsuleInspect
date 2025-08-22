@@ -88,6 +88,7 @@ namespace CapsuleInspect.Setting
 
         public string ModelDir { get; set; } = "";
         public string ImageDir { get; set; } = "";
+        public string AIModelPath { get; set; } = "";
 
         public CameraType CamType { get; set; } = CameraType.WebCam;
 

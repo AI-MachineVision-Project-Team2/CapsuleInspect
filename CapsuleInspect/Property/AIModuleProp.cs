@@ -1,6 +1,7 @@
 ﻿using CapsuleInspect.Algorithm;
 using CapsuleInspect.Core;
 using CapsuleInspect.Inspect;
+using CapsuleInspect.Setting;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -179,6 +180,8 @@ namespace CapsuleInspect.Property
 
         private void btnLoadModel_Click(object sender, EventArgs e)
         {
+            _modelPath = SettingXml.Inst.AIModelPath;
+
             if (string.IsNullOrEmpty(_modelPath))
             {
                 MessageBox.Show("모델 파일을 선택해주세요.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
