@@ -146,6 +146,12 @@ namespace CapsuleInspect
         private void btnStop_Click(object sender, EventArgs e)
         {
             Global.Inst.InspStage.StopCycle();
+            // 이미지 인덱스 초기화
+            if (Global.Inst.InspStage.ImageLoader != null)
+            {
+                Global.Inst.InspStage.ImageLoader.Reset(); // ImageLoader에 ResetIndex 메서드 필요
+                SLogger.Write("[RunForm] 이미지 인덱스 초기화 완료");
+            }
         }
     }
 }
