@@ -73,6 +73,9 @@ namespace CapsuleInspect.Inspect
         }
         public bool Inspect(Bitmap bmpImage)
         {
+            // 초기화: 검사 시작 시 _isDefect를 false로 리셋
+            _isDefect = false;
+
             // 필터링된 이미지를 우선적으로 사용
             Mat inputImage = Global.Inst.InspStage.GetFilteredImage() ?? BitmapConverter.ToMat(bmpImage);
             if (inputImage is null)
@@ -109,7 +112,6 @@ namespace CapsuleInspect.Inspect
             if (bmp == null)
                 return null;
 
-            _isDefect = false; // 초기화
             Graphics g = Graphics.FromImage(bmp);
             int step = 10;
 
@@ -183,31 +185,36 @@ namespace CapsuleInspect.Inspect
                                 inspectInfos.Add(drawInfo);
                                 filteredObjects.Add(prediction);
                             }
+                            // 필터 미통과 객체 (Good): 화면 표시 및 로그 기록 안 함
                         }
 
                         // Count 필터
                         var countFilter = Filters.FirstOrDefault(f => f.name == "Count" && f.isUse);
                         int findCount = filteredObjects.Count;
-                        if (countFilter != null)
+                        bool isCountDefect = false;
+                        if (countFilter != null && countFilter.min >= 1)
                         {
-                            if ((countFilter.min > 0 && findCount < countFilter.min) || (countFilter.max > 0 && findCount > countFilter.max) || findCount >= 1)
+                            if (findCount >= countFilter.min && (countFilter.max == 0 || findCount <= countFilter.max))
                             {
-                                _isDefect = true; // findCount >= 1이면 불량
-                                filteredObjects.Clear();
-                                string countInfo = $"Defect Count:{findCount}";
-                                DrawInspectInfo countDraw = new DrawInspectInfo(new Rect(0, 0, bmp.Width, bmp.Height), countInfo, InspectType.InspBinary, DecisionType.Defect);
-                                inspectInfos.Add(countDraw); // Count 필터 Defect는 화면 표시
-                                SLogger.Write($"[SaigeAI] Scratch 불량 감지 - findCount: {findCount}", SLogger.LogType.Info);
+                                isCountDefect = true; // Count 조건 충족 시 defect로 간주
+                                _isDefect = true;
+                            }
+                            else
+                            {
+                                // Count 범위 밖: 전체 Defect로 표시 (기존 로직 유지)
+                                if ((countFilter.max > 0 && findCount > countFilter.max))
+                                {
+                                    filteredObjects.Clear();
+                                    string countInfo = $"Defect Count:{findCount}";
+                                    DrawInspectInfo countDraw = new DrawInspectInfo(new Rect(0, 0, bmp.Width, bmp.Height), countInfo, InspectType.InspBinary, DecisionType.Defect);
+                                    inspectInfos.Add(countDraw);
+                                    _isDefect = true; // Count 불량도 defect로 플래그
+                                }
                             }
                         }
-                        else if (findCount >= 1)
+                        else
                         {
-                            _isDefect = true; // Count 필터가 없어도 findCount >= 1이면 불량
-                            filteredObjects.Clear();
-                            string countInfo = $"Defect Count:{findCount}";
-                            DrawInspectInfo countDraw = new DrawInspectInfo(new Rect(0, 0, bmp.Width, bmp.Height), countInfo, InspectType.InspBinary, DecisionType.Defect);
-                            inspectInfos.Add(countDraw);
-                            SLogger.Write($"[SaigeAI] Scratch 불량 감지 (Count 필터 없음) - findCount: {findCount}", SLogger.LogType.Info);
+                            _isDefect = findCount > 0; // Count 필터 없으면 기본
                         }
 
                         // 필터링된 객체 그리기 (Defect는 빨간색)

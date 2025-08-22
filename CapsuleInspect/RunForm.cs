@@ -68,31 +68,26 @@ namespace CapsuleInspect
 
             bool isAIDefect = false;
             bool isTeachingDefect = false;
-            List<string> defectTypes = new List<string>(); // 불량 유형 추적
-            List<InspResult> teachingResults = new List<InspResult>(); // Teaching 검사 결과 저장
+            int ngScratchFromAI = 0; // AI에서 Scratch 불량 여부 (1 or 0)
+            List<string> defectTypes = new List<string>();
 
-            // 1. AI 검사 (Scratch만 처리)
+            // AI 검사
             string modelPath = stage.CurModel.ModelPath;
             if (!string.IsNullOrEmpty(modelPath))
             {
                 var saigeAI = stage.AIModule;
                 saigeAI.LoadEngine(modelPath);
-
                 Bitmap bitmap = stage.GetBitmap();
                 if (bitmap != null)
                 {
-                    if (saigeAI.Inspect(bitmap))
+                    if (saigeAI.Inspect(bitmap)) // Inspect에서 _isDefect 설정
                     {
-                        Bitmap resultImage = saigeAI.GetResultImage();
+                        Bitmap resultImage = saigeAI.GetResultImage(); // 내부 DrawResult 호출, _isDefect 확인
                         if (resultImage != null)
                         {
                             stage.UpdateDisplay(resultImage);
-                            isAIDefect = saigeAI.IsDefect; // SaigeAI의 불량 여부 확인 (findCount >= 1)
-                            if (isAIDefect)
-                            {
-                                defectTypes.Add("Scratch");
-                                SLogger.Write("[RunForm] AI Scratch 불량 감지", SLogger.LogType.Info);
-                            }
+                            isAIDefect = saigeAI.IsDefect; // _isDefect 사용
+                            if (isAIDefect) ngScratchFromAI = 1; // AI defect 시 Scratch 1 증가 (개수 무관)
                         }
                         else
                         {
@@ -113,74 +108,39 @@ namespace CapsuleInspect
                 }
             }
 
-            // 2. Teaching 기반 검사 (Crack, Squeeze, PrintDefect)
-            if (SettingXml.Inst.CamType == Grab.CameraType.None ||
-                SettingXml.Inst.CommType == Sequence.CommunicatorType.None)
-            {
-                stage.CycleInspect(true); // 단일 사이클 검사
-            }
-            else
-            {
-                stage.StartAutoRun();
-            }
+            // Teaching 검사
+            int ngCrack, ngScratchFromTeaching, ngSqueeze, ngPrintDefect;
+            stage.InspWorker.RunInspect(out isTeachingDefect, out ngCrack, out ngScratchFromTeaching, out ngSqueeze, out ngPrintDefect);
 
-            // 3. Teaching 검사 결과 수집
-            foreach (var window in stage.CurModel.InspWindowList)
-            {
-                if (window.IgnoreInsp) continue; // 검사 제외된 ROI는 스킵
-                foreach (var result in window.InspResultList)
-                {
-                    teachingResults.Add(result);
-                    if (result.IsDefect)
-                    {
-                        isTeachingDefect = true;
-                        switch (window.InspWindowType)
-                        {
-                            case InspWindowType.Crack:
-                                defectTypes.Add("Crack");
-                                break;
-                            case InspWindowType.Squeeze:
-                                defectTypes.Add("Squeeze");
-                                break;
-                            case InspWindowType.PrintDefect:
-                                defectTypes.Add("PrintDefect");
-                                break;
-                        }
-                    }
-                }
-            }
+            // 전체 불량 여부
+            bool isOverallDefect = isAIDefect || isTeachingDefect;
 
-            // 4. 통계 업데이트
-            var accum = stage.Accum; // InspStage의 Accum 프로퍼티 사용
-            accum.Total++; // 총 검사 횟수 증가
+            // 통계 업데이트
+            var accum = stage.Accum;
+            stage.AddAccumCount(1, isOverallDefect ? 0 : 1, isOverallDefect ? 1 : 0); // 이미지당 Total/OK/NG 1씩
 
-            if (!isAIDefect && !isTeachingDefect)
-            {
-                accum.OK++; // 모든 검사에서 불량이 없으면 OK 카운트
-                stage.AddAccumCount(1, 1, 0); // Total=1, OK=1, NG=0
-            }
-            else
-            {
-                accum.NG++; // 불량이 하나라도 있으면 NG 카운트
-                stage.AddAccumCount(1, 0, 1); // Total=1, OK=0, NG=1
+            // 불량 유형: AI + Teaching
+            int ngScratch = (ngScratchFromAI > 0 || ngScratchFromTeaching > 0) ? 1 : 0; // 중복 방지, 이미지당 1
+            stage.AddNgDetailCount(ngCrack, ngScratch, ngSqueeze, ngPrintDefect);
 
-                // 불량 유형별 카운트
-                int crack = defectTypes.Contains("Crack") ? 1 : 0;
-                int scratch = defectTypes.Contains("Scratch") ? 1 : 0;
-                int squeeze = defectTypes.Contains("Squeeze") ? 1 : 0;
-                int printDefect = defectTypes.Contains("PrintDefect") ? 1 : 0;
-                stage.AddNgDetailCount(crack, scratch, squeeze, printDefect);
-            }
-
-            // 5. 결과 표시
+            // 결과 표시
             var resultForm = MainForm.GetDockForm<ResultForm>();
             if (resultForm != null)
             {
                 resultForm.AddModelResult(stage.CurModel);
             }
 
-            // 6. 불량 종류별 고유 카운트 업데이트
-            stage.SetDistinctNgCount(defectTypes.Distinct().Count());
+            // 단일 사이클 실행
+            if (SettingXml.Inst.CamType == Grab.CameraType.None ||
+                SettingXml.Inst.CommType == Sequence.CommunicatorType.None)
+            {
+                stage.InspWorker.StartSingleCycleLoop();
+            }
+            else
+            {
+                stage.StartAutoRun();
+            }
+        
         }
 
         private void btnStop_Click(object sender, EventArgs e)
