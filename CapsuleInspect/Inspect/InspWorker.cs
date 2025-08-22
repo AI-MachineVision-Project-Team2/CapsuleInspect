@@ -1,5 +1,6 @@
 ﻿using CapsuleInspect.Algorithm;
 using CapsuleInspect.Core;
+using CapsuleInspect.Setting;
 using CapsuleInspect.Teach;
 using CapsuleInspect.Util;
 using OpenCvSharp;
@@ -115,9 +116,10 @@ namespace CapsuleInspect.Inspect
         }
 
         //InspStage내의 모든 InspWindow들을 검사하는 함수
-        public bool RunInspect(out bool isDefect)
+        public bool RunInspect(out bool isDefect, out int ngCrack, out int ngScratch, out int ngSqueeze, out int ngPrintDefect)
         {
             isDefect = false;
+
             LastDefectType = "OK"; // 기본값
 
             Model curMode = Global.Inst.InspStage.CurModel;
@@ -127,30 +129,54 @@ namespace CapsuleInspect.Inspect
                 if (inspWindow is null)
                     continue;
 
-                UpdateInspData(inspWindow);
+            ngCrack = ngScratch = ngSqueeze = ngPrintDefect = 0;
+
+            var curMode = Global.Inst.InspStage.CurModel;
+            if (curMode == null || curMode.InspWindowList == null)
+            {
+                var cam = MainForm.GetDockForm<CameraForm>();
+                cam?.SetInspResultCount(0, 0, 0);
+                Global.Inst.InspStage.SetDistinctNgCount(0);
+                return true;
             }
 
-            _inspectBoard.InspectWindowList(inspWindowList);
+            var inspWindowList = curMode.InspWindowList;
 
-            int totalCnt = 0;
-            int okCnt = 0;
-            int ngCnt = 0;
+            // 검사 대상 ROI만 추출 (체크 해제된 ROI는 제외)
+            var activeWindows = inspWindowList
+                .Where(w => w != null && !w.IgnoreInsp)
+                .ToList();
 
-            var allRects = new List<DrawInspectInfo>();
+            // 활성 ROI가 하나도 없으면: 검사 스킵 + UI 정리
+            if (activeWindows.Count == 0)
+            {
+                var cam = MainForm.GetDockForm<CameraForm>();
+                cam?.SetInspResultCount(0, 0, 0);
+                Global.Inst.InspStage.SetDistinctNgCount(0);
+                return true;
+            }
 
-            // 누적 변수 선언
-            int ngCrack = 0, ngScratch = 0, ngSqueeze = 0, ngPrintDefect = 0;
+            // 검사 데이터 준비 (활성 ROI만)
+            foreach (var w in activeWindows)
+            {
+                if (w == null) continue;
+                UpdateInspData(w);
+            }
 
-            foreach (var inspWindow in inspWindowList)
+            // 실제 검사 실행 (활성 ROI만)
+            _inspectBoard.InspectWindowList(activeWindows);
+
+            int totalCnt = 0, okCnt = 0, ngCnt = 0;
+
+            // 결과 집계 (활성 ROI만)
+            foreach (var w in activeWindows)
             {
                 totalCnt++;
-
-                if (inspWindow.IsDefect())
+                if (w.IsDefect())
                 {
-                    if (!isDefect)
-                        isDefect = true;
-
+                    isDefect = true;
                     ngCnt++;
+
 
                     // ROI 이름 기준으로 세분화된 NG 카운트 분기
                     if (inspWindow.Name != null)
@@ -163,6 +189,14 @@ namespace CapsuleInspect.Inspect
                             ngSqueeze++;
                         else if (inspWindow.Name.Contains("PrintDefect"))
                             ngPrintDefect++;
+
+                    switch (GetInspWindowKind(w))
+                    {
+                        case InspWindowType.Crack: ngCrack = 1; break;
+                        case InspWindowType.Scratch: ngScratch = 1; break;
+                        case InspWindowType.Squeeze: ngSqueeze = 1; break;
+                        case InspWindowType.PrintDefect: ngPrintDefect = 1; break;
+                        default: break;
                     }
                 }
                 else
@@ -170,13 +204,22 @@ namespace CapsuleInspect.Inspect
                     okCnt++;
                 }
 
-                DisplayResult(inspWindow, InspectType.InspNone);
+                // ROI별 결과 표시(도형/박스) — 내부에서 CameraForm에 그려줌
+                DisplayResult(w, InspectType.InspNone);
             }
 
+            // 종류별 distinct 카운트
+            int distinctByKind =
+                (ngCrack > 0 ? 1 : 0) +
+                (ngScratch > 0 ? 1 : 0) +
+                (ngSqueeze > 0 ? 1 : 0) +
+                (ngPrintDefect > 0 ? 1 : 0);
+            Global.Inst.InspStage.SetDistinctNgCount(distinctByKind);
+
+            // 상단 카운터 갱신
             var cameraForm = MainForm.GetDockForm<CameraForm>();
             if (cameraForm != null)
             {
-                cameraForm.AddRect(allRects);                        // (있다면)
                 cameraForm.SetInspResultCount(totalCnt, okCnt, ngCnt);
             }
 
@@ -206,10 +249,30 @@ namespace CapsuleInspect.Inspect
 
                 LastDefectType = type;
             }
-
             return true;
         }
+        private InspWindowType GetInspWindowKind(InspWindow w)
+        {
+            var t = w.GetType();
+            var p1 = t.GetProperty("InspWindowType");
+            if (p1 != null && p1.PropertyType == typeof(InspWindowType))
+                return (InspWindowType)p1.GetValue(w, null);
 
+            var p2 = t.GetProperty("WindowType");
+            if (p2 != null && p2.PropertyType == typeof(InspWindowType))
+                return (InspWindowType)p2.GetValue(w, null);
+
+            var name = (w?.Name ?? w?.UID ?? string.Empty).ToLowerInvariant();
+            if (name.Contains("crack") || name.Contains("크랙") || name.Contains("균열"))
+                return InspWindowType.Crack;
+            if (name.Contains("scratch") || name.Contains("스크래치"))
+                return InspWindowType.Scratch;
+            if (name.Contains("squeeze") || name.Contains("찌그러") || name.Contains("변형"))
+                return InspWindowType.Squeeze;
+            if (name.Contains("printdefect") || name.Contains("인쇄") || name.Contains("프린트"))
+                return InspWindowType.PrintDefect;
+            return InspWindowType.None;
+        }
         //특정 InspWindow에 대한 검사 진행
         //inspType이 있다면 그것만을 검사하고, 없다면 InpsWindow내의 모든 알고리즘 검사
         public bool TryInspect(InspWindow inspObj, InspectType inspType)
@@ -220,13 +283,13 @@ namespace CapsuleInspect.Inspect
                     return false;
 
                 _inspectBoard.Inspect(inspObj);
-
                 DisplayResult(inspObj, inspType);
             }
             else
             {
                 bool isDefect = false;
-                RunInspect(out isDefect);
+                int ngCrack, ngScratch, ngSqueeze, ngPrintDefect;
+                RunInspect(out isDefect, out ngCrack, out ngScratch, out ngSqueeze, out ngPrintDefect);
             }
 
             ResultForm resultForm = MainForm.GetDockForm<ResultForm>();
@@ -263,6 +326,13 @@ namespace CapsuleInspect.Inspect
                 Mat srcImage = Global.Inst.InspStage.GetFilteredImage() ??
                   Global.Inst.InspStage.GetMat(0, inspAlgo.ImageChannel);
                 inspAlgo.SetInspData(srcImage);
+
+                if (inspAlgo.InspectType == InspectType.InspAI)
+                {
+                    Global.Inst.InspStage.AIModule.LoadEngine(SettingXml.Inst.AIModelPath);
+                    AIAlgorithm aiAlgo = inspAlgo as AIAlgorithm;
+                    aiAlgo.SetSaigeAI(Global.Inst.InspStage.AIModule);
+                }
             }
 
             return true;

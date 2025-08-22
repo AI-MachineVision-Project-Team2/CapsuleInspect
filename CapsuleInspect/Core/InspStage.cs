@@ -128,6 +128,18 @@ namespace CapsuleInspect.Core
         public AccumCounter Accum { get; } = new AccumCounter();
         public event Action<AccumCounter> AccumChanged;
 
+        //지피티 추가
+        public int LastDistinctNgCount { get; private set; }
+        public event Action<int> DistinctNgCountUpdated;
+
+
+        private void OnUi(Action a)
+        {
+            var main = Application.OpenForms.OfType<MainForm>().FirstOrDefault();
+            if (main != null && main.InvokeRequired) main.BeginInvoke(a);
+            else a();
+        }
+
         public void ResetAccum()
         {
             Accum.Reset();
@@ -810,22 +822,25 @@ namespace CapsuleInspect.Core
             }
         }
 
-        public bool OneCycle()
-        {
-            if (UseCamera)
-            {
-                if (!Grab(0)) return false;
-            }
-            else
-            {
-                if (!VirtualGrab()) return false;
-            }
+      
+        public bool OneCycle() 
+        { 
+            if (UseCamera) 
+            { 
+                if (!Grab(0)) return false; 
+            } 
+            else 
+            { 
+                if (!VirtualGrab()) return false; 
+            } 
             ResetDisplay();
 
-            bool isDefect;
-            if (!_inspWorker.RunInspect(out isDefect))
-                return false;
+            //RunAISegAndShow();
 
+            bool isDefect;
+            int ngCrack, ngScratch, ngSqueeze, ngPrintDefect;
+              if (!_inspWorker.RunInspect(out isDefect, out ngCrack, out ngScratch, out ngSqueeze, out ngPrintDefect))
+                return false;
             // 여기서도 항상 검사 완료 이벤트를 올림
             try
             {
@@ -836,8 +851,10 @@ namespace CapsuleInspect.Core
                 if (h != null) h(defectType);
             }
             catch { }
+            
+          
+            return true; 
 
-            return true;
         }
 
         public void StopCycle()
@@ -894,15 +911,16 @@ namespace CapsuleInspect.Core
                                 SLogger.Write(errMsg, SLogger.LogType.Error);
                             }
                         }
+                        RunAISegAndShow();
 
-                        bool isDefect = false;
-                        if (!_inspWorker.RunInspect(out isDefect))
+                        bool isDefect;
+                        int ngCrack, ngScratch, ngSqueeze, ngPrintDefect;
+                        if (!_inspWorker.RunInspect(out isDefect, out ngCrack, out ngScratch, out ngSqueeze, out ngPrintDefect))
                         {
                             errMsg = "검사 실패";
                             SLogger.Write(errMsg, SLogger.LogType.Error);
                         }
 
-                        // 기존: 제어부 통지
                         VisionSequence.Inst.VisionCommand(Vision2Mmi.InspDone, isDefect);
 
                         // 세부 타입 문자열 가져와서 UI로 통지
@@ -982,7 +1000,58 @@ namespace CapsuleInspect.Core
             }
         }
 
+        // 마지막 검사 결과를 기반으로, 불량 개수 계산 및 UI 업데이트
+        private void PublishDistinctNg()
+        {
+            // Distinct-by-kind 값은 InspWorker에서 계산해 SetDistinctNgCount로 전달됨.
+            OnUi(() => DistinctNgCountUpdated?.Invoke(LastDistinctNgCount));
+        }
+        public void SetDistinctNgCount(int count)
+        {
+            LastDistinctNgCount = count;
+            OnUi(() => DistinctNgCountUpdated?.Invoke(count));
+        }
 
+        public void ShowSaigeResult()
+        {
+            if (_saigeAI is null)
+                return;
+
+            var result = _saigeAI.GetResultImage();
+            if (result != null)
+                UpdateDisplay(result);
+        }
+
+        public void RunAISegAndShow()
+        {
+            try
+            {
+                var bmp = GetBitmap();               // 현재 표시용 비트맵 (ImageSpace에서 꺼냄)
+                if (bmp == null) return;
+
+                var ai = AIModule;                   // SaigeAI 인스턴스 (지연 생성 프로퍼티)
+                ai?.Inspect(bmp);                    // 세그먼트/검사 실행
+                var result = ai?.GetResultImage();   // 그려진 결과 비트맵
+                                                     // ★ 추가: DrawResult에서 반환된 defectInfos 가져오기 (DrawResult 호출 전에 resultImage 생성 필요)
+                                                     // GetResultImage() 내부 DrawResult 호출로, defectInfos를 반환하도록 GetResultImage() 수정 or 별도 호출
+                                                     // 간단히: ai.DrawResult(result); 대신 직접 호출
+                List<DrawInspectInfo> defectInfos = ai.DrawResult(result); // 수정된 DrawResult 반환 사용
+
+                if (result != null)
+                    UpdateDisplay(result);
+
+                // 불량 객체 그리기
+                var cameraForm = MainForm.GetDockForm<CameraForm>();
+                if (cameraForm != null && defectInfos != null && defectInfos.Count > 0)
+                {
+                    cameraForm.AddRect(defectInfos);
+                }
+            }
+            catch (Exception ex)
+            {
+                SLogger.Write($"AI Inspect 실패: {ex.Message}", SLogger.LogType.Error);
+            }
+        }
 
         #region Disposable
 

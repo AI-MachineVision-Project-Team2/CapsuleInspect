@@ -1,5 +1,6 @@
 ﻿using CapsuleInspect.Core;
 using CapsuleInspect.Grab;
+using CapsuleInspect.Inspect;
 using CapsuleInspect.Setting;
 using CapsuleInspect.Util;
 using System;
@@ -107,13 +108,13 @@ namespace CapsuleInspect
 
         private void btnInsp_Click(object sender, EventArgs e)
         {
-            SLogger.Write("[RunForm] 검사 클릭됨");
-            string serialID = string.Format("{0:MM-dd HH:mm:ss}", DateTime.Now);
-            Global.Inst.InspStage.InspectReady("LOT_NUMBER", serialID);
 
+            SLogger.Write($"[RunForm] 검사 클릭됨");
+            string serialID = $"{DateTime.Now:MM-dd HH:mm:ss}";
+            var stage = Global.Inst.InspStage;
+            stage.InspectReady("LOT_NUMBER", serialID);
             // 초기화 뒤 재구독 보장 (안전망)
             BindStage();
-
             if (SettingXml.Inst.CamType == Grab.CameraType.None ||
                 SettingXml.Inst.CommType == Sequence.CommunicatorType.None)
             {
@@ -121,13 +122,22 @@ namespace CapsuleInspect
             }
             else
             {
-                Global.Inst.InspStage.StartAutoRun();
+                stage.StartAutoRun();
             }
+
         }
 
         private void btnStop_Click(object sender, EventArgs e)
         {
             Global.Inst.InspStage.StopCycle();
+            // 이미지 인덱스 초기화
+            if (Global.Inst.InspStage.ImageLoader != null)
+            {
+                Global.Inst.InspStage.ImageLoader.Reset(); // ImageLoader에 ResetIndex 메서드 필요
+                SLogger.Write("[RunForm] 이미지 인덱스 초기화 완료");
+            }
+
+            Global.Inst.InspStage.ShowSaigeResult();
         }
     }
 }

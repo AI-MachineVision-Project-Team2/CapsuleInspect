@@ -27,17 +27,25 @@ namespace CapsuleInspect.Core
         private Mat _binaryResultImage = null;
         private bool _usePreview = true;
         public InspWindow CurrentInspWindow => _inspWindow;
+        private List<DrawInspectInfo> _measureLines = null;
         public void SetImage(Mat image)
         {
             _orinalImage = image;
             _previewImage = new Mat();
             _binaryResultImage = null;
         }
+        public void SetMeasureLines(List<DrawInspectInfo> lines)
+        {
+            _measureLines = lines;
+        }
         public void SetBinaryResultImage(Mat binary)
         {
             _binaryResultImage = binary.Clone();
         }
-
+        public Mat GetBinaryResultImage()
+        {
+            return _binaryResultImage;
+        }
         // 프리뷰를 위한 InspWindow 설정
         public void SetInspWindow(InspWindow inspwindow)
         {
@@ -265,6 +273,34 @@ namespace CapsuleInspect.Core
           
             //_binaryResultImage = _previewImage.Clone(); // 이진화 결과 이미지 업데이트
             SLogger.Write("SetMorphologyPreview: Morphology 결과 적용 및 표시 완료", SLogger.LogType.Info);
+        }
+        public void DrawOverlay(Graphics g)
+        {
+            if (_measureLines != null && _measureLines.Count > 0)
+            {
+                using (Pen pen = new Pen(Color.Orange, 2)) // 선 색상/두께
+                using (SolidBrush brush = new SolidBrush(Color.Green)) // 텍스트 색상
+                using (Font font = new Font("Arial", 10, FontStyle.Bold)) // 폰트
+                {
+                    // 평균 Width/Height 계산 (표시용)
+                    var widths = _measureLines.Where(l => l.info.StartsWith("W:")).Select(l => int.Parse(l.info.Substring(3))).ToList();
+                    var heights = _measureLines.Where(l => l.info.StartsWith("H:")).Select(l => int.Parse(l.info.Substring(3))).ToList();
+                    int avgWidth = widths.Any() ? (int)widths.Average() : 0;
+                    int avgHeight = heights.Any() ? (int)heights.Average() : 0;
+
+                    // 각 선 그리기
+                    foreach (var line in _measureLines)
+                    {
+                        Rectangle r = new Rectangle(line.rect.X, line.rect.Y, line.rect.Width, line.rect.Height);
+                        g.DrawRectangle(pen, r);
+                        g.DrawString(line.info, font, brush, r.Location); // 개별 값 표시
+                    }
+
+                    // 평균 값 표시 (화면 오른쪽 상단에 요약)
+                    System.Drawing.Point summaryPos = new System.Drawing.Point(10, 10); // 위치 조정 가능
+                    g.DrawString($"Avg Width: {avgWidth} px\nAvg Height: {avgHeight} px", font, brush, summaryPos);
+                }
+            }
         }
     }
 }

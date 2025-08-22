@@ -18,7 +18,7 @@ namespace CapsuleInspect.Teach
     public partial class InspWindow
     {
         public InspWindowType InspWindowType { get; set; }
-        
+
         public string Name { get; set; }
         public string UID { get; set; }
 
@@ -29,7 +29,7 @@ namespace CapsuleInspect.Teach
         // Xml Serialize를 위해서, Element을 명확하게 알려줘야 함        
         [XmlElement("InspAlgorithm")]
         public List<InspAlgorithm> AlgorithmList { get; set; } = new List<InspAlgorithm>();
-        
+
         // 검사 결과를 저장하기 위한 리스트
         public List<InspResult> InspResultList { get; set; } = new List<InspResult>();
 
@@ -111,27 +111,27 @@ namespace CapsuleInspect.Teach
 
             foreach (var algorithm in AlgorithmList)
             {
-                if (algorithm.InspectType != InspectType.InspMatch)
-                    continue;
-
-                MatchAlgorithm matchAlgo = (MatchAlgorithm)algorithm;
-                matchAlgo.ResetTemplateImages();
-
-                for (int i = 0; i < _windowImages.Count; i++)
+                if (algorithm.InspectType == InspectType.InspMatch)
                 {
-                    Mat tempImage = _windowImages[i];
-                    if (tempImage is null)
-                        continue;
+                    MatchAlgorithm matchAlgo = (MatchAlgorithm)algorithm;
+                    matchAlgo.ResetTemplateImages();
 
-                    if (tempImage.Type() == MatType.CV_8UC3)
+                    for (int i = 0; i < _windowImages.Count; i++)
                     {
-                        Mat grayImage = new Mat();
-                        Cv2.CvtColor(tempImage, grayImage, ColorConversionCodes.BGR2GRAY);
-                        matchAlgo.AddTemplateImage(grayImage);
-                    }
-                    else
-                    {
-                        matchAlgo.AddTemplateImage(tempImage);
+                        Mat tempImage = _windowImages[i];
+                        if (tempImage is null)
+                            continue;
+
+                        if (tempImage.Type() == MatType.CV_8UC3)
+                        {
+                            Mat grayImage = new Mat();
+                            Cv2.CvtColor(tempImage, grayImage, ColorConversionCodes.BGR2GRAY);
+                            matchAlgo.AddTemplateImage(grayImage);
+                        }
+                        else
+                        {
+                            matchAlgo.AddTemplateImage(tempImage);
+                        }
                     }
                 }
             }
@@ -157,6 +157,9 @@ namespace CapsuleInspect.Teach
                     break;
                 case InspectType.InspFilter:
                     inspAlgo = new FilterAlgorithm();
+                    break;
+                case InspectType.InspAI:
+                    inspAlgo = new AIAlgorithm();
                     break;
             }
 

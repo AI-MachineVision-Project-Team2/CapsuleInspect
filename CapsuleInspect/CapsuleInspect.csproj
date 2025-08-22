@@ -139,6 +139,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Algorithm\AIAlgorithm.cs" />
     <Compile Include="Algorithm\BlobAlgorithm.cs" />
     <Compile Include="Algorithm\DrawInspectInfo.cs" />
     <Compile Include="Algorithm\FilterAlgorithm.cs" />

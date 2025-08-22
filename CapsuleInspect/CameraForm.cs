@@ -122,6 +122,10 @@ namespace CapsuleInspect
             imageViewer.LoadBitmap(bitmap);
             _imgHistory.Push(mat.Clone());
         }
+        public ImageViewCtrl GetImageViewControl()
+        {
+            return this.imageViewer; 
+        }
 
         private void CameraForm_Resize(object sender, EventArgs e)
         {

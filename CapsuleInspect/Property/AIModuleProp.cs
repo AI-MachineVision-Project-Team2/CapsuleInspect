@@ -1,4 +1,7 @@
-﻿using CapsuleInspect.Inspect;
+﻿using CapsuleInspect.Algorithm;
+using CapsuleInspect.Core;
+using CapsuleInspect.Inspect;
+using CapsuleInspect.Setting;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,21 +13,32 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
-using CapsuleInspect.Core;
 namespace CapsuleInspect.Property
 {
     public partial class AIModuleProp : UserControl
     {
-        SaigeAI _saigeAI; // SaigeAI 인스턴스
+        //SaigeAI _saigeAI; // SaigeAI 인스턴스
+        AIAlgorithm _aiAlgo = null;
         string _modelPath = string.Empty;
+        private bool _updateDataGridView = true;
+        private readonly int COL_USE = 1;
+        private readonly int COL_MIN = 2;
+        private readonly int COL_MAX = 3;
         //EngineType _engineType;
-
+        public List<BlobFilter> BlobFilters { get; set; } = new List<BlobFilter>();
         public AIModuleProp()
         {
             InitializeComponent();
             InitializeFilterDataGridView();
+            SetDefault(); // 생성자에서 초기화
         }
-
+        public void SetDefault()
+        {
+            BlobFilters.Add(new BlobFilter { name = "Area", isUse = false, min = 200, max = 500 });
+            BlobFilters.Add(new BlobFilter { name = "Width", isUse = false, min = 0, max = 0 });
+            BlobFilters.Add(new BlobFilter { name = "Height", isUse = false, min = 0, max = 0 });
+            BlobFilters.Add(new BlobFilter { name = "Count", isUse = false, min = 0, max = 0 });
+        }
         private void InitializeFilterDataGridView()
         {
             // 스타일 설정
@@ -84,10 +98,10 @@ namespace CapsuleInspect.Property
             });
 
             // 항목 추가
-            AddFilterRow("Area");
-            AddFilterRow("Length");
-            AddFilterRow("Width");
-            AddFilterRow("Count");
+            AddFilterRow("Area", false, 200, 500);
+            AddFilterRow("Width", false, 0, 0);
+            AddFilterRow("Height", false, 0, 0);
+            AddFilterRow("Count", false, 0, 0);
 
             dataGridViewFilter.AllowUserToAddRows = false;
             dataGridViewFilter.RowHeadersVisible = false;
@@ -98,13 +112,16 @@ namespace CapsuleInspect.Property
 
             // 이벤트 핸들러 추가
             dataGridViewFilter.CurrentCellDirtyStateChanged += dataGridViewFilter_CurrentCellDirtyStateChanged;
+            dataGridViewFilter.CellValueChanged += dataGridViewFilter_CellValueChanged;
         }
 
-        private void AddFilterRow(string itemName)
+        // GridView 행 추가 메서드 수정 (초기값 반영)
+        private void AddFilterRow(string itemName, bool isUse, int min, int max)
         {
-            dataGridViewFilter.Rows.Add(itemName, false, "", "");
+            dataGridViewFilter.Rows.Add(itemName, isUse, min.ToString(), max.ToString());
         }
-
+        // BinaryProp처럼 GridView 값을 BlobFilters에 반영
+      
         private void dataGridViewFilter_CurrentCellDirtyStateChanged(object sender, EventArgs e)
         {
             if (dataGridViewFilter.CurrentCell is DataGridViewCheckBoxCell)
@@ -112,73 +129,84 @@ namespace CapsuleInspect.Property
                 dataGridViewFilter.CommitEdit(DataGridViewDataErrorContexts.Commit);
             }
         }
-
-        private void btnSelAIModel_Click(object sender, EventArgs e)
+        private void dataGridViewFilter_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            string filter = "Segmentation Files|*.saigeseg;";
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
-            {
-                openFileDialog.Title = "AI 모델 파일 선택";
-                openFileDialog.Filter = filter;
-                openFileDialog.Multiselect = false;
-                try
-                {
-                    if (!string.IsNullOrEmpty(_modelPath) && Directory.Exists(Path.GetDirectoryName(_modelPath)))
-                        openFileDialog.InitialDirectory = Path.GetDirectoryName(_modelPath);
-                    else
-                        openFileDialog.InitialDirectory = @"C:\model";
-                }
-                catch (Exception)
-                {
-                    openFileDialog.InitialDirectory = @"C:\model";
-                }
+            if (_updateDataGridView == true)
+                UpdateDataGridView(false);
 
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    _modelPath = openFileDialog.FileName;
-                    txtAIModelPath.Text = _modelPath;
-                }
-            }
+
         }
-
-        private void btnLoadModel_Click(object sender, EventArgs e)
+       
+        public void SetAlgorithm(AIAlgorithm aiAlgo)
         {
-            if (string.IsNullOrEmpty(_modelPath))
-            {
-                MessageBox.Show("모델 파일을 선택해주세요.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            if (_saigeAI == null)
-            {
-                _saigeAI = Global.Inst.InspStage.AIModule;
-            }
-
-            _saigeAI.LoadEngine(_modelPath);
-            MessageBox.Show("모델이 성공적으로 로드되었습니다.", "정보", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            _aiAlgo = aiAlgo;
+            // 이진화 알고리즘 필터값이 없을 경우, 기본값 설정
+            if (_aiAlgo.BlobFilters.Count <= 0)
+                _aiAlgo.SetDefault();
+            SetProperty();
         }
-
-        private void btnInspAI_Click(object sender, EventArgs e)
+        public void SetProperty()
         {
-            if (_saigeAI == null)
-            {
-                MessageBox.Show("AI 모듈이 초기화되지 않았습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (_aiAlgo is null)
                 return;
-            }
-
-            Bitmap bitmap = Global.Inst.InspStage.GetBitmap();
-
-            if (bitmap is null)
-            {
-                MessageBox.Show("현재 이미지가 없습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            UpdateDataGridView(true);
+           
+        }
+        //UI컨트롤러 값을 이진화 알고리즘 클래스에 적용
+        public void GetProperty()
+        {
+            if (_aiAlgo is null)
                 return;
+
+            //GridView 값을 _blobAlgo에 반영
+            UpdateDataGridView(false);
+        }
+        private void UpdateDataGridView(bool update)
+        {
+            if (_aiAlgo is null)
+                return;
+
+            if (update)
+            {
+                _updateDataGridView = false;
+                List<BlobFilter> blobFilters = _aiAlgo.BlobFilters;
+
+                for (int i = 0; i < blobFilters.Count; i++)
+                {
+                    if (i >= dataGridViewFilter.Rows.Count)
+                        break;
+
+                    dataGridViewFilter.Rows[i].Cells[COL_USE].Value = blobFilters[i].isUse;
+                    dataGridViewFilter.Rows[i].Cells[COL_MIN].Value = blobFilters[i].min;
+                    dataGridViewFilter.Rows[i].Cells[COL_MAX].Value = blobFilters[i].max;
+                }
+                _updateDataGridView = true;
             }
+            else
+            {
+                if (_updateDataGridView == false)
+                    return;
 
-            _saigeAI.Inspect(bitmap);
+                List<BlobFilter> blobFilters = _aiAlgo.BlobFilters;
 
-            Bitmap resultImage = _saigeAI.GetResultImage();
+                for (int i = 0; i < blobFilters.Count; i++)
+                {
+                    BlobFilter blobFilter = blobFilters[i];
+                    blobFilter.isUse = (bool)dataGridViewFilter.Rows[i].Cells[COL_USE].Value;
 
-            Global.Inst.InspStage.UpdateDisplay(resultImage);
+                    object value = dataGridViewFilter.Rows[i].Cells[COL_MIN].Value;
+
+                    int min = 0;
+                    if (value != null && int.TryParse(value.ToString(), out min))
+                        blobFilter.min = min;
+
+                    value = dataGridViewFilter.Rows[i].Cells[COL_MAX].Value;
+
+                    int max = 0;
+                    if (value != null && int.TryParse(value.ToString(), out max))
+                        blobFilter.max = max;
+                }
+            }
         }
     }
 }

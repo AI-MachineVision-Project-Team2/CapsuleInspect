@@ -258,6 +258,12 @@ namespace CapsuleInspect
             }
         }
 
+        public static ImageViewCtrl GetImageViewCtrl()
+        {
+            var camForm = GetDockForm<CameraForm>();
+            return camForm?.GetImageViewControl();
+        }
+
         public void UpdateFilePathTextBox(string path)
         {
             if (txtFilePath.InvokeRequired)

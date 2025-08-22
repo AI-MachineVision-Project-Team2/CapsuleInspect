@@ -2,6 +2,7 @@
 using CapsuleInspect.Core;
 using CapsuleInspect.Teach;
 using CapsuleInspect.Util;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -370,6 +371,54 @@ namespace CapsuleInspect.Property
             ImageChannelChanged?.Invoke(this, new ImageChannelEventArgs(_blobAlgo.ImageChannel));
         }
 
+        private void chkMeasure_CheckedChanged(object sender, EventArgs e)
+        {
+
+            var cameraForm = MainForm.GetDockForm<CameraForm>();
+            if (cameraForm == null) return;
+
+            var preview = Global.Inst.InspStage.PreView;
+            if (preview == null) return;
+
+            var currentWindow = preview.CurrentInspWindow;
+            if (currentWindow == null) return;
+
+            foreach (var algo in currentWindow.AlgorithmList)
+            {
+                if (algo is BlobAlgorithm blobAlgo)
+                {
+                    if (!chkMeasure.Checked)
+                    {
+                        preview.SetMeasureLines(null); // 측정선 제거
+                        MainForm.GetImageViewCtrl()?.Invalidate(); // 다시 그리기
+                        return;
+                    }
+
+                    Mat binary = preview.GetBinaryResultImage();
+                    if (binary == null || binary.Empty()) return;
+
+                    // 주석 해제: 실제 측정 호출
+                    var result = blobAlgo.MeasureCapsuleSize(binary, algo.InspRect);
+                    preview.SetMeasureLines(result);
+
+                    // 화면 갱신
+                    MainForm.GetImageViewCtrl()?.Invalidate(); // ImageViewCtrl 갱신 (Paint 이벤트 트리거)
+
+                    // 추가: CameraForm의 UpdateDisplay 호출로 전체 뷰 갱신 (필요 시)
+                    cameraForm.UpdateDisplay();
+
+                    // 결과 로그 (디버깅용)
+                    if (result.Count > 0)
+                    {
+                        SLogger.Write($"측정 완료: Width/Height 선 {result.Count}개 생성.", SLogger.LogType.Info);
+                    }
+                    else
+                    {
+                        SLogger.Write("측정 결과가 없습니다. 윤곽선이 없거나 ROI 문제.", SLogger.LogType.Error);
+                    }
+                }
+            }
+        }
     }
     public class ImageChannelEventArgs : EventArgs
     {
