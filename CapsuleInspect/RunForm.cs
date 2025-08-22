@@ -134,7 +134,7 @@ namespace CapsuleInspect
             if (SettingXml.Inst.CamType == Grab.CameraType.None ||
                 SettingXml.Inst.CommType == Sequence.CommunicatorType.None)
             {
-                stage.InspWorker.StartSingleCycleLoop();
+                Global.Inst.InspStage.CycleInspect(true); // 무한 루프 검사
             }
             else
             {
