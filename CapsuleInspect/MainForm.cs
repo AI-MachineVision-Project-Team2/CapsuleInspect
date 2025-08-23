@@ -214,20 +214,11 @@ namespace CapsuleInspect
 
         private void modelSaveAsMenuItem_Click(object sender, EventArgs e)
         {
-            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
-            {
-                saveFileDialog.InitialDirectory = SettingXml.Inst.ModelDir;
-                saveFileDialog.Title = "모델 파일 선택";
-                saveFileDialog.Filter = "Model Files|*.xml;";
-                saveFileDialog.DefaultExt = "xml";
-
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    string filePath = saveFileDialog.FileName;
-                    Global.Inst.InspStage.SaveModel(filePath);
-                }
-            }
+            var model = Global.Inst.InspStage.CurModel;
+            if (model != null)
+                model.SaveAs();
         }
+        
 
         public void DoModelSave()
         {

@@ -187,39 +187,37 @@ namespace Common.Util.Helpers
 			}
 		}
 
-		/// <summary>
-		/// Saves an object to a serialized xml file
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="fileName"></param>
-		/// <param name="obj"></param>
-		public static void SaveXml<T>(string fileName, T obj)
-		{
-            //XmlSerializer를 사용하여 객체 → XML 변환(직렬화) 후, FileStream을 통해 파일로 저장
+        /// <summary>
+        /// Saves an object to a serialized xml file
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fileName"></param>
+        /// <param name="obj"></param>
+        public static void SaveXml<T>(string fileName, T obj)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+                throw new ArgumentException("fileName is null or empty.", nameof(fileName));
 
-            using (Stream stream = new FileStream(fileName, FileMode.Create))
-			{
-				try
-				{
-					//	XmlSerializer serializer = new XmlSerializer(obj.GetType());
-					XmlSerializer serializer = XmlSerializer.FromTypes(new[] { typeof(T) })[0];
-					serializer.Serialize(stream, obj);
-				}
-				catch
-				{
-					throw;
-				}
-			}
-		}
-		#endregion
+            // ✅ 상위 폴더 자동 생성
+            string dir = Path.GetDirectoryName(Path.GetFullPath(fileName));
+            if (!string.IsNullOrEmpty(dir))
+                Directory.CreateDirectory(dir);
 
-		/// <summary>
-		/// 객체를 Linq XML문서형태로 변환하여 반환한다.
-		/// </summary>
-		/// <typeparam name="T">변환하고 자하는 객체의 타입</typeparam>
-		/// <param name="obj">변환하고 자하는 객체</param>
-		/// <returns>Linq XML문서</returns>
-		public static XDocument ObjectToLinqXmlDoc<T>(T obj)
+            using (Stream stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                var serializer = XmlSerializer.FromTypes(new[] { typeof(T) })[0];
+                serializer.Serialize(stream, obj);
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// 객체를 Linq XML문서형태로 변환하여 반환한다.
+        /// </summary>
+        /// <typeparam name="T">변환하고 자하는 객체의 타입</typeparam>
+        /// <param name="obj">변환하고 자하는 객체</param>
+        /// <returns>Linq XML문서</returns>
+        public static XDocument ObjectToLinqXmlDoc<T>(T obj)
 		{
 			string xmlString = ObjectToXmlString<T>(obj);
 

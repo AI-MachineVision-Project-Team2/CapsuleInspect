@@ -16,6 +16,7 @@ namespace CapsuleInspect.Inspect
 {
     public class InspWorker
     {
+
         private CancellationTokenSource _cts = new CancellationTokenSource();
 
         private InspectBoard _inspectBoard = new InspectBoard();
@@ -87,6 +88,7 @@ namespace CapsuleInspect.Inspect
                 Thread.Sleep(200); // 주기 설정
             }
 
+
             IsRunning = false;
 
             SLogger.Write("자동 반복 검사 종료");
@@ -118,6 +120,15 @@ namespace CapsuleInspect.Inspect
         //InspStage내의 모든 InspWindow들을 검사하는 함수
         public bool RunInspect(out bool isDefect, out int ngCrack, out int ngScratch, out int ngSqueeze, out int ngPrintDefect)
         {
+            // === [집계 시작] 검사 1장 처리 결과를 유형별 1건으로 압축해서 카운트 ===
+            var model = Global.Inst.InspStage.CurModel;
+
+            // 현재 모델의 검사 대상 윈도우(무시 플래그 제외)
+            var allWindows = model.InspWindowList
+                .Where(w => w.IgnoreInsp == false)
+                .ToList();
+
+
             // out 매개변수 초기화 (모든 경로에서 값이 할당되도록 보장)
             isDefect = false;
             ngCrack = ngScratch = ngSqueeze = ngPrintDefect = 0;
