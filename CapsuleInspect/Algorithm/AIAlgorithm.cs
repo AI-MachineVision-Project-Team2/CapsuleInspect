@@ -22,8 +22,10 @@ namespace CapsuleInspect.Algorithm
     public class AIAlgorithm : BlobAlgorithm
     {
         private SaigeAI _saigeAI = null;
-        
-     
+        private readonly List<DrawInspectInfo> _resultRects = new List<DrawInspectInfo>();
+
+        public int OutBlobCount { get; private set; } = 0;
+
         public AIAlgorithm()
         {
             InspectType = InspectType.InspAI;
@@ -77,11 +79,20 @@ namespace CapsuleInspect.Algorithm
 
         //측정 검사 알고리즘
 
+        public override void SetInspData(Mat srcImage)
+        {
+            base.SetInspData(srcImage);
+        }
 
         public override bool DoInspect()
         {
-            ResetResult();
+            ResetResult();              // 베이스 공통 결과 초기화
+            _resultRects.Clear();
             OutBlobCount = 0;
+            IsInspected = false;
+            IsDefect = false;
+            //Decision = DecisionType.Good;
+            ResultString.Clear();
 
             if (_srcImage == null || _srcImage.Empty())
             {

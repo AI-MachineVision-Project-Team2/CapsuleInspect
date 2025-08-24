@@ -120,6 +120,97 @@ namespace CapsuleInspect.Inspect
         //InspStage내의 모든 InspWindow들을 검사하는 함수
         public bool RunInspect(out bool isDefect, out int ngCrack, out int ngScratch, out int ngSqueeze, out int ngPrintDefect)
         {
+            /*
+            // 기본 out 값
+            isDefect = false;
+            ngCrack = ngScratch = ngSqueeze = ngPrintDefect = 0;
+            LastDefectType = "OK";
+
+            Model currentModel = Global.Inst.InspStage.CurModel;
+            if (currentModel == null || currentModel.InspWindowList == null)
+            {
+                var cam0 = MainForm.GetDockForm<CameraForm>();
+                cam0?.SetInspResultCount(0, 0, 0);
+                Global.Inst.InspStage.SetDistinctNgCount(0);
+                return true;
+            }
+
+            // 검사 대상 ROI만 추출
+            var activeWindows = currentModel.InspWindowList
+                .Where(w => w != null && !w.IgnoreInsp)
+                .ToList();
+
+            // 활성 ROI가 없으면 UI 초기화 후 종료
+            if (activeWindows.Count == 0)
+            {
+                var cam1 = MainForm.GetDockForm<CameraForm>();
+                cam1?.SetInspResultCount(0, 0, 0);
+                Global.Inst.InspStage.SetDistinctNgCount(0);
+                return true;
+            }
+
+            // 검사 데이터 준비
+            foreach (var w in activeWindows)
+                UpdateInspData(w);
+
+            // 실제 검사 실행
+            _inspectBoard.InspectWindowList(activeWindows);
+
+            // ROI별 OK/NG 카운트(상단 카운터 표시용)
+            int totalRoi = activeWindows.Count;
+            int ngRoi = activeWindows.Count(w => w.IsDefect());
+            int okRoi = totalRoi - ngRoi;
+
+            // === 유형별 '존재 여부'로 1회만 집계 (PrintDefect가 여러 ROI여도 1) ===
+            bool bCrack = activeWindows.Any(w => GetInspWindowKind(w) == InspWindowType.Crack && w.IsDefect());
+            bool bScratch = activeWindows.Any(w => GetInspWindowKind(w) == InspWindowType.Scratch && w.IsDefect());
+            bool bSqueeze = activeWindows.Any(w => GetInspWindowKind(w) == InspWindowType.Squeeze && w.IsDefect());
+            bool bPrint = activeWindows.Any(w => GetInspWindowKind(w) == InspWindowType.PrintDefect && w.IsDefect());
+
+            ngCrack = bCrack ? 1 : 0;
+            ngScratch = bScratch ? 1 : 0;
+            ngSqueeze = bSqueeze ? 1 : 0;
+            ngPrintDefect = bPrint ? 1 : 0;
+
+            isDefect = bCrack || bScratch || bSqueeze || bPrint;
+
+            // ROI별 결과 표시(도형/박스)
+            foreach (var w in activeWindows)
+                DisplayResult(w, InspectType.InspNone);
+
+            // 종류별 distinct 카운트 (표시에 사용)
+            Global.Inst.InspStage.SetDistinctNgCount(
+                (bCrack ? 1 : 0) + (bScratch ? 1 : 0) + (bSqueeze ? 1 : 0) + (bPrint ? 1 : 0)
+            );
+
+            // 상단 카운터 갱신(ROI 기준)
+            var cameraForm = MainForm.GetDockForm<CameraForm>();
+            cameraForm?.SetInspResultCount(totalRoi, okRoi, ngRoi);
+
+            // 누적 카운트 갱신(이미지 1장 단위)
+            Global.Inst.InspStage.AddAccumCount(
+                1,                 // Total +1
+                isDefect ? 0 : 1,  // 모두 정상이면 OK +1
+                isDefect ? 1 : 0   // 하나라도 불량이면 NG +1
+            );
+
+            // 세분화된 NG 카운트(유형별 존재 시 1씩)
+            Global.Inst.InspStage.AddNgDetailCount(ngCrack, ngScratch, ngSqueeze, ngPrintDefect);
+
+            // 최종 세부 타입(우선순위: Crack > Squeeze > Scratch > PrintDefect)
+            if (!isDefect)
+            {
+                LastDefectType = "OK";
+            }
+            else
+            {
+                if (bCrack) LastDefectType = "Crack";
+                else if (bSqueeze) LastDefectType = "Squeeze";
+                else if (bScratch) LastDefectType = "Scratch";
+                else LastDefectType = "PrintDefect";
+            }
+
+            return true;*/
             // 기본 out 값
             isDefect = false;
             ngCrack = ngScratch = ngSqueeze = ngPrintDefect = 0;
@@ -214,6 +305,7 @@ namespace CapsuleInspect.Inspect
 
         private InspWindowType GetInspWindowKind(InspWindow w)
         {
+            
             var t = w.GetType();
             var p1 = t.GetProperty("InspWindowType");
             if (p1 != null && p1.PropertyType == typeof(InspWindowType))

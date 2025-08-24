@@ -60,7 +60,7 @@ namespace CapsuleInspect.Inspect
             switch (_engineType)
             {
                 case EngineType.SEG:
-                    _sEGEngine = new SegmentationEngine(modelPath, 0);
+                    _sEGEngine = new SegmentationEngine(modelPath, -1);
                     var segOption = _sEGEngine.GetInferenceOption();
                     segOption.CalcTime = true;
                     segOption.CalcObject = true;
