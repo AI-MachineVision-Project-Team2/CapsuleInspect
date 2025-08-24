@@ -179,46 +179,6 @@ namespace CapsuleInspect.Teach
 
         //클래스 내에서, 인자로 입력된 타입의 알고리즘을 검사하거나,
         ///모든 알고리즘을 검사하는 옵션을 가지는 검사 함수
-        public virtual bool DoInpsect(InspectType inspType)
-        {
-            // 필터링된 이미지를 가져옴
-            Mat inputImage = Global.Inst.InspStage.GetFilteredImage() ?? Global.Inst.InspStage.GetMat(0, eImageChannel.Color);
-            if (inputImage == null)
-            {
-                SLogger.Write("검사에 사용할 이미지가 없습니다.", SLogger.LogType.Error);
-                return false;
-            }
-            // 1. 먼저 InspFilter 실행하여 _filteredImage 설정
-            var filterAlgo = AlgorithmList.Find(algo => algo.InspectType == InspectType.InspFilter);
-            if (filterAlgo != null && filterAlgo.IsUse && (inspType == InspectType.InspNone || inspType == InspectType.InspFilter))
-            {
-                filterAlgo.SetInspData(inputImage);
-                if (filterAlgo.DoInspect())
-                {
-                    // 필터링된 이미지 갱신
-                    inputImage = Global.Inst.InspStage.GetFilteredImage()?.Clone() ?? inputImage;
-                }
-            }
-
-            // 2. 나머지 알고리즘(InspMatch, InspBinary) 실행
-            foreach (var inspAlgo in AlgorithmList)
-            {
-                if (inspAlgo == filterAlgo) continue; // 필터는 이미 실행됨
-                if (inspAlgo.IsUse && (inspType == InspectType.InspNone || inspAlgo.InspectType == inspType))
-                {
-                    inspAlgo.SetInspData(inputImage);
-                    inspAlgo.DoInspect();
-                }
-            }
-
-            // 3. InspAIModule 별도 처리
-            if (inspType == InspectType.InspNone || inspType == InspectType.InspAI)
-            {
-                Bitmap inputBitmap = inputImage.ToBitmap();
-                Global.Inst.InspStage.AIModule.Inspect(inputBitmap);
-            }
-            return true;
-        }
 
         public bool IsDefect()
         {

@@ -34,7 +34,25 @@ namespace CapsuleInspect.Inspect
             {
                 if (algo.IsUse == false)
                     continue;
+                // ❶ 검사영역(Teach/InspRect) 기본값 보정
+                algo.TeachRect = window.WindowArea;
+                algo.InspRect = window.InspArea.Width > 0 ? window.InspArea : window.WindowArea;
 
+                // ❷ 검사 입력 이미지 주입 (필터된 이미지 우선)
+                Mat src = Global.Inst.InspStage.GetFilteredImage() ??
+                          Global.Inst.InspStage.GetMat(0, algo.ImageChannel);
+                algo.SetInspData(src);
+
+                // ❸ InspAI라면 Saige 엔진 주입
+                if (algo.InspectType == InspectType.InspAI)
+                {
+                    AIAlgorithm aiAlgo = algo as AIAlgorithm;
+                    if (aiAlgo != null && Global.Inst?.InspStage?.AIModule != null)
+                    {
+                        // 모델 로딩은 Stage 초기화 시점 또는 최초 1회만
+                        aiAlgo.SetSaigeAI(Global.Inst.InspStage.AIModule);
+                    }
+                }
                 if (!algo.DoInspect())
                     return false;
 
@@ -55,12 +73,18 @@ namespace CapsuleInspect.Inspect
                         inspResult.ResultValue = $"{matchAlgo.OutScore}";
                         break;
                     case InspectType.InspBinary:
-                    case InspectType.InspAI:
                         BlobAlgorithm blobAlgo = algo as BlobAlgorithm;
                         int min = blobAlgo.BlobFilters[blobAlgo.FILTER_COUNT].min;
                         int max = blobAlgo.BlobFilters[blobAlgo.FILTER_COUNT].max;
 
                         inspResult.ResultValue = $"{blobAlgo.OutBlobCount}/{min}~{max}";
+                        break;
+                    case InspectType.InspAI:
+                        AIAlgorithm aiAlgo = algo as AIAlgorithm;
+                        int min2 = aiAlgo.BlobFilters[aiAlgo.FILTER_COUNT].min;
+                        int max2 = aiAlgo.BlobFilters[aiAlgo.FILTER_COUNT].max;
+
+                        inspResult.ResultValue = $"{aiAlgo.OutBlobCount}/{min2}~{max2}";
                         break;
                 }
 

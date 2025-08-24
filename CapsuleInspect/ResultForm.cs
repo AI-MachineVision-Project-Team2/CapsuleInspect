@@ -183,6 +183,8 @@ namespace CapsuleInspect
 
         public void AddWindowResult(InspWindow inspWindow)
         {
+            if (this.InvokeRequired) { this.BeginInvoke(new Action(() => AddWindowResult(inspWindow))); return; }
+
             if (inspWindow is null)
                 return;
 

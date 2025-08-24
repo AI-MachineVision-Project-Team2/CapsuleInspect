@@ -14,6 +14,7 @@ namespace CapsuleInspect.Algorithm
     [XmlInclude(typeof(MatchAlgorithm))]
     [XmlInclude(typeof(BlobAlgorithm))]
     [XmlInclude(typeof(FilterAlgorithm))]
+    [XmlInclude(typeof(AIAlgorithm))]
     public abstract class InspAlgorithm
     {
         //알고리즘 타입 정의

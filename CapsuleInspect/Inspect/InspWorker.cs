@@ -221,7 +221,11 @@ namespace CapsuleInspect.Inspect
             {
                 var cam0 = MainForm.GetDockForm<CameraForm>();
                 cam0?.SetInspResultCount(0, 0, 0);
-                Global.Inst.InspStage.SetDistinctNgCount(0);
+                Global.Inst.InspStage.SetDistinctNgCount(0);  
+                // --- ResultForm 갱신: 이번 검사 결과(모델 전체)로 UI 리프레시 ---
+                var resultForm1 = MainForm.GetDockForm<ResultForm>();
+                resultForm1?.AddModelResult(Global.Inst.InspStage.CurModel);
+
                 return true;
             }
 
@@ -236,6 +240,9 @@ namespace CapsuleInspect.Inspect
                 var cam1 = MainForm.GetDockForm<CameraForm>();
                 cam1?.SetInspResultCount(0, 0, 0);
                 Global.Inst.InspStage.SetDistinctNgCount(0);
+                // --- ResultForm 갱신 ---
+                var resultForm1 = MainForm.GetDockForm<ResultForm>();
+                resultForm1?.AddModelResult(Global.Inst.InspStage.CurModel);
                 return true;
             }
 
@@ -298,6 +305,11 @@ namespace CapsuleInspect.Inspect
                 else if (bSqueeze) LastDefectType = "Squeeze";
                 else if (bScratch) LastDefectType = "Scratch";
                 else LastDefectType = "PrintDefect";
+            }
+             var resultForm = MainForm.GetDockForm<ResultForm>();
+            if (resultForm != null)
+            {
+                resultForm.AddModelResult(Global.Inst.InspStage.CurModel);
             }
 
             return true;

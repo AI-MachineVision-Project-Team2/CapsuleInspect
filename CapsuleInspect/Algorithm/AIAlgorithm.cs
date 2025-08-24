@@ -23,7 +23,7 @@ namespace CapsuleInspect.Algorithm
     {
         private SaigeAI _saigeAI = null;
         private readonly List<DrawInspectInfo> _resultRects = new List<DrawInspectInfo>();
-
+        [XmlIgnore]
         public int OutBlobCount { get; private set; } = 0;
 
         public AIAlgorithm()
