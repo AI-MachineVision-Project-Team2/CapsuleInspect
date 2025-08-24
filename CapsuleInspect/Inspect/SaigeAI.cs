@@ -42,7 +42,7 @@ namespace CapsuleInspect.Inspect
 
         private bool _isDefect; // 불량 여부 저장
         public bool IsDefect => _isDefect; // 불량 여부 반환 프로퍼티
-        Bitmap _inspImage = null;
+        Bitmap _inspImage = null;// ★ 항상 '입력받은 ROI 비트맵'을 저장
         private bool _isLoadedEngine = false;
 
         public SaigeAI()
@@ -80,15 +80,14 @@ namespace CapsuleInspect.Inspect
             // 초기화: 검사 시작 시 _isDefect를 false로 리셋
             _isDefect = false;
 
-            // 필터링된 이미지를 우선적으로 사용
-            Mat inputImage = Global.Inst.InspStage.GetFilteredImage() ?? BitmapConverter.ToMat(bmpImage);
-            if (inputImage is null)
+            if (bmpImage == null)
             {
                 MessageBox.Show("이미지가 없습니다. 유효한 이미지를 입력해주세요.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
-            _inspImage = inputImage.ToBitmap();
+            // ★ 좌표계를 ROI로 고정하기 위해 입력 비트맵을 그대로 사용
+            _inspImage = (Bitmap)bmpImage.Clone();
             SrImage srImage = new SrImage(_inspImage);
             Stopwatch sw = Stopwatch.StartNew();
 

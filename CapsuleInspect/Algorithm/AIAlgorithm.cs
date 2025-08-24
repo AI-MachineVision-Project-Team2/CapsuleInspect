@@ -86,193 +86,8 @@ namespace CapsuleInspect.Algorithm
 
         public override bool DoInspect()
         {
-            /*
-            ResetResult();              // 베이스 공통 결과 초기화
-            _resultRects.Clear();
-            OutBlobCount = 0;
-            IsInspected = false;
-            IsDefect = false;
-            //Decision = DecisionType.Good;
-            ResultString.Clear();
-
-            if (_srcImage == null || _srcImage.Empty())
-            {
-                MessageBox.Show("소스 이미지를 가져올 수 없습니다!");
-                return false;
-            }
-
-
-            //검사 영역이 검사 대상 이미지를 벗어나지 않는지 확인
-            if (InspRect.Right > _srcImage.Width ||
-                InspRect.Bottom > _srcImage.Height)
-                return false;
-
-            Mat targetImage = _srcImage[InspRect];
-            // --- 변경: RunForm의 AI 검사 로직을 여기로 옮김 ---
-            bool isAIDefect = false;
-
-
-            // 이미지 변환 (Mat -> Bitmap)
-            using (Bitmap bitmap = targetImage.ToBitmap())  // ROI 영역만 사용
-            {
-                if (bitmap == null)
-                {
-                    MessageBox.Show("이미지 변환 실패.");
-                    return false;
-                }
-
-                // AI 검사 수행
-                if (_saigeAI.Inspect(bitmap))
-                {
-                    OpenCvSharp.Point[][] contours = new OpenCvSharp.Point[0][];
-                    if (_saigeAI.GetContours(ref contours))
-                    {
-                        if (_findArea is null)
-                            _findArea = new List<DrawInspectInfo>();
-
-                        _findArea.Clear();
-
-                        int findBlobCount = 0;
-
-                        foreach (var contour in contours)
-                        {
-                            double area = Cv2.ContourArea(contour);
-                            if (area <= 0)
-                                continue;
-
-                            int showArea = 0;
-                            int showWidth = 0;
-                            int showHeight = 0;
-
-                            BlobFilter areaFilter = BlobFilters[FILTER_AREA];
-
-                            if (areaFilter.isUse)
-                            {
-                                if (areaFilter.min > 0 && area < areaFilter.min)
-                                    continue;
-
-                                if (areaFilter.max > 0 && area > areaFilter.max)
-                                    continue;
-
-                                showArea = (int)(area + 0.5f);
-                            }
-
-                            Rect boundingRect = Cv2.BoundingRect(contour);
-                            RotatedRect rotatedRect = Cv2.MinAreaRect(contour);
-                            Size2d blobSize = new Size2d(boundingRect.Width, boundingRect.Height);
-
-                            // RotatedRect 정보 계산
-                            if (UseRotatedRect)
-                            {
-                                // 너비와 높이 가져오기
-                                float width = rotatedRect.Size.Width;
-                                float height = rotatedRect.Size.Height;
-
-                                // 장축과 단축 구분
-                                blobSize.Width = Math.Max(width, height);
-                                blobSize.Height = Math.Min(width, height);
-                            }
-
-                            BlobFilter widthFilter = BlobFilters[FILTER_WIDTH];
-                            if (widthFilter.isUse)
-                            {
-                                if (widthFilter.min > 0 && blobSize.Width < widthFilter.min)
-                                    continue;
-
-                                if (widthFilter.max > 0 && blobSize.Width > widthFilter.max)
-                                    continue;
-
-                                showWidth = (int)(blobSize.Width + 0.5f);
-                            }
-
-                            BlobFilter heightFilter = BlobFilters[FILTER_HEIGHT];
-                            if (heightFilter.isUse)
-                            {
-                                if (heightFilter.min > 0 && blobSize.Height < heightFilter.min)
-                                    continue;
-
-                                if (heightFilter.max > 0 && blobSize.Height > heightFilter.max)
-                                    continue;
-
-                                showHeight = (int)(blobSize.Height + 0.5f);
-                            }
-
-
-                            findBlobCount++;
-                            Rect blobRect = boundingRect + InspRect.TopLeft;
-
-                            string featureInfo = "";
-                            if (showArea > 0)
-                                featureInfo += $"A:{showArea}";
-
-                            if (showWidth > 0)
-                            {
-                                if (featureInfo != "")
-                                    featureInfo += "\r\n";
-
-                                featureInfo += $"W:{showWidth}";
-                            }
-
-                            if (showHeight > 0)
-                            {
-                                if (featureInfo != "")
-                                    featureInfo += "\r\n";
-
-                                featureInfo += $"H:{showHeight}";
-                            }
-
-                            //검사된 정보를 문자열로 저장
-                            string blobInfo;
-                            blobInfo = $"Blob X:{blobRect.X}, Y:{blobRect.Y}, Size({blobRect.Width},{blobRect.Height})";
-                            ResultString.Add(blobInfo);
-
-                            //검사된 영역 정보를 DrawInspectInfo로 저장
-                            DrawInspectInfo rectInfo = new DrawInspectInfo(blobRect, featureInfo, InspectType.InspAI, DecisionType.Info);
-
-                            if (UseRotatedRect)
-                            {
-                                Point2f[] points = rotatedRect.Points().Select(p => p + InspRect.TopLeft).ToArray();
-                                rectInfo.SetRotatedRectPoints(points);
-                            }
-
-                            _findArea.Add(rectInfo);
-                        }
-
-                        OutBlobCount = findBlobCount;
-
-                        IsDefect = false;
-                        string result = "OK";
-                        BlobFilter countFilter = BlobFilters[FILTER_COUNT];
-
-                        if (countFilter.isUse)
-                        {
-                            if (countFilter.min > 0 && findBlobCount < countFilter.min)
-                                IsDefect = true;
-
-                            if (IsDefect == false && countFilter.max > 0 && findBlobCount > countFilter.max)
-                                IsDefect = true;
-                        }
-
-                        if (IsDefect)
-                        {
-                            string rectInfo = $"Count:{findBlobCount}";
-                            _findArea.Add(new DrawInspectInfo(InspRect, rectInfo, InspectType.InspBinary, DecisionType.Defect));
-
-                            result = "NG";
-
-                            string resultInfo = "";
-                            resultInfo = $"[{result}] Blob count [in : {countFilter.min},{countFilter.max},out : {findBlobCount}]";
-                            ResultString.Add(resultInfo);
-                        }
-                    }
-                }
-            }
-
-            IsInspected = true;
-
-            return true;*/
             // === 초기화 ===
-            ResetResult();              // 베이스 공통 결과 초기화
+            ResetResult();
             _resultRects.Clear();
             OutBlobCount = 0;
             IsInspected = false;
@@ -307,15 +122,24 @@ namespace CapsuleInspect.Algorithm
                     return false;
                 }
 
-                // AI 실행
                 if (_saigeAI.Inspect(bitmap))
                 {
                     OpenCvSharp.Point[][] contours = new OpenCvSharp.Point[0][];
+
                     if (_saigeAI.GetContours(ref contours))
                     {
                         if (_findArea is null)
                             _findArea = new List<DrawInspectInfo>();
                         _findArea.Clear();
+
+                        // ▼ 좌표계 판별: ROI 좌표인지(0~ROI 크기), 풀프레임 좌표인지
+                        bool isRoiCoords = true;
+                        if (contours != null && contours.Length > 0)
+                        {
+                            int roiW = targetImage.Width;
+                            int roiH = targetImage.Height;
+                            isRoiCoords = contours.All(c => c != null && c.All(p => p.X >= 0 && p.Y >= 0 && p.X < roiW && p.Y < roiH));
+                        }
 
                         int findBlobCount = 0;
 
@@ -344,7 +168,6 @@ namespace CapsuleInspect.Algorithm
                             RotatedRect rotatedRect = Cv2.MinAreaRect(contour);
                             Size2d blobSize = new Size2d(boundingRect.Width, boundingRect.Height);
 
-                            // RotatedRect 기반 W/H 구하기(장축/단축)
                             if (UseRotatedRect)
                             {
                                 float width = rotatedRect.Size.Width;
@@ -375,10 +198,9 @@ namespace CapsuleInspect.Algorithm
                                 showHeight = (int)(blobSize.Height + 0.5f);
                             }
 
-                            // --- 필터 통과한 블롭만 카운트/표시 ---
-                            findBlobCount++;
-
-                            Rect blobRect = boundingRect + InspRect.TopLeft;
+                            // --- 좌표 보정 ---
+                            // ROI 좌표면 전역 좌표로 오프셋, 풀프레임 좌표면 그대로
+                            Rect blobRect = isRoiCoords ? (boundingRect + InspRect.TopLeft) : boundingRect;
 
                             string featureInfo = "";
                             if (showArea > 0) featureInfo += $"A:{showArea}";
@@ -401,22 +223,24 @@ namespace CapsuleInspect.Algorithm
                             DrawInspectInfo rectInfo = new DrawInspectInfo(blobRect, featureInfo, InspectType.InspAI, DecisionType.Info);
                             if (UseRotatedRect)
                             {
-                                Point2f[] points = rotatedRect.Points().Select(p => p + InspRect.TopLeft).ToArray();
+                                Point2f[] points = rotatedRect.Points()
+                                    .Select(p => isRoiCoords ? (p + InspRect.TopLeft) : p)
+                                    .ToArray();
                                 rectInfo.SetRotatedRectPoints(points);
                             }
                             _findArea.Add(rectInfo);
+
+                            findBlobCount++;
                         }
 
-                        // === 최종 판정 규칙 (핵심): 잡히면 NG, 없으면 OK ===
+                        // === 최종 판정 규칙: 잡히면 NG, 없으면 OK ===
                         OutBlobCount = findBlobCount;
-                        IsDefect = (findBlobCount > 0);   // ★★ 여기 한 줄이 핵심 ★★
+                        IsDefect = (findBlobCount > 0);
 
-                        // 요약 박스/문구(선택)
                         if (IsDefect)
                         {
                             string rectInfo = $"Count:{findBlobCount}";
                             _findArea.Add(new DrawInspectInfo(InspRect, rectInfo, InspectType.InspAI, DecisionType.Defect));
-
                             string resultInfo = $"[NG] Blob count [out : {findBlobCount}]";
                             ResultString.Add(resultInfo);
                         }
