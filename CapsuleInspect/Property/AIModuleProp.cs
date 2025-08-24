@@ -24,8 +24,42 @@ namespace CapsuleInspect.Property
         private readonly int COL_USE = 1;
         private readonly int COL_MIN = 2;
         private readonly int COL_MAX = 3;
+        private static readonly string[] _filterOrder = new[] { "Area", "Width", "Height", "Count" };
+
         //EngineType _engineType;
         public List<BlobFilter> BlobFilters { get; set; } = new List<BlobFilter>();
+        private void EnsureAlgorithmFilters()
+        {
+            if (_aiAlgo == null) return;
+
+            // 이름(소문자) 기준으로 사전화
+            var dict = (_aiAlgo.BlobFilters ?? new List<BlobFilter>())
+                       .Where(f => f != null && !string.IsNullOrWhiteSpace(f.name))
+                       .ToDictionary(f => f.name.Trim().ToLowerInvariant(), f => f);
+
+            var aligned = new List<BlobFilter>(4);
+            foreach (var name in _filterOrder)
+            {
+                var key = name.ToLowerInvariant();
+                if (!dict.TryGetValue(key, out var f))
+                    f = new BlobFilter { name = name, isUse = false, min = 0, max = 0 };
+                aligned.Add(f);
+            }
+
+            _aiAlgo.BlobFilters = aligned;   // ★ BlobAlgorithm의 인덱스(FILTER_AREA=0, ...)와 정렬 일치
+        }
+
+        private static bool ReadBool(object v, bool def = false)
+        {
+            try { return v is bool b ? b : Convert.ToBoolean(v); }
+            catch { return def; }
+        }
+        private static int ReadInt(object v, int def = 0)
+        {
+            if (v == null) return def;
+            if (v is int ii) return ii;
+            int n; return int.TryParse(v.ToString(), out n) ? n : def;
+        }
         public AIModuleProp()
         {
             InitializeComponent();
@@ -140,17 +174,27 @@ namespace CapsuleInspect.Property
         public void SetAlgorithm(AIAlgorithm aiAlgo)
         {
             _aiAlgo = aiAlgo;
-            // 이진화 알고리즘 필터값이 없을 경우, 기본값 설정
-            if (_aiAlgo.BlobFilters.Count <= 0)
+            if (_aiAlgo == null) return;
+
+            // 알고리즘에 필터가 없으면 기본 생성
+            if (_aiAlgo.BlobFilters == null || _aiAlgo.BlobFilters.Count == 0)
                 _aiAlgo.SetDefault();
+
+            // ★ 필수: 알고리즘 필터 순서/구성 보정(Area/Width/Height/Count)
+            EnsureAlgorithmFilters();
+
+            // 그리드 <- 알고리즘
             SetProperty();
         }
         public void SetProperty()
         {
             if (_aiAlgo is null)
                 return;
+
+            // ★ 순서 보장 후 그리드 업데이트
+            EnsureAlgorithmFilters();
             UpdateDataGridView(true);
-           
+
         }
         //UI컨트롤러 값을 이진화 알고리즘 클래스에 적용
         public void GetProperty()
@@ -163,6 +207,7 @@ namespace CapsuleInspect.Property
         }
         private void UpdateDataGridView(bool update)
         {
+            /*
             if (_aiAlgo is null)
                 return;
 
@@ -206,6 +251,46 @@ namespace CapsuleInspect.Property
                     if (value != null && int.TryParse(value.ToString(), out max))
                         blobFilter.max = max;
                 }
+            }*/
+
+            if (_aiAlgo is null)
+                return;
+
+            // 항상 먼저 알고리즘 쪽 필터 순서를 보정
+            EnsureAlgorithmFilters();
+            var blobFilters = _aiAlgo.BlobFilters;
+
+            if (update)
+            {
+                // 알고리즘 -> 그리드
+                _updateDataGridView = false;
+                // 그리드가 4행(Area/Width/Height/Count)이라는 전제 하에 값만 채움
+                for (int i = 0; i < _filterOrder.Length && i < dataGridViewFilter.Rows.Count; i++)
+                {
+                    dataGridViewFilter.Rows[i].Cells[COL_USE].Value = blobFilters[i].isUse;
+                    dataGridViewFilter.Rows[i].Cells[COL_MIN].Value = blobFilters[i].min;
+                    dataGridViewFilter.Rows[i].Cells[COL_MAX].Value = blobFilters[i].max;
+                }
+                _updateDataGridView = true;
+            }
+            else
+            {
+                // 그리드 -> 알고리즘
+                if (_updateDataGridView == false)
+                    return;
+
+                for (int i = 0; i < _filterOrder.Length && i < dataGridViewFilter.Rows.Count; i++)
+                {
+                    var row = dataGridViewFilter.Rows[i];
+                    var bf = blobFilters[i];
+
+                    bf.isUse = ReadBool(row.Cells[COL_USE].Value, bf.isUse);
+                    bf.min = ReadInt(row.Cells[COL_MIN].Value, bf.min);
+                    bf.max = ReadInt(row.Cells[COL_MAX].Value, bf.max);
+                }
+
+                // (선택) 레퍼런스 유지가 싫다면 아래처럼 재대입
+                // _aiAlgo.BlobFilters = blobFilters;
             }
         }
     }
