@@ -79,7 +79,17 @@ namespace CapsuleInspect.Inspect
 
             return true;
         }
-
+        private static string NgLabelFor(InspWindowType t)
+        {
+            switch (t)
+            {
+                case InspWindowType.PrintDefect: return "printNG";
+                case InspWindowType.Scratch: return "scratchNG";
+                case InspWindowType.Squeeze: return "squeezeNG";
+                case InspWindowType.Crack: return "crackNG";
+                default: return "NG";
+            }
+        }
         public bool InspectWindowList(List<InspWindow> windowList)
         {
             if (windowList.Count <= 0)

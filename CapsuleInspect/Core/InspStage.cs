@@ -264,6 +264,8 @@ namespace CapsuleInspect.Core
                 MessageBox.Show("모델 열기 실패!");
             }
 
+            _grabManager.SetExposureTime(30000);
+
             return true;
         }
 
