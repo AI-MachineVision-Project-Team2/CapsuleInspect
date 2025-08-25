@@ -541,7 +541,7 @@ namespace CapsuleInspect.Inspect
                 inspAlgo.TeachRect = windowArea;
                 inspAlgo.InspRect = windowArea;
 
-
+                /*
                 if (inspAlgo.InspectType == InspectType.InspAI)
                 {
                     Mat srcImage = Global.Inst.InspStage.GetMat(0,eImageChannel.Color);
@@ -559,7 +559,41 @@ namespace CapsuleInspect.Inspect
 
 
                 }
+            }*/
+                // ⬇️ 사용 안 함이면 완전히 스킵 (AI면 엔진 참조도 끊음)
+                if (!inspAlgo.IsUse)
+                {
+                    if (inspAlgo.InspectType == InspectType.InspAI)
+                    {
+                        var aiOff = inspAlgo as AIAlgorithm;
+                        aiOff?.SetSaigeAI(null); // 엔진 미사용 보장
+                    }
+                    continue;
+                }
+
+                // ⬇️ 알고리즘별 입력 이미지/엔진 주입
+                if (inspAlgo.InspectType == InspectType.InspAI)
+                {
+                    // 요구사항: AI는 체크됐을 때만 동작, 엔진 로드/주입
+                    var aiAlgo = inspAlgo as AIAlgorithm;
+
+                    // AI는 원래 하던 대로 "원본 컬러"를 사용 (필요시 GetFilteredImage()로 바꿔도 됨)
+                    Mat srcImage = Global.Inst.InspStage.GetMat(0, eImageChannel.Color);
+                    aiAlgo.SetInspData(srcImage);
+
+                    // 엔진 로드/주입 (모델 경로는 설정값)
+                    Global.Inst.InspStage.AIModule.LoadEngine(SettingXml.Inst.AIModelPath);
+                    aiAlgo.SetSaigeAI(Global.Inst.InspStage.AIModule);
+                }
+                else
+                {
+                    // Binary/Match/기타는 필터 결과가 있으면 그것을 우선 사용
+                    Mat srcImage = Global.Inst.InspStage.GetFilteredImage()
+                                   ?? Global.Inst.InspStage.GetMat(0, inspAlgo.ImageChannel);
+                    inspAlgo.SetInspData(srcImage);
+                }
             }
+
 
             return true;
         }
