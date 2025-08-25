@@ -137,7 +137,7 @@ namespace CapsuleInspect
                 SLogger.Write("[RunForm] 이미지 인덱스 초기화 완료");
             }
 
-            Global.Inst.InspStage.ShowSaigeResult();
+            //Global.Inst.InspStage.ShowSaigeResult();
         }
     }
 }

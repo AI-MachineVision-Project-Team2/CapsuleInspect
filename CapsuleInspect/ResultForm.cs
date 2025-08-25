@@ -173,6 +173,22 @@ namespace CapsuleInspect
             if (curModel is null)
                 return;
 
+            if(_treeListView.InvokeRequired) 
+            { 
+                _treeListView.BeginInvoke(new Action(() => SetTreeListViewObjects(curModel))); 
+                return;
+            }
+            else
+            {
+                SetTreeListViewObjects(curModel);
+            }
+        }
+
+        public void SetTreeListViewObjects(Model curModel)
+        {
+            if (curModel is null)
+                return;
+
             _treeListView.SetObjects(curModel.InspWindowList);
 
             foreach (var window in curModel.InspWindowList)
@@ -201,6 +217,9 @@ namespace CapsuleInspect
         //실제 검사가 되었을때, 검사 결과를 추가하는 함수
         public void AddInspResult(InspResult inspResult)
         {
+            if (!IsHandleCreated || IsDisposed) return;
+            if (InvokeRequired) { BeginInvoke(new Action<InspResult>(AddInspResult), inspResult); return; }
+
             if (inspResult is null)
                 return;
 

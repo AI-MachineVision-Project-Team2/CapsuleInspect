@@ -124,7 +124,7 @@ namespace CapsuleInspect.Algorithm
         {
             //픽셀 영역으로 이진화 필터
             BlobFilter areaFilter = new BlobFilter()
-            { name = "Area", isUse = false, min = 200, max = 500 };
+            { name = "Area", isUse = true, min = 500, max = 0 };
             _filterBlobs.Add(areaFilter);
 
             BlobFilter widthFilter = new BlobFilter()
@@ -136,7 +136,7 @@ namespace CapsuleInspect.Algorithm
             _filterBlobs.Add(heightFilter);
 
             BlobFilter countFilter = new BlobFilter()
-            { name = "Count", isUse = false, min = 0, max = 0 };
+            { name = "Count", isUse = true, min = 1, max = 0 };
             _filterBlobs.Add(countFilter);
         }
 

@@ -388,15 +388,23 @@ namespace CapsuleInspect.Inspect
                 inspAlgo.TeachRect = windowArea;
                 inspAlgo.InspRect = windowArea;
 
-                Mat srcImage = Global.Inst.InspStage.GetFilteredImage() ??
-                  Global.Inst.InspStage.GetMat(0, inspAlgo.ImageChannel);
-                inspAlgo.SetInspData(srcImage);
 
                 if (inspAlgo.InspectType == InspectType.InspAI)
                 {
+                    Mat srcImage = Global.Inst.InspStage.GetMat(0,eImageChannel.Color);
+                    inspAlgo.SetInspData(srcImage);
+
                     Global.Inst.InspStage.AIModule.LoadEngine(SettingXml.Inst.AIModelPath);
                     AIAlgorithm aiAlgo = inspAlgo as AIAlgorithm;
                     aiAlgo.SetSaigeAI(Global.Inst.InspStage.AIModule);
+                }
+                else
+                {
+                    Mat srcImage = Global.Inst.InspStage.GetFilteredImage() ??
+                    Global.Inst.InspStage.GetMat(0, inspAlgo.ImageChannel);
+                    inspAlgo.SetInspData(srcImage);
+
+
                 }
             }
 

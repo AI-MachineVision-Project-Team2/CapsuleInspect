@@ -198,6 +198,7 @@ namespace CapsuleInspect
 
         public void UpdateDisplay(Bitmap bitmap = null)
         {
+          
             if (bitmap == null)
             {
                 //업데이트시 bitmap이 없다면 InspSpace에서 가져온다
@@ -220,6 +221,12 @@ namespace CapsuleInspect
         //모델 정보를 이용해, ROI 갱신
         public void UpdateDiagramEntity()
         {
+            if (InvokeRequired)
+            {
+                // 네가 준 예시처럼 Invoke() 사용
+                Invoke(new Action(UpdateDiagramEntity));
+                return;
+            }
             imageViewer.ResetEntity();
 
             Model model = Global.Inst.InspStage.CurModel;

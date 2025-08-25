@@ -24,7 +24,7 @@ namespace CapsuleInspect.Algorithm
         private SaigeAI _saigeAI = null;
         private readonly List<DrawInspectInfo> _resultRects = new List<DrawInspectInfo>();
         [XmlIgnore]
-        public int OutBlobCount { get; private set; } = 0;
+        public int OutBlobCount { get; set; } = 0;
 
         public AIAlgorithm()
         {
@@ -121,6 +121,8 @@ namespace CapsuleInspect.Algorithm
                     MessageBox.Show("SaigeAI 인스턴스가 설정되지 않았습니다.");
                     return false;
                 }
+
+                bitmap.Save("C:\\model\\test.png");
 
                 if (_saigeAI.Inspect(bitmap))
                 {
