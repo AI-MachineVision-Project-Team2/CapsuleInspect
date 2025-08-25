@@ -7,10 +7,13 @@ using OpenCvSharp;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace CapsuleInspect.Inspect
 {
@@ -37,6 +40,7 @@ namespace CapsuleInspect.Inspect
 
         public void StartCycleInspectImage()
         {
+            
             _cts = new CancellationTokenSource();
             Task.Run(() => InspectionLoop(this, _cts.Token));
         }
@@ -69,8 +73,18 @@ namespace CapsuleInspect.Inspect
                 Global.Inst.InspStage.ImageLoader.CyclicMode = false; // 단일 사이클
             }
 
+            // ⬇️ 단일사이클 시작 시 PDF 생성 여부를 먼저 묻는다
+            var ask = MessageBox.Show(
+                "PDF 보고서를 생성하시겠습니까?",
+                "PDF Export",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            bool makePdf = (ask == DialogResult.Yes);
+
             _cts = new CancellationTokenSource();
-            Task.Run(() => SingleCycleLoop(this, _cts.Token));
+            // ⬇️ 선택값을 SingleCycleLoop에 넘긴다
+            Task.Run(() => SingleCycleLoop(this, _cts.Token, makePdf));
         }
 
         private void InspectionLoop(InspWorker inspWorker, CancellationToken token)
@@ -94,29 +108,168 @@ namespace CapsuleInspect.Inspect
             SLogger.Write("자동 반복 검사 종료");
         }
 
-        private void SingleCycleLoop(InspWorker inspWorker, CancellationToken token)
+        private void SingleCycleLoop(InspWorker inspWorker, CancellationToken token, bool makePdf)
         {
             Global.Inst.InspStage.SetWorkingState(WorkingState.INSPECT);
-
             SLogger.Write("[InspWorker] 단일 사이클 검사 시작");
-
             IsRunning = true;
 
-            while (!token.IsCancellationRequested)
+            Model model = Global.Inst.InspStage.CurModel;
+
+            CapsuleInspect.Util.ReportSession pdf = null;  // ← 네임스페이스 주의
+            int pageIndex = 1;
+            
+
+            try
             {
-                bool result = Global.Inst.InspStage.OneCycle();
-                if (!result)
+                if (makePdf && model != null)
+                    pdf = new CapsuleInspect.Util.ReportSession("Capsule Inspector Report", model);
+
+                while (!token.IsCancellationRequested)
                 {
-                    SLogger.Write("[InspWorker] 단일 사이클 검사 종료");
-                    break;
+                    bool result = Global.Inst.InspStage.OneCycle();
+                    if (!result)
+                    {
+                        SLogger.Write("[InspWorker] 단일 사이클 검사 종료");
+                        break;
+                    }
+
+                    if (makePdf && pdf != null)
+                    {
+                        var srcMat = Global.Inst.InspStage.GetMat(0, eImageChannel.Color);
+                        using (var bmpOriginal = CapsuleInspect.Util.ReportSession.MatToBitmap(srcMat))
+                        using (var bmpResult = CapsuleInspect.Util.ReportSession.CaptureCameraImageSafe(MainForm.GetDockForm<CameraForm>()))
+                        {
+                            // 이번 사이클의 결과를 "그대로" 수집
+                            var cycleRows = CapsuleInspect.Util.ReportSession.CollectRowsFromModel(model);
+                            // ✨ 페이지 제목을 "현재 이미지 파일명"으로
+                            string pageTitle = GetCurrentImageNameSafe();
+                            if (string.IsNullOrWhiteSpace(pageTitle))
+                                pageTitle = $"Capture_{DateTime.Now:HHmmss}";
+                            // ✅ 타이틀 포함 오버로드 호출
+                            pdf.AddCyclePageCompact(
+                                pageTitle,
+                                bmpOriginal,
+                                bmpResult,
+                                /* rowsForThisCycle: */ cycleRows,
+                                pageIndex++,
+                                maxImageHeightMm: 60,
+                                rowsLimit: 12
+                            );
+                        }
+                    }
+
+                    Thread.Sleep(200);
                 }
-                Thread.Sleep(200); // 검사 간 지연
+
+                if (makePdf && pdf != null)
+                {
+                    // 통계 그리드 캡처 (UI 안전)
+                    Bitmap statsBmp = null;
+                    try
+                    {
+                        var statsForm = MainForm.GetDockForm<StatisticsForm>(); // 실제 폼명에 맞추세요
+                        Control grid = statsForm?.Controls.OfType<DataGridView>().FirstOrDefault()
+                                       ?? statsForm?.Controls.OfType<ListView>().FirstOrDefault()
+                                       ?? (Control)statsForm;
+                        statsBmp = CapsuleInspect.Util.ReportSession.CaptureControlSafe(grid);
+                    }
+                    catch { }
+
+                    var stats = CapsuleInspect.Util.ReportSession.GetStatsFromStageSafe();
+                    pdf.InsertStatsFrontPage(statsBmp, stats);
+
+                    // === 저장 경로를 모델 경로 기준으로 설정 ===
+                    string modelPath = Global.Inst.InspStage.CurModel?.ModelPath;
+                    string defaultDir = string.IsNullOrEmpty(modelPath)
+                        ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CapsuleReports")
+                        : Path.GetDirectoryName(modelPath);   // 모델 XML 있는 폴더
+
+                    Directory.CreateDirectory(defaultDir);
+
+                    string filePath = null;
+                    var ui = GetUiInvoker();
+
+                    if (ui != null)
+                    {
+                        try
+                        {
+                            ui.Invoke((Action)(() =>
+                            {
+                                using (var sfd = new SaveFileDialog
+                                {
+                                    Filter = "PDF Report (*.pdf)|*.pdf",
+                                    InitialDirectory = defaultDir,
+                                    FileName = $"Report_{DateTime.Now:yyyyMMdd_HHmmss}.pdf"
+                                })
+                                {
+                                    if (sfd.ShowDialog(ui) == DialogResult.OK)
+                                        filePath = sfd.FileName;
+                                }
+                            }));
+                        }
+                        catch (Exception exDlg)
+                        {
+                            SLogger.Write($"[InspWorker] SaveFileDialog 실패, 자동 저장으로 진행: {exDlg.GetType().FullName} {exDlg.Message}", SLogger.LogType.Error);
+                        }
+                    }
+
+                    if (string.IsNullOrEmpty(filePath))
+                        filePath = Path.Combine(defaultDir, $"Report_{DateTime.Now:yyyyMMdd_HHmmss}.pdf");
+
+                    pdf.Save(filePath);
+                    SLogger.Write($"[InspWorker] PDF Export: {filePath}");
+                }
             }
-
-            IsRunning = false;
-            SLogger.Write("[InspWorker] 단일 사이클 검사 완료");
+            catch (Exception ex)
+            {
+                SLogger.Write($"[InspWorker] 단일 사이클 pdf 처리 중 오류: {ex.GetType().FullName} - {ex.Message}\r\n{ex.StackTrace}", SLogger.LogType.Error);
+            }
+            finally
+            {
+                pdf?.Dispose();
+                IsRunning = false;
+                SLogger.Write("[InspWorker] 단일 사이클 검사 완료");
+            }
         }
+        private static string GetCurrentImageNameSafe()
+        {
+            try
+            {
+                var loader = Global.Inst?.InspStage?.ImageLoader;
+                if (loader != null)
+                {
+                    var path = loader.CurrentFilePath;
+                    if (!string.IsNullOrEmpty(path))
+                        return System.IO.Path.GetFileNameWithoutExtension(path);
+                }
 
+                // 단일 이미지 검사 설정이 있을 때 fallback
+                var mp = Global.Inst?.InspStage?.CurModel?.InspectImagePath;
+                if (!string.IsNullOrEmpty(mp))
+                    return System.IO.Path.GetFileNameWithoutExtension(mp);
+
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        // UI 호출에 쓸 살아있는 컨트롤을 찾아온다.
+        private static Control GetUiInvoker()
+        {
+            var cam = MainForm.GetDockForm<CameraForm>();
+            if (cam != null && cam.IsHandleCreated && !cam.IsDisposed) return cam;
+
+            var res = MainForm.GetDockForm<ResultForm>();
+            if (res != null && res.IsHandleCreated && !res.IsDisposed) return res;
+
+            // 아무 도킹폼도 없으면 열려있는 첫 폼
+            var any = Application.OpenForms.Cast<Form>()
+                            .FirstOrDefault(f => f.IsHandleCreated && !f.IsDisposed);
+            return any;
+        }
         //InspStage내의 모든 InspWindow들을 검사하는 함수
         public bool RunInspect(out bool isDefect, out int ngCrack, out int ngScratch, out int ngSqueeze, out int ngPrintDefect)
         {
