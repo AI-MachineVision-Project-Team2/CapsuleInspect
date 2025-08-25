@@ -146,7 +146,7 @@ namespace CapsuleInspect.Inspect
                             string pageTitle = GetCurrentImageNameSafe();
                             if (string.IsNullOrWhiteSpace(pageTitle))
                                 pageTitle = $"Capture_{DateTime.Now:HHmmss}";
-                            // ✅ 타이틀 포함 오버로드 호출
+                            //  타이틀 포함 오버로드 호출
                             pdf.AddCyclePageCompact(
                                 pageTitle,
                                 bmpOriginal,
