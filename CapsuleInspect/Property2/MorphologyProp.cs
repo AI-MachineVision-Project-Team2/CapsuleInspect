@@ -90,7 +90,7 @@ namespace CapsuleInspect.Property2
                 if (blob != null)
                 {
                     blob.Filter = FilterType.Morphology;
-                    blob.FilterOptions = new { KernelSize = kernel, MorphType = morphType };
+                    blob.FilterOptions = new FilterOptions { KernelSize = kernel, MorphType = morphType };
                 }
             }
         }

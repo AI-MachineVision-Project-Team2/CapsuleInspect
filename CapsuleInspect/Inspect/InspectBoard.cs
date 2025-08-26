@@ -1,12 +1,13 @@
 ﻿using CapsuleInspect.Algorithm;
 using CapsuleInspect.Core;
 using CapsuleInspect.Teach;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using OpenCvSharp;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace CapsuleInspect.Inspect
 {
@@ -37,6 +38,13 @@ namespace CapsuleInspect.Inspect
                
                 if (!algo.DoInspect())
                     return false;
+
+                if(algo.InspectType == InspectType.InspMatch && algo.IsInspected)
+                {
+                    MatchAlgorithm matchAlgo = algo as MatchAlgorithm;
+                    Point alignOffset = matchAlgo.GetOffset();
+                    window.SetInspOffset(alignOffset);
+                }
 
                 string resultInfo = string.Join("\r\n", algo.ResultString);
 

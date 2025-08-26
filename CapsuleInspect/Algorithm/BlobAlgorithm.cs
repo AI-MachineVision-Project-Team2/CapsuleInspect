@@ -49,6 +49,18 @@ namespace CapsuleInspect.Algorithm
         public BlobFilter() { }
     }
 
+    public class FilterOptions
+    {
+        public MorphTypes MorphType { get; set; }
+        public int KernelSize { get; set; }
+        public int Min { get; set; }
+        public int Max { get; set; }
+
+        // 기본 생성자가 필요
+        public FilterOptions() { }
+    }
+
+
     public class BlobAlgorithm : InspAlgorithm
     {
         public BinaryThreshold BinThreshold { get; set; } = new BinaryThreshold();
@@ -68,9 +80,10 @@ namespace CapsuleInspect.Algorithm
 
         // Canny 옵션 필드 추가
         public FilterType Filter = FilterType.None;
-        public dynamic FilterOptions = null;
+        public FilterOptions FilterOptions = null;
 
         List<BlobFilter> _filterBlobs = new List<BlobFilter>();
+
         public List<BlobFilter> BlobFilters
         {
             get { return _filterBlobs; }
@@ -78,6 +91,7 @@ namespace CapsuleInspect.Algorithm
         }
 
         //검사로 찾은 Blob의 개수
+        [XmlIgnore]
         public int OutBlobCount { get; set; } = 0;
 
         public BlobAlgorithm()

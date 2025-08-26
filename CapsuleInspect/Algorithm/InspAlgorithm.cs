@@ -27,6 +27,7 @@ namespace CapsuleInspect.Algorithm
 
         //검사할 영역 정보를 저장하는 변수
         public Rect TeachRect { get; set; }
+        [XmlIgnore]
         public Rect InspRect { get; set; }
         public eImageChannel ImageChannel { get; set; } = eImageChannel.Gray;
 
@@ -36,9 +37,11 @@ namespace CapsuleInspect.Algorithm
         [XmlIgnore]
         public Mat ResultImage => _srcImage?.Clone();
         //검사 결과 정보
+        [XmlIgnore]
         public List<string> ResultString { get; set; } = new List<string>();
 
         //불량 여부
+        [XmlIgnore]
         public bool IsDefect { get; set; }
 
         // InspWindow 복사를 위한 InspAlgorithm 복사 함수

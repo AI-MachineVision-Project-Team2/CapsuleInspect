@@ -31,6 +31,7 @@ namespace CapsuleInspect.Teach
         public List<InspAlgorithm> AlgorithmList { get; set; } = new List<InspAlgorithm>();
 
         // 검사 결과를 저장하기 위한 리스트
+        [XmlIgnore]
         public List<InspResult> InspResultList { get; set; } = new List<InspResult>();
 
 

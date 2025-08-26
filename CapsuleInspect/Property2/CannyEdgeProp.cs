@@ -70,7 +70,7 @@ namespace CapsuleInspect.Property2
                 if (blob != null)
                 {
                     blob.Filter = FilterType.CannyEdge;
-                    blob.FilterOptions = new { Min = min, Max = max };
+                    blob.FilterOptions = new FilterOptions{ Min = min, Max = max };
                   
                 }
             }
