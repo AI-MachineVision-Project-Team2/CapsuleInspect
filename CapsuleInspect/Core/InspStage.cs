@@ -9,6 +9,7 @@ using CapsuleInspect.Util;
 using Microsoft.Win32;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
+using SaigeVision.Net.V2;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -17,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
@@ -132,6 +134,10 @@ namespace CapsuleInspect.Core
         public int LastDistinctNgCount { get; private set; }
         public event Action<int> DistinctNgCountUpdated;
 
+        public bool SaveCamImage { get; set; } = true;
+        public int SaveImageIndex { get; set; } = 0;
+
+        private string _capturePath = "";
 
         private void OnUi(Action a)
         {
@@ -264,7 +270,13 @@ namespace CapsuleInspect.Core
                 MessageBox.Show("모델 열기 실패!");
             }
 
-            _grabManager.SetExposureTime(30000);
+            
+            if (_grabManager != null)
+            {
+                _grabManager.SetExposureTime(32000);
+                Grab(0);
+            }
+           
 
             return true;
         }
@@ -899,10 +911,23 @@ namespace CapsuleInspect.Core
 
                         if (UseCamera)
                         {
+                            Thread.Sleep(500);
                             if (!Grab(0))
                             {
                                 errMsg = "이미지 촬영 실패";
                                 SLogger.Write(errMsg, SLogger.LogType.Error);
+                            }
+
+                            if(SaveCamImage && Directory.Exists(_capturePath))
+                            {
+                                Mat curImage = GetMat(0, eImageChannel.Color);
+
+                                if(curImage != null)
+                                {
+                                    string imageName = $"{++SaveImageIndex:D4}.png";
+                                    string savePath = Path.Combine(_capturePath, imageName);
+                                    curImage.SaveImage(savePath);
+                                }
                             }
                         }
                         else
@@ -972,6 +997,17 @@ namespace CapsuleInspect.Core
 
         public bool StartAutoRun()
         {
+            if(SaveCamImage && _model != null)
+            {
+                SaveImageIndex = 0;
+
+                _capturePath = Path.Combine(Path.GetDirectoryName(_model.ModelPath), "Capture");
+                if (!Directory.Exists(_capturePath))
+                {
+                    Directory.CreateDirectory(_capturePath);
+                }
+            }
+
             SLogger.Write("동작 : 자동 검사 시작");
 
             string modelPath = CurModel.ModelPath;
@@ -984,6 +1020,8 @@ namespace CapsuleInspect.Core
 
             LiveMode = false;
             UseCamera = SettingXml.Inst.CamType != CameraType.None ? true : false;
+
+            Global.Inst.InspStage.AIModule.LoadEngine(SettingXml.Inst.AIModelPath);
 
             SetWorkingState(WorkingState.INSPECT);
             // 자동검사 시작

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -58,6 +59,8 @@ namespace CapsuleInspect.Grab
                     }
                 }
             }
+
+            Thread.Sleep(500);
 
             // 영상 전송이 완료되었을 때 이벤트 발생
             OnTransferCompleted(BufferIndex);

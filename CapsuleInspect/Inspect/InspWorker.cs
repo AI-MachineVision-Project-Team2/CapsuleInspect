@@ -547,7 +547,6 @@ namespace CapsuleInspect.Inspect
                     Mat srcImage = Global.Inst.InspStage.GetMat(0,eImageChannel.Color);
                     inspAlgo.SetInspData(srcImage);
 
-                    Global.Inst.InspStage.AIModule.LoadEngine(SettingXml.Inst.AIModelPath);
                     AIAlgorithm aiAlgo = inspAlgo as AIAlgorithm;
                     aiAlgo.SetSaigeAI(Global.Inst.InspStage.AIModule);
                 }
