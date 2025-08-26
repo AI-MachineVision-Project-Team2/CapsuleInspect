@@ -120,13 +120,16 @@
       <HintPath>..\packages\Microsoft.Extensions.Primitives.8.0.0\lib\net462\Microsoft.Extensions.Primitives.dll</HintPath>
     </Reference>
     <Reference Include="MigraDoc.DocumentObjectModel, Version=6.2.1.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.6.2.1\lib\net462\MigraDoc.DocumentObjectModel.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ExternalLib\PDFReport\MigraDoc.DocumentObjectModel.dll</HintPath>
     </Reference>
     <Reference Include="MigraDoc.Rendering-gdi, Version=6.2.1.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.6.2.1\lib\net462\MigraDoc.Rendering-gdi.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ExternalLib\PDFReport\MigraDoc.Rendering-gdi.dll</HintPath>
     </Reference>
     <Reference Include="MigraDoc.RtfRendering-gdi, Version=6.2.1.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.6.2.1\lib\net462\MigraDoc.RtfRendering-gdi.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ExternalLib\PDFReport\MigraDoc.RtfRendering-gdi.dll</HintPath>
     </Reference>
     <Reference Include="MvCameraControl.Net">
       <HintPath>..\ExternalLib\HikRobot\MvCameraControl.Net.dll</HintPath>
@@ -144,31 +147,40 @@
       <HintPath>..\packages\PdfiumViewer.2.13.0.0\lib\net20\PdfiumViewer.dll</HintPath>
     </Reference>
     <Reference Include="PdfSharp-gdi, Version=6.2.1.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDFsharp-GDI.6.2.1\lib\net462\PdfSharp-gdi.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ExternalLib\PDFReport\PdfSharp-gdi.dll</HintPath>
     </Reference>
     <Reference Include="PdfSharp.BarCodes-gdi, Version=6.2.1.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDFsharp-GDI.6.2.1\lib\net462\PdfSharp.BarCodes-gdi.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ExternalLib\PDFReport\PdfSharp.BarCodes-gdi.dll</HintPath>
     </Reference>
     <Reference Include="PdfSharp.Charting-gdi, Version=6.2.1.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDFsharp-GDI.6.2.1\lib\net462\PdfSharp.Charting-gdi.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ExternalLib\PDFReport\PdfSharp.Charting-gdi.dll</HintPath>
     </Reference>
     <Reference Include="PdfSharp.Cryptography, Version=6.2.1.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDFsharp-GDI.6.2.1\lib\net462\PdfSharp.Cryptography.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ExternalLib\PDFReport\PdfSharp.Cryptography.dll</HintPath>
     </Reference>
     <Reference Include="PdfSharp.Quality-gdi, Version=6.2.1.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDFsharp-GDI.6.2.1\lib\net462\PdfSharp.Quality-gdi.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ExternalLib\PDFReport\PdfSharp.Quality-gdi.dll</HintPath>
     </Reference>
     <Reference Include="PdfSharp.Shared, Version=6.2.1.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDFsharp-GDI.6.2.1\lib\net462\PdfSharp.Shared.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ExternalLib\PDFReport\PdfSharp.Shared.dll</HintPath>
     </Reference>
     <Reference Include="PdfSharp.Snippets-gdi, Version=6.2.1.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDFsharp-GDI.6.2.1\lib\net462\PdfSharp.Snippets-gdi.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ExternalLib\PDFReport\PdfSharp.Snippets-gdi.dll</HintPath>
     </Reference>
     <Reference Include="PdfSharp.System, Version=6.2.1.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDFsharp-GDI.6.2.1\lib\net462\PdfSharp.System.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ExternalLib\PDFReport\PdfSharp.System.dll</HintPath>
     </Reference>
     <Reference Include="PdfSharp.WPFonts, Version=6.2.1.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\PDFsharp-GDI.6.2.1\lib\net462\PdfSharp.WPFonts.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ExternalLib\PDFReport\PdfSharp.WPFonts.dll</HintPath>
     </Reference>
     <Reference Include="SaigeVision.Net.Core.V2">
       <HintPath>..\ExternalLib\Saige\SaigeVision.Net.Core.V2.dll</HintPath>
