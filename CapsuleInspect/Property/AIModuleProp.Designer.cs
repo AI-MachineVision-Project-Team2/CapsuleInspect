@@ -30,6 +30,7 @@
         {
             this.lbl_SEG = new System.Windows.Forms.Label();
             this.dataGridViewFilter = new System.Windows.Forms.DataGridView();
+            this.chkUse = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewFilter)).BeginInit();
             this.SuspendLayout();
             // 
@@ -39,33 +40,47 @@
             this.lbl_SEG.BackColor = System.Drawing.Color.Transparent;
             this.lbl_SEG.Font = new System.Drawing.Font("Noto Sans KR", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.lbl_SEG.ForeColor = System.Drawing.SystemColors.MenuText;
-            this.lbl_SEG.Location = new System.Drawing.Point(4, 0);
+            this.lbl_SEG.Location = new System.Drawing.Point(3, 0);
+            this.lbl_SEG.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lbl_SEG.Name = "lbl_SEG";
-            this.lbl_SEG.Size = new System.Drawing.Size(272, 46);
+            this.lbl_SEG.Size = new System.Drawing.Size(176, 30);
             this.lbl_SEG.TabIndex = 18;
             this.lbl_SEG.Text = "SEGMENTATION";
             // 
             // dataGridViewFilter
             // 
             this.dataGridViewFilter.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewFilter.Location = new System.Drawing.Point(12, 61);
-            this.dataGridViewFilter.Margin = new System.Windows.Forms.Padding(4);
+            this.dataGridViewFilter.Location = new System.Drawing.Point(8, 63);
             this.dataGridViewFilter.Name = "dataGridViewFilter";
             this.dataGridViewFilter.RowHeadersWidth = 62;
             this.dataGridViewFilter.RowTemplate.Height = 23;
-            this.dataGridViewFilter.Size = new System.Drawing.Size(416, 177);
+            this.dataGridViewFilter.Size = new System.Drawing.Size(291, 118);
             this.dataGridViewFilter.TabIndex = 19;
+            // 
+            // chkUse
+            // 
+            this.chkUse.AutoSize = true;
+            this.chkUse.Checked = true;
+            this.chkUse.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkUse.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.chkUse.Location = new System.Drawing.Point(8, 34);
+            this.chkUse.Name = "chkUse";
+            this.chkUse.Size = new System.Drawing.Size(49, 21);
+            this.chkUse.TabIndex = 20;
+            this.chkUse.Text = "검사";
+            this.chkUse.UseVisualStyleBackColor = true;
+            this.chkUse.CheckedChanged += new System.EventHandler(this.chkUse_CheckedChanged);
             // 
             // AIModuleProp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkUse);
             this.Controls.Add(this.dataGridViewFilter);
             this.Controls.Add(this.lbl_SEG);
             this.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "AIModuleProp";
-            this.Size = new System.Drawing.Size(596, 497);
+            this.Size = new System.Drawing.Size(417, 331);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewFilter)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -75,5 +90,6 @@
         #endregion
         private System.Windows.Forms.Label lbl_SEG;
         private System.Windows.Forms.DataGridView dataGridViewFilter;
+        private System.Windows.Forms.CheckBox chkUse;
     }
 }

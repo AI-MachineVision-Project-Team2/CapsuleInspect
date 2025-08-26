@@ -35,6 +35,8 @@
             this.cbCommType = new System.Windows.Forms.ComboBox();
             this.laIpAddr = new System.Windows.Forms.Label();
             this.lbCommType = new System.Windows.Forms.Label();
+            this.txtExposure = new System.Windows.Forms.TextBox();
+            this.lblExposure = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // txtMachine
@@ -43,17 +45,17 @@
             this.txtMachine.Location = new System.Drawing.Point(117, 29);
             this.txtMachine.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.txtMachine.Name = "txtMachine";
-            this.txtMachine.Size = new System.Drawing.Size(201, 34);
+            this.txtMachine.Size = new System.Drawing.Size(201, 25);
             this.txtMachine.TabIndex = 20;
             // 
             // lbMachine
             // 
             this.lbMachine.AutoSize = true;
             this.lbMachine.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.lbMachine.Location = new System.Drawing.Point(17, 35);
+            this.lbMachine.Location = new System.Drawing.Point(17, 30);
             this.lbMachine.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lbMachine.Name = "lbMachine";
-            this.lbMachine.Size = new System.Drawing.Size(63, 26);
+            this.lbMachine.Size = new System.Drawing.Size(41, 17);
             this.lbMachine.TabIndex = 19;
             this.lbMachine.Text = "설비명";
             // 
@@ -72,10 +74,10 @@
             // txtIpAddr
             // 
             this.txtIpAddr.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.txtIpAddr.Location = new System.Drawing.Point(117, 143);
+            this.txtIpAddr.Location = new System.Drawing.Point(117, 114);
             this.txtIpAddr.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.txtIpAddr.Name = "txtIpAddr";
-            this.txtIpAddr.Size = new System.Drawing.Size(201, 34);
+            this.txtIpAddr.Size = new System.Drawing.Size(201, 25);
             this.txtIpAddr.TabIndex = 17;
             // 
             // cbCommType
@@ -83,20 +85,20 @@
             this.cbCommType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbCommType.Font = new System.Drawing.Font("Noto Sans KR", 9F);
             this.cbCommType.FormattingEnabled = true;
-            this.cbCommType.Location = new System.Drawing.Point(117, 87);
+            this.cbCommType.Location = new System.Drawing.Point(117, 68);
             this.cbCommType.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.cbCommType.Name = "cbCommType";
-            this.cbCommType.Size = new System.Drawing.Size(201, 34);
+            this.cbCommType.Size = new System.Drawing.Size(201, 25);
             this.cbCommType.TabIndex = 16;
             // 
             // laIpAddr
             // 
             this.laIpAddr.AutoSize = true;
             this.laIpAddr.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.laIpAddr.Location = new System.Drawing.Point(17, 150);
+            this.laIpAddr.Location = new System.Drawing.Point(17, 115);
             this.laIpAddr.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.laIpAddr.Name = "laIpAddr";
-            this.laIpAddr.Size = new System.Drawing.Size(66, 26);
+            this.laIpAddr.Size = new System.Drawing.Size(45, 17);
             this.laIpAddr.TabIndex = 15;
             this.laIpAddr.Text = "IP 주소";
             // 
@@ -104,17 +106,40 @@
             // 
             this.lbCommType.AutoSize = true;
             this.lbCommType.Font = new System.Drawing.Font("Noto Sans KR", 9F);
-            this.lbCommType.Location = new System.Drawing.Point(17, 92);
+            this.lbCommType.Location = new System.Drawing.Point(17, 73);
             this.lbCommType.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lbCommType.Name = "lbCommType";
-            this.lbCommType.Size = new System.Drawing.Size(80, 26);
+            this.lbCommType.Size = new System.Drawing.Size(52, 17);
             this.lbCommType.TabIndex = 14;
             this.lbCommType.Text = "통신타입";
             // 
+            // txtExposure
+            // 
+            this.txtExposure.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.txtExposure.Location = new System.Drawing.Point(117, 152);
+            this.txtExposure.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.txtExposure.Name = "txtExposure";
+            this.txtExposure.Size = new System.Drawing.Size(201, 25);
+            this.txtExposure.TabIndex = 22;
+            this.txtExposure.TextChanged += new System.EventHandler(this.txtExposure_TextChanged);
+            // 
+            // lblExposure
+            // 
+            this.lblExposure.AutoSize = true;
+            this.lblExposure.Font = new System.Drawing.Font("Noto Sans KR", 9F);
+            this.lblExposure.Location = new System.Drawing.Point(17, 157);
+            this.lblExposure.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblExposure.Name = "lblExposure";
+            this.lblExposure.Size = new System.Drawing.Size(55, 17);
+            this.lblExposure.TabIndex = 21;
+            this.lblExposure.Text = "노출 시간";
+            // 
             // CommunicatorSetting
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 26F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.txtExposure);
+            this.Controls.Add(this.lblExposure);
             this.Controls.Add(this.txtMachine);
             this.Controls.Add(this.lbMachine);
             this.Controls.Add(this.btnApply);
@@ -141,5 +166,7 @@
         private System.Windows.Forms.ComboBox cbCommType;
         private System.Windows.Forms.Label laIpAddr;
         private System.Windows.Forms.Label lbCommType;
+        private System.Windows.Forms.TextBox txtExposure;
+        private System.Windows.Forms.Label lblExposure;
     }
 }

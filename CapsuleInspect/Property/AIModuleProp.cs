@@ -185,6 +185,8 @@ namespace CapsuleInspect.Property
 
             // 그리드 <- 알고리즘
             SetProperty();
+            chkUse.Checked = _aiAlgo.IsUse;
+            ApplyUseState(_aiAlgo.IsUse);
         }
         public void SetProperty()
         {
@@ -194,14 +196,15 @@ namespace CapsuleInspect.Property
             // ★ 순서 보장 후 그리드 업데이트
             EnsureAlgorithmFilters();
             UpdateDataGridView(true);
-
+            chkUse.Checked = _aiAlgo.IsUse;
+            ApplyUseState(_aiAlgo.IsUse);
         }
         //UI컨트롤러 값을 이진화 알고리즘 클래스에 적용
         public void GetProperty()
         {
             if (_aiAlgo is null)
                 return;
-
+            _aiAlgo.IsUse = chkUse.Checked;
             //GridView 값을 _blobAlgo에 반영
             UpdateDataGridView(false);
         }
@@ -292,6 +295,19 @@ namespace CapsuleInspect.Property
                 // (선택) 레퍼런스 유지가 싫다면 아래처럼 재대입
                 // _aiAlgo.BlobFilters = blobFilters;
             }
+        }
+        private void ApplyUseState(bool enabled)
+        {
+            // 알고리즘 사용 여부 동기화
+            if (_aiAlgo != null)
+                _aiAlgo.IsUse = enabled;
+
+            // UI 비활성화(체크 해제 시 그리드 필터를 아예 못 건드리게)
+            dataGridViewFilter.Enabled = enabled;
+        }
+        private void chkUse_CheckedChanged(object sender, EventArgs e)
+        {
+            ApplyUseState(chkUse.Checked);
         }
     }
 }
