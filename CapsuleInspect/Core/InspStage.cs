@@ -214,10 +214,31 @@ namespace CapsuleInspect.Core
             {
                 _grabManager.TransferCompleted += _multiGrab_TransferCompleted;
                 InitModelGrab(MAX_GRAB_BUF);
+                ApplyExposureFromSetting();
             }
 
+           
         }
+        private void ApplyExposureFromSetting()
+        {
+            if (_grabManager == null) return;
 
+            var exp = SettingXml.Inst.ExposureUs;
+            if (exp < 10) exp = 10;
+            if (exp > 1_000_000) exp = 1_000_000;
+
+            try
+            {
+                if (_grabManager.SetExposureTime(exp))
+                    SLogger.Write($"[InspStage] 초기 노출 적용: {exp} μs");
+                else
+                    SLogger.Write("[InspStage] 초기 노출 적용 실패", SLogger.LogType.Error);
+            }
+            catch (Exception ex)
+            {
+                SLogger.Write($"[InspStage] 초기 노출 적용 예외: {ex}", SLogger.LogType.Error);
+            }
+        }
 
         public bool Initialize()
         {
@@ -259,6 +280,7 @@ namespace CapsuleInspect.Core
                 _grabManager.TransferCompleted += _multiGrab_TransferCompleted;
 
                 InitModelGrab(MAX_GRAB_BUF);
+                ApplyExposureFromSetting();
             }
             // VisionSequence 초기화
             VisionSequence.Inst.InitSequence();
@@ -619,6 +641,18 @@ namespace CapsuleInspect.Core
 
             _imageSpace.Split(bufferIndex);
 
+            if (SaveCamImage && Directory.Exists(_capturePath))
+            {
+                Mat curImage = GetMat(0, eImageChannel.Color);
+
+                if (curImage != null)
+                {
+                    string imageName = $"{++SaveImageIndex:D4}.png";
+                    string savePath = Path.Combine(_capturePath, imageName);
+                    curImage.SaveImage(savePath);
+                }
+            }
+
             DisplayGrabImage(bufferIndex);
 
 
@@ -916,19 +950,7 @@ namespace CapsuleInspect.Core
                             {
                                 errMsg = "이미지 촬영 실패";
                                 SLogger.Write(errMsg, SLogger.LogType.Error);
-                            }
-
-                            if(SaveCamImage && Directory.Exists(_capturePath))
-                            {
-                                Mat curImage = GetMat(0, eImageChannel.Color);
-
-                                if(curImage != null)
-                                {
-                                    string imageName = $"{++SaveImageIndex:D4}.png";
-                                    string savePath = Path.Combine(_capturePath, imageName);
-                                    curImage.SaveImage(savePath);
-                                }
-                            }
+                            }                          
                         }
                         else
                         {
@@ -938,7 +960,8 @@ namespace CapsuleInspect.Core
                                 SLogger.Write(errMsg, SLogger.LogType.Error);
                             }
                         }
-                        RunAISegAndShow();
+                        ResetDisplay();
+                        //RunAISegAndShow();
 
                         bool isDefect;
                         int ngCrack, ngScratch, ngSqueeze, ngPrintDefect;
@@ -997,7 +1020,9 @@ namespace CapsuleInspect.Core
 
         public bool StartAutoRun()
         {
-            if(SaveCamImage && _model != null)
+            SLogger.Write("Action : StartAutoRun");
+
+            if (SaveCamImage && _model != null)
             {
                 SaveImageIndex = 0;
 
@@ -1006,9 +1031,22 @@ namespace CapsuleInspect.Core
                 {
                     Directory.CreateDirectory(_capturePath);
                 }
+                else
+                {
+                    string[] files = Directory.GetFiles(_capturePath);
+                    foreach (string file in files)
+                    {
+                        try
+                        {
+                            File.Delete(file);
+                        }
+                        catch (Exception ex)
+                        {
+                            SLogger.Write($"Failed to delete file: {file}. Exception: {ex.Message}", SLogger.LogType.Error);
+                        }
+                    }
+                }
             }
-
-            SLogger.Write("동작 : 자동 검사 시작");
 
             string modelPath = CurModel.ModelPath;
             if (modelPath == "")
@@ -1021,10 +1059,9 @@ namespace CapsuleInspect.Core
             LiveMode = false;
             UseCamera = SettingXml.Inst.CamType != CameraType.None ? true : false;
 
-            Global.Inst.InspStage.AIModule.LoadEngine(SettingXml.Inst.AIModelPath);
-
             SetWorkingState(WorkingState.INSPECT);
-            // 자동검사 시작
+
+            //#19_VISION_SEQUENCE#5 자동검사 시작
             string modelName = Path.GetFileNameWithoutExtension(modelPath);
             VisionSequence.Inst.StartAutoRun(modelName);
             return true;

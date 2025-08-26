@@ -72,14 +72,18 @@ namespace CapsuleInspect.Setting
         {
             if (string.IsNullOrWhiteSpace(text)) return;
 
-            // 숫자만 허용(정수). 소수 지원하려면 double.TryParse 후 (long)Math.Round(...)
             if (!long.TryParse(text.Trim(), out var exposure))
                 return;
 
-            // 장비 스펙에 맞춰 클램프 (예: 10 ~ 1,000,000 us)
+            // 장비 스펙에 맞춘 범위 클램프 (예: 10 ~ 1,000,000 us)
             if (exposure < 10) exposure = 10;
             if (exposure > 1_000_000) exposure = 1_000_000;
 
+            // ① 설정에 저장
+            SettingXml.Inst.ExposureUs = exposure;
+            SettingXml.Save();
+
+            // ② 현재 활성 GrabModel 에도 즉시 적용
             var grab = GetActiveGrab();
             if (grab == null)
             {
@@ -89,15 +93,10 @@ namespace CapsuleInspect.Setting
 
             try
             {
-                // GrabModel은 HikRobotCam/WebCam 모두 동일 시그니처를 구현
                 if (grab.SetExposureTime(exposure))
-                {
-                    SLogger.Write($"노출(ExposureTime) 적용: {exposure} (μs 기준)");
-                }
+                    SLogger.Write($"노출(ExposureTime) 적용: {exposure} μs");
                 else
-                {
-                    SLogger.Write("노출 설정 실패(드라이버가 거부함).", SLogger.LogType.Error);
-                }
+                    SLogger.Write("노출 설정 실패(드라이버 거부).", SLogger.LogType.Error);
             }
             catch (Exception ex)
             {
@@ -133,6 +132,8 @@ namespace CapsuleInspect.Setting
             cbCommType.SelectedIndex = (int)SettingXml.Inst.CommType;
 
             txtIpAddr.Text = SettingXml.Inst.CommIP;
+            // 우선 설정에 저장된 값 표시
+            txtExposure.Text = SettingXml.Inst.ExposureUs.ToString();
             RefreshExposureFromCamera();
         }
 

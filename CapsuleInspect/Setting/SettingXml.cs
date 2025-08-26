@@ -16,7 +16,7 @@ namespace CapsuleInspect.Setting
         //환경설정 파일 저장 경로
         private const string SETTING_DIR = "Setup";
         private const string SETTING_FILE_NAME = @"Setup\Setting.xml";
-
+        public long ExposureUs { get; set; } = 32000;
         #region Singleton Instance
         private static SettingXml _setting;
 

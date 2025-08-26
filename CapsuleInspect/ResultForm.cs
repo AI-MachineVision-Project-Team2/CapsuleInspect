@@ -277,6 +277,7 @@ namespace CapsuleInspect
             var cameraForm = MainForm.GetDockForm<CameraForm>();
             if (cameraForm != null && result.ResultRectList != null)
             {
+                cameraForm.ResetDisplay();
                 cameraForm.AddRect(result.ResultRectList); // Defect 및 Count 필터 Defect 표시
             }
         }
