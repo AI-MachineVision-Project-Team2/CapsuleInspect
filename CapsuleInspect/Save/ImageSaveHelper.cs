@@ -25,7 +25,7 @@ namespace CapsuleInspect
             Directory.CreateDirectory(@"c:\model\ng_squeeze\Image");
         }
 
-        public static string SavePng(Bitmap img, Category category, string fileNameNoExt, bool useDateFolder = false)
+        public static string SavePng(OpenCvSharp.Mat img, Category category, string fileNameNoExt, bool useDateFolder = false)
         {
             if (img == null) throw new ArgumentNullException(nameof(img));
             EnsureDirectories();
@@ -41,7 +41,7 @@ namespace CapsuleInspect
             string pathNoExt = Path.Combine(dir, safe);
             string finalPath = GetNonConflictingPath(pathNoExt, ".png");
 
-            img.Save(finalPath, ImageFormat.Png);
+            img.SaveImage(finalPath);
             return finalPath;
         }
 

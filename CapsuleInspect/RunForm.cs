@@ -61,15 +61,18 @@ namespace CapsuleInspect
             var stage = Global.Inst.InspStage;
             if (stage == null) return;
 
-            Bitmap bmp = stage.GetBitmap(); // 최신 버퍼/채널 기준
-            if (bmp == null) return;
+            //Bitmap bmp = stage.GetBitmap(); // 최신 버퍼/채널 기준
+            //if (bmp == null) return;
+            OpenCvSharp.Mat matImage = stage.GetMat(0, eImageChannel.Color);
+            if (matImage == null)
+                return;
 
             // MainForm은 Form이므로 OpenForms로 찾는다
             var main = Application.OpenForms.OfType<MainForm>().FirstOrDefault();
             if (main != null)
             {
                 // prefix는 필요에 맞게 변경 가능("Capsule")
-                main.SaveFromInspection(bmp, defectType, "Capsule");
+                main.SaveFromInspection(matImage, defectType, "Capsule");
                 SLogger.Write("[RunForm] SaveFromInspection 호출: " + defectType);
             }
         }

@@ -32,7 +32,8 @@ namespace CapsuleInspect
                     try
                     {
                         string name = $"{job.Prefix}_{job.Timestamp:yyyyMMdd_HHmmss_fff}_{job.Id}";
-                        savedPath = ImageSaveHelper.SavePng(job.Bitmap, job.Category, name, _useDateFolder);
+
+                        savedPath = ImageSaveHelper.SavePng(job.SaveImage, job.Category, name, _useDateFolder);
                     }
                     catch
                     {
@@ -40,7 +41,7 @@ namespace CapsuleInspect
                     }
                     finally
                     {
-                        job.Bitmap.Dispose();
+                        job.SaveImage.Dispose();
                     }
 
                     // 저장 성공 알림
@@ -52,18 +53,13 @@ namespace CapsuleInspect
             }, _cts.Token);
         }
 
-        public void Enqueue(Bitmap srcBitmap, Category category, string prefix = "Capsule")
+        public void Enqueue(OpenCvSharp.Mat image, Category category, string prefix = "Capsule")
         {
-            if (srcBitmap == null) return;
-
-            // 원본과 분리된 복사본
-            Bitmap copy = new Bitmap(srcBitmap.Width, srcBitmap.Height, srcBitmap.PixelFormat);
-            using (Graphics g = Graphics.FromImage(copy))
-                g.DrawImageUnscaled(srcBitmap, 0, 0);
+            if (image == null) return;
 
             var job = new SaveJob
             {
-                Bitmap = copy,
+                SaveImage = image.Clone(),
                 Category = category,
                 Prefix = prefix,
                 Timestamp = DateTime.Now,
@@ -75,12 +71,12 @@ namespace CapsuleInspect
                 // 큐가 가득 찼으면 오래된 작업 드롭 후 추가
                 if (_queue.TryTake(out var dropped))
                 {
-                    dropped.Bitmap.Dispose();
+                    dropped.SaveImage.Dispose();
                     _queue.Add(job);
                 }
                 else
                 {
-                    job.Bitmap.Dispose();
+                    job.SaveImage.Dispose();
                 }
             }
         }
@@ -92,17 +88,18 @@ namespace CapsuleInspect
             try { _worker.Wait(2000); } catch { }
             _cts.Dispose();
             while (_queue.TryTake(out var leftover))
-                leftover.Bitmap.Dispose();
+                leftover.SaveImage.Dispose();
             _queue.Dispose();
         }
 
         private class SaveJob
         {
-            public Bitmap Bitmap;
+            public OpenCvSharp.Mat SaveImage;
             public Category Category;
             public string Prefix;
             public DateTime Timestamp;
             public string Id;
         }
     }
+
 }

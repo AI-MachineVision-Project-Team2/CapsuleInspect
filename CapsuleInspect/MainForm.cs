@@ -268,9 +268,9 @@ namespace CapsuleInspect
         }
 
         // 검사 결과가 나올 때 호출해서 저장
-        public void SaveFromInspection(Bitmap resultBitmap, string defectType, string prefix = "Capsule")
+        public void SaveFromInspection(OpenCvSharp.Mat resultMat, string defectType, string prefix = "Capsule")
         {
-            if (resultBitmap == null) return;
+            if (resultMat == null) return;
 
             Category cat;
             if (defectType == "OK") cat = Category.OK;
@@ -280,7 +280,8 @@ namespace CapsuleInspect
             else if (defectType == "Squeeze") cat = Category.NG_Squeeze;
             else cat = Category.OK;
 
-            _realtimeSaver.Enqueue(resultBitmap, cat, prefix);
+            _realtimeSaver.Enqueue(resultMat, cat, prefix);
         }
+
     }
 }
